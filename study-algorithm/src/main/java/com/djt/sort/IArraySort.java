@@ -1,4 +1,4 @@
-package sort;
+package com.djt.sort;
 
 /**
  * 数组排序

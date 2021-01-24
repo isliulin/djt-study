@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    日志级别: TRACE < DEBUG < INFO < WARN < ERROR < FATAL
+    status : 设置log4j2自身内部日志信息的输出级别
+    monitorInterval : log4j2自动检测配置文件改动，并能重新配置本身, 该参数代表每次检测的间隔秒数
+-->
+<Configuration status="WARN" monitorInterval="600">
+    <Properties>
+        <!-- 配置日志文件输出目录及文件名 -->
+        <Property name="LOG_HOME">./logs</Property>
+        <Property name="FILE_NAME">${artifactId}</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- 配置控制台日志输出 -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <!-- 只输出level及以上级别的信息(onMatch),其他的不输出(onMismatch) -->
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            <!-- 输出日志的格式 -->
+            <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}] %-5level [%class{36}] [%t] - %msg%xEx%n"/>
+        </Console>
+        <!-- 一般日志文件格式 输出INFO及以上级别的日志 -->
+        <RollingRandomAccessFile name="Info"
+                                 fileName="${LOG_HOME}/${FILE_NAME}.log"
+                                 filePattern="${LOG_HOME}/${FILE_NAME}_%d{yyyy-MM-dd}.log.gz">
+            <Filters>
+                <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}] %-5level [%class{36}] [%t] - %msg%xEx%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingRandomAccessFile>
+        <!-- 错误日志文件格式 输出WARN及以上级别的日志 -->
+        <RollingRandomAccessFile name="Error"
+                                 fileName="${LOG_HOME}/${FILE_NAME}_ERROR.log"
+                                 filePattern="${LOG_HOME}/${FILE_NAME}_ERROR_%d{yyyy-MM-dd}.log.gz">
+            <Filters>
+                <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}] %-5level [%class{36}] [%t] - %msg%xEx%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingRandomAccessFile>
+        <!-- 配置异步写日志 -->
+        <Async name="Async">
+            <AppenderRef ref="Info"/>
+        </Async>
+    </Appenders>
+
+    <!--只有定义了logger并引入的appender，appender才会生效-->
+    <Loggers>
+        <!-- 配置日志的根节点 -->
+        <root level="INFO">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="Info"/>
+            <appender-ref ref="Error"/>
+        </root>
+        <!-- 第三方日志系统 -->
+        <logger level="info" name="org.springframework.core"/>
+        <logger level="info" name="org.springframework.beans"/>
+        <logger level="info" name="org.springframework.context"/>
+    </Loggers>
+</Configuration>

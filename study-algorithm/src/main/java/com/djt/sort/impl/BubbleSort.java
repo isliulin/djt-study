@@ -1,6 +1,6 @@
-package sort.impl;
+package com.djt.sort.impl;
 
-import sort.IArraySort;
+import com.djt.sort.IArraySort;
 
 /**
  * 冒泡排序
