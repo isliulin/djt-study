@@ -3,8 +3,8 @@ package com.djt.sort;
 /**
  * 数组排序
  *
- * @author 　duanjiatao@xgd.com
- * @date 　  2021-01-22 11:13:23
+ * @author 　djt317@qq.com
+ * @date 　  2021-01-22 11:13
  */
 public interface IArraySort {
 
