@@ -15,5 +15,5 @@ public interface IArraySort {
      * @return 排序后的数组
      * @throws Exception 异常
      */
-    int[] sort(int[] sourceArray) throws Exception;
+    int[] sort(final int[] sourceArray) throws Exception;
 }

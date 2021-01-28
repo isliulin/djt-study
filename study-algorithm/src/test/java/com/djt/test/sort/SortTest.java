@@ -2,6 +2,7 @@ package com.djt.test.sort;
 
 import com.djt.sort.IArraySort;
 import com.djt.sort.impl.BubbleSort;
+import com.djt.sort.impl.SelectSort;
 import com.djt.test.utils.TestUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +29,20 @@ public class SortTest {
     @Test
     public void testBubbleSort() throws Exception {
         IArraySort arraySort = new BubbleSort();
-        System.out.println(Arrays.toString(arr));
-        System.out.println(Arrays.toString(arraySort.sort(arr)));
+        printArray("排序前", arr);
+        printArray("排序后", arraySort.sort(arr));
     }
+
+    @Test
+    public void testSelectSort() throws Exception {
+        IArraySort arraySort = new SelectSort();
+        printArray("排序前", arr);
+        printArray("排序后", arraySort.sort(arr));
+    }
+
+    public static void printArray(String msg, int[] arr) {
+        System.out.println(msg + " " + Arrays.toString(arr));
+    }
+
+
 }
