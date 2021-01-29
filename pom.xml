@@ -14,6 +14,8 @@
     <modules>
         <module>study-algorithm</module>
         <module>study-bigdata</module>
+        <module>study-other</module>
+        <module>study-utils</module>
     </modules>
 
     <properties>

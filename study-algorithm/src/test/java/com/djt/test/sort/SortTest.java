@@ -3,7 +3,7 @@ package com.djt.test.sort;
 import com.djt.sort.IArraySort;
 import com.djt.sort.impl.BubbleSort;
 import com.djt.sort.impl.SelectSort;
-import com.djt.test.utils.TestUtils;
+import com.djt.test.utils.RandomUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,7 +22,7 @@ public class SortTest {
     @Before
     public void before() {
         for (int i = 0; i < 10; i++) {
-            arr[i] = TestUtils.getRandomNumber(0, 10);
+            arr[i] = RandomUtils.getRandomNumber(0, 10);
         }
     }
 
