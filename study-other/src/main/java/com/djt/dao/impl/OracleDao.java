@@ -1,7 +1,7 @@
 package com.djt.dao.impl;
 
 import com.djt.dao.AbstractDao;
-import com.djt.utils.PasswordUtils;
+import com.djt.test.utils.PasswordUtils;
 
 import java.sql.SQLException;
 import java.util.Properties;
@@ -39,8 +39,7 @@ public class OracleDao extends AbstractDao {
         try {
             dataSource.setUrl(config.getProperty("oracle.druid.Url"));
             dataSource.setUsername(config.getProperty("oracle.druid.Username"));
-            dataSource.setPassword(PasswordUtils.decrypt(config.getProperty("password.public.key"),
-                    config.getProperty("oracle.druid.Password")));
+            dataSource.setPassword(PasswordUtils.decrypt(config.getProperty("oracle.druid.Password")));
             dataSource.setInitialSize(Integer.parseInt(config.getProperty("oracle.druid.InitialSize", "3")));
             dataSource.setMaxActive(Integer.parseInt(config.getProperty("oracle.druid.MaxActive", "3")));
             dataSource.setMinIdle(Integer.parseInt(config.getProperty("oracle.druid.MinIdle", "1")));

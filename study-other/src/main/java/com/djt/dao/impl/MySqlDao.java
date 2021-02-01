@@ -1,7 +1,7 @@
 package com.djt.dao.impl;
 
 import com.djt.dao.AbstractDao;
-import com.djt.utils.PasswordUtils;
+import com.djt.test.utils.PasswordUtils;
 
 import java.sql.SQLException;
 import java.util.Properties;
@@ -39,8 +39,7 @@ public class MySqlDao extends AbstractDao {
         try {
             dataSource.setUrl(config.getProperty("mysql.druid.Url"));
             dataSource.setUsername(config.getProperty("mysql.druid.Username"));
-            dataSource.setPassword(PasswordUtils.decrypt(config.getProperty("password.public.key"),
-                    config.getProperty("mysql.druid.Password")));
+            dataSource.setPassword(PasswordUtils.decrypt(config.getProperty("mysql.druid.Password")));
             dataSource.setInitialSize(Integer.parseInt(config.getProperty("mysql.druid.InitialSize", "3")));
             dataSource.setMaxActive(Integer.parseInt(config.getProperty("mysql.druid.MaxActive", "3")));
             dataSource.setMinIdle(Integer.parseInt(config.getProperty("mysql.druid.MinIdle", "1")));

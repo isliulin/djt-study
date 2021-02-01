@@ -15,10 +15,17 @@ import javax.crypto.SecretKey;
  */
 public class SecureUtilTest {
 
+    /**
+     * 较为流行
+     * 用于替代DES
+     */
     @Test
     public void testAES() {
         String pwd = "123456";
-        SecretKey key = SecureUtil.generateKey(SymmetricAlgorithm.AES.getValue());
+        String keyStr = "c7f5285a8c88ab48b17b98ef01389f29";
+        SecretKey key = SecureUtil.generateKey(SymmetricAlgorithm.AES.getValue(), HexUtil.decodeHex(keyStr));
+        keyStr = HexUtil.encodeHexStr(key.getEncoded());
+        System.out.println("秘钥:" + keyStr);
         AES aes = SecureUtil.aes(key.getEncoded());
         String en = aes.encryptHex(pwd);
         System.out.println("加密后:" + en);
@@ -41,6 +48,10 @@ public class SecureUtilTest {
     }
 
     @Test
-    public void testKey() {
+    public void testPasswordUtils() {
+        String en = PasswordUtils.encrypt("123456");
+        System.out.println("加密后:" + en);
+        String de = PasswordUtils.decrypt(en);
+        System.out.println("解密后:" + de);
     }
 }
