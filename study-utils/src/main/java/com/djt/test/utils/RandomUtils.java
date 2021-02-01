@@ -1,5 +1,7 @@
 package com.djt.test.utils;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 
@@ -17,6 +19,19 @@ public class RandomUtils {
     private final static ZoneId ZONE_ID = ZoneId.systemDefault();
     private final static ZoneOffset ZONE_OFFSET = OffsetDateTime.now().getOffset();
 
+
+    /**
+     * 生成指定长度的数字字符串 末尾补0
+     *
+     * @param start  起始值
+     * @param end    截止值
+     * @param length 长度
+     * @return xxx
+     */
+    public static String getString(long start, long end, int length) {
+        String baseNum = String.valueOf(getRandomNumber(start, end));
+        return StringUtils.rightPad(baseNum, length, "0");
+    }
 
     /**
      * 生成随机数
