@@ -2,6 +2,7 @@ package com.djt.dao.impl;
 
 import com.djt.dao.AbstractDao;
 import com.djt.test.utils.PasswordUtils;
+import lombok.extern.slf4j.Slf4j;
 
 import java.sql.SQLException;
 import java.util.Properties;
@@ -12,6 +13,7 @@ import java.util.Properties;
  * @author 　djt317@qq.com
  * @date 　  2021-01-29 17:27
  */
+@Slf4j
 public class MySqlDao extends AbstractDao {
 
     /**
@@ -20,7 +22,7 @@ public class MySqlDao extends AbstractDao {
     private volatile static MySqlDao dao;
 
     private MySqlDao(Properties config) {
-        super.config = config;
+        super(config);
     }
 
     public static MySqlDao getInstance(Properties config) {

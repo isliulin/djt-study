@@ -1,5 +1,6 @@
 package com.djt.test.dao;
 
+import cn.hutool.db.sql.SqlExecutor;
 import com.alibaba.fastjson.JSONObject;
 import com.djt.dao.impl.OracleDao;
 import com.djt.test.utils.RandomUtils;
@@ -10,6 +11,7 @@ import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,9 +38,10 @@ public class OracleDaoTest extends DaoTest {
 
     @Test
     public void testInsertBatchRandom() {
-        String startDt = "2020-01-01";
-        String endDt = "2020-01-31";
-        insertBatchRandom(startDt, endDt, 10);
+        String startDt = "20201201";
+        String endDt = "20201231";
+        ((OracleDao) dao).createPartition("xdata_edw.bz_mer_check_term_trade_1d", startDt, endDt);
+        insertBatchRandom(startDt, endDt, 100, 10);
     }
 
     /**
@@ -113,18 +116,17 @@ public class OracleDaoTest extends DaoTest {
      * 批量插入数据
      * 随机制造数据
      *
-     * @param startDT 起始分区(yyyyMMdd)
-     * @param endDT   截止分区(yyyyMMdd)
-     * @param size    插入条数
+     * @param startDT   起始分区(yyyyMMdd)
+     * @param endDT     截止分区(yyyyMMdd)
+     * @param size      插入条数
+     * @param batchSize 分批大小
      */
-    public void insertBatchRandom(String startDT, String endDT, int size) {
-        int batchSize = 100000;
+    public void insertBatchRandom(String startDT, String endDT, int size, int batchSize) {
         String sql = "insert into xdata_edw.BZ_MER_CHECK_TERM_TRADE_1D (TRANS_DATE,LMERCH_NO,LMERCH_NAME,LTERM_NO,PMERCH_NAME,TERM_SN,FEE_CALC_TYPE,STROKE_COUNT,AMOUNT_SUM,FEE_AMOUNT_SUM,PAYABLE_AMOUNT)\n" +
                 "values(?,?,?,?,?,?,?,?,?,?,?)";
-        PreparedStatement pstm = null;
         try {
-            pstm = conn.prepareStatement(sql);
             int batchCount = 0;
+            List<Object[]> paramsList = new ArrayList<>();
             for (int i = 0; i < size; i++) {
 
                 /*
@@ -150,30 +152,29 @@ public class OracleDaoTest extends DaoTest {
                 long AMOUNT_SUM = RandomUtils.getRandomNumber(0, 10000);
                 long FEE_AMOUNT_SUM = RandomUtils.getRandomNumber(0, 1000);
                 long PAYABLE_AMOUNT = RandomUtils.getRandomNumber(0, 1000);
-                pstm.setLong(1, Long.parseLong(TRANS_DATE));
-                pstm.setString(2, LMERCH_NO);
-                pstm.setString(3, LMERCH_NAME);
-                pstm.setString(4, LTERM_NO);
-                pstm.setString(5, LMERCH_NAME);
-                pstm.setString(6, LTERM_NO);
-                pstm.setString(7, FEE_CALC_TYPE);
-                pstm.setLong(8, STROKE_COUNT);
-                pstm.setLong(9, AMOUNT_SUM);
-                pstm.setLong(10, FEE_AMOUNT_SUM);
-                pstm.setLong(11, PAYABLE_AMOUNT);
-                pstm.addBatch();
+                Object[] params = new Object[11];
+
+                params[0] = Long.parseLong(TRANS_DATE);
+                params[1] = LMERCH_NO;
+                params[2] = LMERCH_NAME;
+                params[3] = LTERM_NO;
+                params[4] = LMERCH_NAME;
+                params[5] = LTERM_NO;
+                params[6] = FEE_CALC_TYPE;
+                params[7] = STROKE_COUNT;
+                params[8] = AMOUNT_SUM;
+                params[9] = FEE_AMOUNT_SUM;
+                params[10] = PAYABLE_AMOUNT;
+                paramsList.add(params);
 
                 if ((i > 0 && i % batchSize == 0) || i == size - 1) {
-                    pstm.executeBatch();
-                    pstm.clearBatch();
+                    SqlExecutor.executeBatch(conn, sql, paramsList);
                     System.out.println("第 " + (++batchCount) + " 批插入成功.");
                 }
             }
             System.out.println("写入总条数：" + size);
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        } finally {
-            dao.close(pstm);
         }
     }
 }

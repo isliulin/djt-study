@@ -1,13 +1,18 @@
 package com.djt.test.utils;
 
+import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.HexUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
+import cn.hutool.crypto.asymmetric.KeyType;
+import cn.hutool.crypto.asymmetric.RSA;
 import cn.hutool.crypto.symmetric.AES;
 import cn.hutool.crypto.symmetric.DES;
 import cn.hutool.crypto.symmetric.SymmetricAlgorithm;
 import org.junit.Test;
 
 import javax.crypto.SecretKey;
+import java.security.KeyPair;
 
 /**
  * @author 　djt317@qq.com
@@ -44,6 +49,22 @@ public class SecureUtilTest {
         String en = des.encryptHex(pwd);
         System.out.println("加密后:" + en);
         String de = des.decryptStr(en);
+        System.out.println("解密后:" + de);
+    }
+
+    @Test
+    public void testRSA() {
+        String pwd = "123456";
+        KeyPair pair = SecureUtil.generateKeyPair("RSA");
+        String pviKey = Base64.encode(pair.getPrivate().getEncoded());
+        String pubKey = Base64.encode(pair.getPublic().getEncoded());
+        System.out.println("私钥：" + pviKey);
+        System.out.println("公钥：" + pubKey);
+
+        RSA rsa = SecureUtil.rsa(pviKey, pubKey);
+        String en = rsa.encryptBase64(StrUtil.utf8Bytes(pwd), KeyType.PrivateKey);
+        System.out.println("加密后:" + en);
+        String de = rsa.decryptStr(en, KeyType.PublicKey);
         System.out.println("解密后:" + de);
     }
 

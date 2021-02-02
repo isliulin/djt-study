@@ -13,12 +13,12 @@ import java.util.Date;
 @Getter
 @Setter
 @ToString
-public class TestBean {
+public class TestHuToolBean {
 
     private Integer id;
 
-    //注意：字段名要与表字段名保持一致，大小写无所谓，否则映射不到
-    private Date create_time;
+    //Hutool中可以下划线，也可以驼峰，自动识别
+    private Date createTime;
 
     private Date modify_time;
 

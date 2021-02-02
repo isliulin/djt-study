@@ -1,5 +1,7 @@
 package com.djt.dao;
 
+import cn.hutool.db.Db;
+import cn.hutool.db.DbUtil;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.util.JdbcUtils;
 import org.apache.commons.dbutils.QueryRunner;
@@ -24,7 +26,7 @@ public abstract class AbstractDao {
     /**
      * 配置
      */
-    protected Properties config = null;
+    protected Properties config;
 
     /**
      * 数据源
@@ -32,16 +34,26 @@ public abstract class AbstractDao {
     protected final DruidDataSource dataSource = new DruidDataSource();
 
     /**
-     * 操作工具
+     * 数据库操作工具
      */
-    protected QueryRunner queryRunner = new QueryRunner(dataSource);
+    protected QueryRunner queryRunner;
+
+    /**
+     * 数据库操作工具2
+     */
+    protected Db db;
+
+    protected AbstractDao(Properties config) {
+        this.config = config;
+        initDataSource();
+        queryRunner = new QueryRunner(dataSource);
+        db = DbUtil.use(dataSource);
+    }
 
     /**
      * 初始化数据源
-     *
-     * @throws Exception e
      */
-    protected abstract void initDataSource() throws Exception;
+    protected abstract void initDataSource();
 
     /**
      * 获取数据库连接
@@ -50,10 +62,6 @@ public abstract class AbstractDao {
      * @throws Exception e
      */
     public Connection getConnection() throws Exception {
-        if (!dataSource.isInited()) {
-            initDataSource();
-            dataSource.init();
-        }
         return dataSource.getConnection();
     }
 
@@ -78,6 +86,18 @@ public abstract class AbstractDao {
      */
     public <T> List<T> query(String sql, Class<T> tClass, Object... params) throws Exception {
         return queryRunner.query(sql, new BeanListHandler<>(tClass), params);
+    }
+
+    /**
+     * 查询
+     *
+     * @param sql    查询sql
+     * @param params 参数列表
+     * @param tClass Bean class
+     * @return 结果列表
+     */
+    public <T> List<T> query2(String sql, Class<T> tClass, Object... params) throws Exception {
+        return db.query(sql, tClass, params);
     }
 
     /**
@@ -107,11 +127,9 @@ public abstract class AbstractDao {
         JdbcUtils.close(resultSet);
     }
 
-    public Properties getConfig() {
-        return config;
+    public DruidDataSource getDataSource() {
+        return dataSource;
     }
 
-    protected void setConfig(Properties config) {
-        this.config = config;
-    }
+
 }

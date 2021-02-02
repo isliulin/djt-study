@@ -1,7 +1,8 @@
 package com.djt.test.dao;
 
 import com.djt.dao.impl.MySqlDao;
-import com.djt.test.bean.TestBean;
+import com.djt.test.bean.TestDbUtilsBean;
+import com.djt.test.bean.TestHuToolBean;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
 import org.junit.Test;
@@ -23,8 +24,12 @@ public class MySqlDaoTest extends DaoTest {
     @Test
     public void testQuery() throws Exception {
         String sql = "select * from xdata.t_test";
-        List<TestBean> beanList = dao.query(sql, TestBean.class);
-        for (TestBean bean : beanList) {
+        List<TestDbUtilsBean> beanList = dao.query(sql, TestDbUtilsBean.class);
+        for (TestDbUtilsBean bean : beanList) {
+            System.out.println(bean);
+        }
+        List<TestHuToolBean> beanList2 = dao.query2(sql, TestHuToolBean.class);
+        for (TestHuToolBean bean : beanList2) {
             System.out.println(bean);
         }
     }
@@ -33,8 +38,8 @@ public class MySqlDaoTest extends DaoTest {
     public void testQueryRunner() throws Exception {
         QueryRunner queryRunner = new QueryRunner();
         String sql = "select * from xdata.t_test";
-        List<TestBean> beanList = queryRunner.query(dao.getConnection(), sql, new BeanListHandler<>(TestBean.class));
-        for (TestBean bean : beanList) {
+        List<TestDbUtilsBean> beanList = queryRunner.query(dao.getConnection(), sql, new BeanListHandler<>(TestDbUtilsBean.class));
+        for (TestDbUtilsBean bean : beanList) {
             System.out.println(bean);
         }
     }

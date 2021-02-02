@@ -1,9 +1,13 @@
 package com.djt.dao.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.djt.dao.AbstractDao;
 import com.djt.test.utils.PasswordUtils;
+import com.djt.test.utils.RandomUtils;
+import lombok.extern.slf4j.Slf4j;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Properties;
 
 /**
@@ -12,6 +16,7 @@ import java.util.Properties;
  * @author 　djt317@qq.com
  * @date 　  2021-02-01 10:25
  */
+@Slf4j
 public class OracleDao extends AbstractDao {
 
     /**
@@ -20,7 +25,7 @@ public class OracleDao extends AbstractDao {
     private volatile static OracleDao dao;
 
     private OracleDao(Properties config) {
-        super.config = config;
+        super(config);
     }
 
     public static OracleDao getInstance(Properties config) {
@@ -58,6 +63,27 @@ public class OracleDao extends AbstractDao {
             dataSource.setConnectionProperties(config.getProperty("oracle.druid.ConnectionProperties"));
         } catch (SQLException e) {
             throw new RuntimeException("数据源初始化失败！", e);
+        }
+    }
+
+    /**
+     * 创建分区
+     *
+     * @param startDtStr 起始分区(yyyyMMdd)
+     * @param endDtStr   截止分区(yyyyMMdd)
+     */
+    public void createPartition(String tableName, String startDtStr, String endDtStr) {
+        LocalDate startDt = LocalDate.parse(startDtStr, RandomUtils.YMD);
+        LocalDate endDt = LocalDate.parse(endDtStr, RandomUtils.YMD);
+        while (!startDt.isAfter(endDt)) {
+            String thisDate = startDt.format(RandomUtils.YMD);
+            String sql = StrUtil.format("ALTER TABLE {} ADD PARTITION P{} VALUES ({})", tableName, thisDate, thisDate);
+            try {
+                db.execute(sql);
+            } catch (SQLException e) {
+                log.error("分区 " + thisDate + " 创建失败：" + e.getMessage());
+            }
+            startDt = startDt.plusDays(1);
         }
     }
 
