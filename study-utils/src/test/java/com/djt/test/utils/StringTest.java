@@ -1,0 +1,43 @@
+package com.djt.test.utils;
+
+import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONValidator;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
+
+import java.nio.charset.StandardCharsets;
+
+/**
+ * @author 　djt317@qq.com
+ * @date 　  2021-02-02 19:24
+ */
+public class StringTest {
+
+    @Test
+    public void testStringUtils() {
+        String sql = StrUtil.format("ALTER TABLE {} ADD PARTITION P{} VALUES ({})", "xdata.t_test", "20210101", "20210101");
+        System.out.println(sql);
+        System.out.println(StringUtils.isNumeric("0123"));
+        System.out.println(StringUtils.isNumeric("123x"));
+        System.out.println(StringUtils.isNumeric("123 456"));
+        System.out.println(StringUtils.isNumericSpace("123 456 "));
+        System.out.println(StringUtils.isNumericSpace("123 456 x"));
+    }
+
+    @Test
+    public void testJson() {
+        //判断json是否合法
+        String str = "{\"a\":\"1\"}";
+        System.out.println(JSONValidator.fromUtf8(str.getBytes(StandardCharsets.UTF_8)).validate());
+        System.out.println(JSONObject.isValid("666"));
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("A", "123");
+        System.out.println("A:" + jsonObject.getLongValue("A"));
+        jsonObject.put("B", "12 3");
+        System.out.println("B:" + jsonObject.getLongValue("B"));
+        jsonObject.put("C", "12 x");
+        System.out.println("C:" + jsonObject.getLongValue("C"));
+
+    }
+}

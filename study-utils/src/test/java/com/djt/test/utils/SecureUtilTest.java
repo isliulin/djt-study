@@ -9,6 +9,7 @@ import cn.hutool.crypto.asymmetric.RSA;
 import cn.hutool.crypto.symmetric.AES;
 import cn.hutool.crypto.symmetric.DES;
 import cn.hutool.crypto.symmetric.SymmetricAlgorithm;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 import javax.crypto.SecretKey;
@@ -18,6 +19,7 @@ import java.security.KeyPair;
  * @author 　djt317@qq.com
  * @date 　  2021-02-01 19:27
  */
+@Slf4j
 public class SecureUtilTest {
 
     /**

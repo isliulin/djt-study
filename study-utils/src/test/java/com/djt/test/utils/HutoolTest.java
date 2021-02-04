@@ -14,4 +14,6 @@ public class HutoolTest {
         String sql = StrUtil.format("ALTER TABLE {} ADD PARTITION P{} VALUES ({})", "xdata.t_test", "20210101", "20210101");
         System.out.println(sql);
     }
+
+
 }
