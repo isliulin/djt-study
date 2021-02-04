@@ -12,11 +12,16 @@
 
     <properties>
         <scala.version>2.11.8</scala.version>
-        <hadoop.version>3.0.0-cdh6.3.2</hadoop.version>
-        <spark.version>2.4.0-cdh6.3.2</spark.version>
-        <hbase.version>2.1.0-cdh6.3.2</hbase.version>
-        <hive.version>2.1.1-cdh6.3.2</hive.version>
+        <!--<hadoop.version>3.0.0-cdh6.3.2</hadoop.version>-->
+        <!--<spark.version>2.4.0-cdh6.3.2</spark.version>-->
+        <!--<hbase.version>2.1.0-cdh6.3.2</hbase.version>-->
+        <!--<hive.version>2.1.1-cdh6.3.2</hive.version>-->
         <elasticsearch.version>6.7.2</elasticsearch.version>
+
+        <hadoop.version>2.6.0-cdh5.11.0</hadoop.version>
+        <spark.version>2.1.0.cloudera2</spark.version>
+        <hbase.version>1.2.0-cdh5.11.0</hbase.version>
+        <hive.version>1.1.0-cdh5.11.0</hive.version>
     </properties>
 
     <dependencies>
@@ -70,6 +75,13 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming_2.11</artifactId>
+            <version>${spark.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-server</artifactId>
             <version>${hbase.version}</version>
@@ -102,6 +114,27 @@
                 </includes>
             </resource>
         </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <version>4.3.0</version>
+                <configuration>
+                    <sourceDir>src/main/scala</sourceDir>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>scala-compile-first</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
 
     </build>
 
