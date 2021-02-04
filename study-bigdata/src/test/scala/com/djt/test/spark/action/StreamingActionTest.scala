@@ -1,6 +1,6 @@
 package com.djt.test.spark.action
 
-import com.djt.spark.action.impl.TradeStatStreamingAction
+import com.djt.spark.action.impl.{TradeStatStreamingAction, WordCountStreamingAction}
 import com.djt.utils.ParamConstant
 import org.junit.Test
 
@@ -20,8 +20,17 @@ class StreamingActionTest extends AbsActionTest {
     }
 
     @Test
-    def testStreamingAction(): Unit = {
+    def testTradeStatStreamingAction(): Unit = {
+        config.setProperty(ParamConstant.SPARK_SOCKET_STREAM_HOST, "172.20.20.183")
+        config.setProperty(ParamConstant.SPARK_SOCKET_STREAM_PORT, "6666")
         new TradeStatStreamingAction(config).action()
+    }
+
+    @Test
+    def testWordCountStreamingAction(): Unit = {
+        config.setProperty(ParamConstant.SPARK_SOCKET_STREAM_HOST, "172.20.20.183")
+        config.setProperty(ParamConstant.SPARK_SOCKET_STREAM_PORT, "7777")
+        new WordCountStreamingAction(config).action()
     }
 
 }

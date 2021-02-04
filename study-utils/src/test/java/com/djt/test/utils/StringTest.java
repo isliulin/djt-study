@@ -1,6 +1,7 @@
 package com.djt.test.utils;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONValidator;
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +39,15 @@ public class StringTest {
         System.out.println("B:" + jsonObject.getLongValue("B"));
         jsonObject.put("C", "12 x");
         System.out.println("C:" + jsonObject.getLongValue("C"));
-
     }
+
+    @Test
+    public void testJson2() {
+        System.out.println(JSONUtil.isJson("666"));
+        System.out.println(JSONUtil.isJson("{}"));
+        System.out.println(JSONUtil.isJson("{\"A\"}"));
+        System.out.println(JSONUtil.isJsonObj("{}"));
+        System.out.println(JSONUtil.isJsonObj("{\"A\"}"));
+    }
+
 }

@@ -29,6 +29,16 @@ object ParamConstant {
     val SPARK_STREAMING_DURATION_SECONDS = "spark.streaming.duration.seconds"
 
     /**
+     * spark socketTextStream host
+     */
+    val SPARK_SOCKET_STREAM_HOST = "spark.socket.stream.host"
+
+    /**
+     * spark socketTextStream port
+     */
+    val SPARK_SOCKET_STREAM_PORT = "spark.socket.stream.port"
+
+    /**
      * spark
      */
     val MAX_TOSTRING_FIELDS = "spark.debug.maxToStringFields"

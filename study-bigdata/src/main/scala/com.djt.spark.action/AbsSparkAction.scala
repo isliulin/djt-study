@@ -18,6 +18,7 @@ abstract class AbsSparkAction(config: Properties) extends Serializable {
 
     protected val LOG: Logger = LoggerFactory.getLogger(this.getClass)
 
+    @transient
     private var sparkSession: SparkSession = _
 
     /**
@@ -26,11 +27,17 @@ abstract class AbsSparkAction(config: Properties) extends Serializable {
     def action(): Unit = {
         LOG.info("任务开始...")
         val start = System.currentTimeMillis()
-        val ss = getSparkSession
-        beforeAction(ss)
-        executeAction(ss)
-        ss.close()
-        LOG.info("任务结束...共耗时：{} 秒", (System.currentTimeMillis() - start) / 1000)
+        try {
+            getSparkSession
+            beforeAction(sparkSession)
+            executeAction(sparkSession)
+        } catch {
+            case e: Exception =>
+                LOG.error("系统异常！", e)
+        } finally {
+            sparkSession.close()
+            LOG.info("任务结束...共耗时：{} 秒", (System.currentTimeMillis() - start) / 1000)
+        }
     }
 
     /**
