@@ -13,5 +13,6 @@ public class HttpTest {
     public void testHttpUtil() {
         String content = HttpUtil.get("https://www.baidu.com");
         System.out.println(content);
+
     }
 }

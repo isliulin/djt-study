@@ -8,6 +8,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author 　djt317@qq.com
@@ -48,6 +51,24 @@ public class StringTest {
         System.out.println(JSONUtil.isJson("{\"A\"}"));
         System.out.println(JSONUtil.isJsonObj("{}"));
         System.out.println(JSONUtil.isJsonObj("{\"A\"}"));
+    }
+
+    @Test
+    public void testMap() {
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("A", null);
+        System.out.println(dataMap.get("A"));
+        System.out.println(dataMap.getOrDefault("A", "").toString());
+    }
+
+    @Test
+    public void testMOptional() {
+        String str = null;
+        Optional<String> optional = Optional.ofNullable(str);
+        System.out.println(optional.orElse("666"));
+        str = "xxx";
+        optional = Optional.ofNullable(str);
+        System.out.println(optional.orElse("777"));
     }
 
 }

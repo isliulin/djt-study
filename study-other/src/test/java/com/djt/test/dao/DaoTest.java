@@ -29,7 +29,7 @@ public abstract class DaoTest {
     @Before
     public void before() {
         config = PropertiesUtils.loadProperties("/config.properties");
-        System.out.println("=======初始化开始...=======");
+        System.out.println("=======初始化开始=======");
         System.out.println(config.toString());
         initDao();
         if (dao == null) {
@@ -42,7 +42,7 @@ public abstract class DaoTest {
                 throw new RuntimeException("获取数据库连接失败！", e);
             }
         }
-        System.out.println("=======初始化完成...=======");
+        System.out.println("=======初始化完成=======");
     }
 
     @After
@@ -71,7 +71,7 @@ public abstract class DaoTest {
     }
 
     @Test
-    public void testOther(){
+    public void testOther() {
 
     }
 

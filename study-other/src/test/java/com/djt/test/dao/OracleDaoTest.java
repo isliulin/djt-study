@@ -1,24 +1,30 @@
 package com.djt.test.dao;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.sql.SqlExecutor;
+import cn.hutool.http.HttpUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.djt.dao.impl.OracleDao;
 import com.djt.test.utils.RandomUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
 import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author 　djt317@qq.com
  * @date 　  2021-02-01 10:34
  */
+@Slf4j
 public class OracleDaoTest extends DaoTest {
 
     @Override
@@ -32,7 +38,7 @@ public class OracleDaoTest extends DaoTest {
         String sql = "select * from xdata_edw.t_region_map";
         List<Map<String, Object>> beanList = dao.query(sql);
         for (Map<String, Object> data : beanList) {
-            System.out.println(data);
+            log.info(data.toString());
         }
     }
 
@@ -44,38 +50,52 @@ public class OracleDaoTest extends DaoTest {
         insertBatchRandom(startDt, endDt, 100, 10);
     }
 
+    @Test
+    public void testInsertFromFile() {
+        String filePath = "C:\\Users\\duanjiatao\\Desktop\\ETL_region\\t_region_map数据.sql";
+        insertFromFile(filePath);
+    }
+
+    @Test
+    public void testGenRegionInfo() {
+        genRegionInfoByAddress();
+    }
+
     /**
      * 批量插入数据
+     * 原生写法
      *
-     * @param jsonObjectList 数据列表 一个json为一条数据
+     * @param dataList 数据列表
      */
-    public void insert(List<JSONObject> jsonObjectList) {
+    public void insertRegionInfo(List<? extends Map<String, Object>> dataList) {
         int batchSize = 1000;
-        String sql = "insert into xdata_edw.t_region_map2 (CODE, NAME, CUP_CODE, PBOC_CODE, REGIONGRADE, PARENTREGION, LNG, LAT)\n" +
-                "values (?,?,?,?,?,?,?,?)";
+        String sql = "insert into xdata_edw.t_region_map2 (CODE, NAME, CUP_CODE, PBOC_CODE, REGIONGRADE, PARENTREGION, LOG, LAT, ALL_NAME_LEFT, ALL_NAME_RIGHT)\n" +
+                "values (?,?,?,?,?,?,?,?,?,?)";
         PreparedStatement pstm = null;
         try {
             conn = dao.getConnection();
             pstm = conn.prepareStatement(sql);
             int batchCount = 0;
-            for (int i = 0; i < jsonObjectList.size(); i++) {
-                JSONObject jsonObject = jsonObjectList.get(i);
+            for (int i = 0; i < dataList.size(); i++) {
+                JSONObject jsonObject = new JSONObject(dataList.get(i));
                 pstm.setString(1, jsonObject.getString("CODE"));
                 pstm.setString(2, jsonObject.getString("NAME"));
                 pstm.setString(3, jsonObject.getString("CUP_CODE"));
                 pstm.setString(4, jsonObject.getString("PBOC_CODE"));
                 pstm.setString(5, jsonObject.getString("REGIONGRADE"));
                 pstm.setString(6, jsonObject.getString("PARENTREGION"));
-                pstm.setString(7, jsonObject.getString("LNG"));
+                pstm.setString(7, jsonObject.getString("LOG"));
                 pstm.setString(8, jsonObject.getString("LAT"));
+                pstm.setString(9, jsonObject.getString("ALL_NAME_LEFT"));
+                pstm.setString(10, jsonObject.getString("ALL_NAME_RIGHT"));
                 pstm.addBatch();
-                if ((i > 0 && i % batchSize == 0) || i == jsonObjectList.size() - 1) {
+                if ((i > 0 && i % batchSize == 0) || i == dataList.size() - 1) {
                     pstm.executeBatch();
                     pstm.clearBatch();
-                    System.out.println("第 " + (++batchCount) + " 批插入成功.");
+                    log.info("第 {} 批插入成功.", (++batchCount));
                 }
             }
-            System.out.println("写入总条数：" + jsonObjectList.size());
+            log.info("写入总条数：{}", dataList.size());
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
@@ -86,29 +106,27 @@ public class OracleDaoTest extends DaoTest {
     /**
      * 从文件批量插入数据
      * 文件中每行是一个insert语句
+     *
+     * @param filePath 文件路径
      */
-    public void insertFromFile() {
+    public void insertFromFile(String filePath) {
         int batchSize = 1000;
-        File file = new File("C:\\Users\\duanjiatao\\Desktop\\region_map.sql");
-        Statement pstm = null;
+        File file = new File(filePath);
         try {
-            conn = dao.getConnection();
-            pstm = conn.createStatement();
             List<String> lines = FileUtils.readLines(file, "UTF-8");
             int batchCount = 0;
+            List<String> sqlList = new ArrayList<>();
             for (int i = 0; i < lines.size(); i++) {
-                pstm.addBatch(lines.get(i));
+                sqlList.add(lines.get(i));
                 if ((i > 0 && i % batchSize == 0) || i == lines.size() - 1) {
-                    pstm.executeBatch();
-                    pstm.clearBatch();
-                    System.out.println("第 " + (++batchCount) + " 批插入成功.");
+                    SqlExecutor.executeBatch(conn, sqlList);
+                    sqlList.clear();
+                    log.info("第 {} 批插入成功.", (++batchCount));
                 }
             }
-            System.out.println("写入总条数：" + lines.size());
+            log.info("写入总条数：{}", lines.size());
         } catch (Exception e) {
             throw new RuntimeException(e);
-        } finally {
-            dao.close(pstm);
         }
     }
 
@@ -169,12 +187,64 @@ public class OracleDaoTest extends DaoTest {
 
                 if ((i > 0 && i % batchSize == 0) || i == size - 1) {
                     SqlExecutor.executeBatch(conn, sql, paramsList);
-                    System.out.println("第 " + (++batchCount) + " 批插入成功.");
+                    log.info("第 {} 批插入成功.", (++batchCount));
                 }
             }
-            System.out.println("写入总条数：" + size);
+            log.info("写入总条数：{}", size);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
+
+    public void genRegionInfoByAddress() {
+        //正向解析可用
+        String ak = "edGc5mIugVxx7lwUx9YpraKeWmExG64o";  //xxx
+        //地址->经纬度
+        String url = "http://api.map.baidu.com/geocoding/v3/?ak={}&address={}&output=json";
+        //经纬度->地址
+        String url2 = "http://api.map.baidu.com/reverse_geocoding/v3/?ak={}&output=json&coordtype=wgs84ll&location={}";
+        String sql = "SELECT t1.*,\n" +
+                "       replace(t3.name||(case when t2.name<>t3.name then t2.name else '' end)||(case when t1.name<>t2.name then t1.name else '' end),' ','') AS all_name_left\n" +
+                "FROM xdata_edw.t_region_map t1\n" +
+                "LEFT JOIN xdata_edw.t_region_map t2 ON t1.parentregion = t2.code\n" +
+                "LEFT JOIN xdata_edw.t_region_map t3 ON t2.parentregion = t3.code";
+        List<Map<String, Object>> resultList;
+        try {
+            resultList = dao.query(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        for (Map<String, Object> dataMap : resultList) {
+            String address = Optional.ofNullable(dataMap.get("ALL_NAME_LEFT")).orElse("").toString();
+            if (StringUtils.isBlank(address)) {
+                continue;
+            }
+            String responseStr = HttpUtil.get(StrUtil.format(url, ak, address));
+            JSONObject regionInfo = JSON.parseObject(responseStr);
+            if (regionInfo.getInteger("status") != 0) {
+                log.warn("正向地址解析失败！=>{}:{}", address, responseStr);
+                continue;
+            }
+            regionInfo = regionInfo.getJSONObject("result").getJSONObject("location");
+            String lng = regionInfo.getString("lng");
+            String lat = regionInfo.getString("lat");
+            dataMap.put("LOG", lng);
+            dataMap.put("LAT", lat);
+            String location = lat + "," + lng;
+            responseStr = HttpUtil.get(StrUtil.format(url2, ak, location));
+            regionInfo = JSON.parseObject(responseStr);
+            if (regionInfo.getInteger("status") != 0) {
+                log.warn("反向地址解析失败！=>{}:{}:{}", location, address, responseStr);
+                continue;
+            }
+            regionInfo = regionInfo.getJSONObject("result").getJSONObject("addressComponent");
+            String province = regionInfo.getString("province");
+            String city = regionInfo.getString("city");
+            String district = regionInfo.getString("district");
+            String adcode = regionInfo.getString("adcode");
+            dataMap.put("ALL_NAME_RIGHT", province + city + district + "&adcode=" + adcode);
+        }
+        insertRegionInfo(resultList);
+    }
+
 }
