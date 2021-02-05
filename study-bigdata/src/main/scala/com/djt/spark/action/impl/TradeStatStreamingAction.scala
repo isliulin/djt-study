@@ -18,8 +18,9 @@ class TradeStatStreamingAction(config: Properties) extends AbsStreamingAction(co
 
     /**
      * 监听端口 实时处理
+     * 累加 交易笔数 与 交易金额
      *
-     * @param sparkSession ss
+     * @param streamingContext ss
      */
     override def executeAction(streamingContext: StreamingContext): Unit = {
         val sc = streamingContext.sparkContext
@@ -50,4 +51,3 @@ class TradeStatStreamingAction(config: Properties) extends AbsStreamingAction(co
     }
 
 }
-

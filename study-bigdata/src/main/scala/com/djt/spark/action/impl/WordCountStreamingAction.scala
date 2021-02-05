@@ -34,10 +34,12 @@ class WordCountStreamingAction(config: Properties) extends AbsStreamingAction(co
                 })
             }
             tuple2List
-        })
+        }) //.reduceByKey(_ + _)
 
+        //使用 mapWithState 需要提前 reduceByKey 进行预汇总 如果不预先汇总 则结果必然错误 最后一步汇总结果更离谱！
         val stateSpec = StateSpec.function(mappingAddFunction _)
         dStream.mapWithState(stateSpec).print()
+        //使用 updateStateByKey 则无上述问题
         //dStream.updateStateByKey(updateAddFunction).print()
 
         streamingContext.start()
