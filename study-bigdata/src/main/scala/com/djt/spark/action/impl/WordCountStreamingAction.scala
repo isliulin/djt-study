@@ -3,7 +3,7 @@ package com.djt.spark.action.impl
 import com.djt.spark.action.AbsStreamingAction
 import com.djt.utils.ParamConstant
 import org.apache.commons.lang3.StringUtils
-import org.apache.spark.streaming.{StateSpec, StreamingContext}
+import org.apache.spark.streaming.{Minutes, StateSpec, StreamingContext}
 
 import java.util.Properties
 import scala.collection.mutable.ListBuffer
@@ -34,10 +34,10 @@ class WordCountStreamingAction(config: Properties) extends AbsStreamingAction(co
                 })
             }
             tuple2List
-        }) //.reduceByKey(_ + _)
+        }).reduceByKey(_ + _)
 
         //使用 mapWithState 需要提前 reduceByKey 进行预汇总 如果不预先汇总 则结果必然错误 最后一步汇总结果更离谱！
-        val stateSpec = StateSpec.function(mappingAddFunction _)
+        val stateSpec = StateSpec.function(mappingAddFunction _).timeout(Minutes(2 * 24 * 60))
         dStream.mapWithState(stateSpec).print()
         //使用 updateStateByKey 则无上述问题
         //dStream.updateStateByKey(updateAddFunction).print()

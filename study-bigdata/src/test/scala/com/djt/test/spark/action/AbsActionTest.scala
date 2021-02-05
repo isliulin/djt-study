@@ -5,6 +5,8 @@ import org.junit.Before
 import org.slf4j.LoggerFactory
 
 import java.util.Properties
+import scala.collection.JavaConversions._
+
 
 /**
  * @author 　djt317@qq.com
@@ -28,7 +30,11 @@ abstract class AbsActionTest {
         config.setProperty(ParamConstant.ES_INDEX_AUTO_CREATE, "false")
         config.setProperty(ParamConstant.HBASE_ZK_QUORUM, "172.20.4.91,172.20.4.92,172.20.4.93")
         config.setProperty(ParamConstant.HBASE_ZK_PORT, "2181")
+        config.setProperty("中文", "中文测试")
         setConfig(config)
+        config.keySet().foreach(key => {
+            println(s"$key : ${config.getProperty(key.toString)}")
+        })
         LOG.info("=======初始化完成...=======")
     }
 

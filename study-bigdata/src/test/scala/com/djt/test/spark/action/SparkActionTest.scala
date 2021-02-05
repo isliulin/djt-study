@@ -10,6 +10,11 @@ import org.junit.Test
 class SparkActionTest extends AbsActionTest {
 
     @Test
+    def testConfig(): Unit = {
+
+    }
+
+    @Test
     def testFirstAction(): Unit = {
         new FirstSparkAction(config).action()
     }

@@ -97,6 +97,10 @@ abstract class AbsStreamingAction(config: Properties) extends AbsSparkAction(con
      * @return
      */
     def mappingAddFunction(key: String, value: Option[Long], state: State[Long]): (String, Long) = {
+        if (state.isTimingOut()) {
+            LOG.warn("{} 已过期!", key)
+            return (key, 0L)
+        }
         val sumStateValue = state.getOption().getOrElse(0L) + value.getOrElse(0L)
         state.update(sumStateValue)
         (key, sumStateValue)
