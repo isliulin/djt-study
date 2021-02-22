@@ -7,9 +7,11 @@ import com.alibaba.druid.util.JdbcUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
 import org.apache.commons.dbutils.handlers.MapListHandler;
+import org.apache.commons.lang3.Validate;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
@@ -59,9 +61,9 @@ public abstract class AbstractDao {
      * 获取数据库连接
      *
      * @return conn
-     * @throws Exception e
+     * @throws SQLException e
      */
-    public Connection getConnection() throws Exception {
+    public Connection getConnection() throws SQLException {
         return dataSource.getConnection();
     }
 
@@ -71,8 +73,9 @@ public abstract class AbstractDao {
      * @param sql    查询sql
      * @param params 参数列表
      * @return 结果列表
+     * @throws SQLException e
      */
-    public List<Map<String, Object>> query(String sql, Object... params) throws Exception {
+    public List<Map<String, Object>> query(String sql, Object... params) throws SQLException {
         return queryRunner.query(sql, new MapListHandler(), params);
     }
 
@@ -83,8 +86,9 @@ public abstract class AbstractDao {
      * @param params 参数列表
      * @param tClass Bean class
      * @return 结果列表
+     * @throws SQLException e
      */
-    public <T> List<T> query(String sql, Class<T> tClass, Object... params) throws Exception {
+    public <T> List<T> query(String sql, Class<T> tClass, Object... params) throws SQLException {
         return queryRunner.query(sql, new BeanListHandler<>(tClass), params);
     }
 
@@ -95,9 +99,21 @@ public abstract class AbstractDao {
      * @param params 参数列表
      * @param tClass Bean class
      * @return 结果列表
+     * @throws SQLException e
      */
-    public <T> List<T> query2(String sql, Class<T> tClass, Object... params) throws Exception {
+    public <T> List<T> query2(String sql, Class<T> tClass, Object... params) throws SQLException {
         return db.query(sql, tClass, params);
+    }
+
+    /**
+     * 执行SQL
+     *
+     * @param sql 待执行的SQL
+     * @throws SQLException e
+     */
+    public void executeSql(String sql) throws SQLException {
+        Validate.notBlank(sql, "SQL不能为空！");
+        db.execute(sql);
     }
 
     /**

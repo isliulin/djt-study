@@ -69,12 +69,14 @@ public class OracleDaoTest extends DaoTest {
      */
     public void insertRegionInfo(List<? extends Map<String, Object>> dataList) {
         int batchSize = 1000;
+        String clearSql = "delete from xdata_edw.t_region_map2";
         String sql = "insert into xdata_edw.t_region_map2 (CODE, NAME, CUP_CODE, PBOC_CODE, REGIONGRADE, PARENTREGION, LOG, LAT, ALL_NAME_LEFT, ALL_NAME_RIGHT)\n" +
                 "values (?,?,?,?,?,?,?,?,?,?)";
         PreparedStatement pstm = null;
         try {
             conn = dao.getConnection();
             pstm = conn.prepareStatement(sql);
+            dao.executeSql(clearSql);
             int batchCount = 0;
             for (int i = 0; i < dataList.size(); i++) {
                 JSONObject jsonObject = new JSONObject(dataList.get(i));
@@ -197,12 +199,12 @@ public class OracleDaoTest extends DaoTest {
     }
 
     public void genRegionInfoByAddress() {
-        //正向解析可用
+        //百度接口认证码
         String ak = "edGc5mIugVxx7lwUx9YpraKeWmExG64o";  //xxx
         //地址->经纬度
         String url = "http://api.map.baidu.com/geocoding/v3/?ak={}&address={}&output=json";
-        //经纬度->地址
-        String url2 = "http://api.map.baidu.com/reverse_geocoding/v3/?ak={}&output=json&coordtype=wgs84ll&location={}";
+        //经纬度->地址  coordtype=wgs84ll
+        String url2 = "http://api.map.baidu.com/reverse_geocoding/v3/?ak={}&output=json&coordtype=bd09ll&location={}";
         String sql = "SELECT t1.*,\n" +
                 "       replace(t3.name||(case when t2.name<>t3.name then t2.name else '' end)||(case when t1.name<>t2.name then t1.name else '' end),' ','') AS all_name_left\n" +
                 "FROM xdata_edw.t_region_map t1\n" +
