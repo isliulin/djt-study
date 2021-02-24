@@ -52,7 +52,7 @@ public class OracleDaoTest extends DaoTest {
 
     @Test
     public void testInsertFromFile() {
-        String filePath = "C:\\Users\\duanjiatao\\Desktop\\ETL_region\\t_region_map数据.sql";
+        String filePath = "C:\\Users\\duanjiatao\\Desktop\\数据中心\\我的开发\\2021\\迭代2\\地区经纬度\\t_region_map数据.sql";
         insertFromFile(filePath);
     }
 

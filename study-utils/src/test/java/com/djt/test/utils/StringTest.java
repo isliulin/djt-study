@@ -5,9 +5,11 @@ import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONValidator;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -16,6 +18,7 @@ import java.util.Optional;
  * @author 　djt317@qq.com
  * @date 　  2021-02-02 19:24
  */
+@SuppressWarnings("ConstantConditions")
 public class StringTest {
 
     @Test
@@ -69,6 +72,38 @@ public class StringTest {
         str = "xxx";
         optional = Optional.ofNullable(str);
         System.out.println(optional.orElse("777"));
+    }
+
+    @Test
+    public void testValidate() {
+        String a = "666";
+        Validate.notNull(a);
+        a = null;
+        Validate.notNull(a);
+    }
+
+    @Test
+    public void testSplit() {
+        String a = "  1   2 3  4 5       6 ";
+        //自带分割
+        String[] strArr = a.split(" ");
+        for (String s : strArr) {
+            System.out.println(s);
+        }
+        System.out.println(Arrays.toString(strArr));
+
+        //工具分割
+        strArr = StringUtils.split(a, " ");
+        for (String s : strArr) {
+            System.out.println(s);
+        }
+        System.out.println(Arrays.toString(strArr));
+    }
+
+    @Test
+    public void testNull() {
+        Object a = (Integer) null;
+        System.out.println(a);
     }
 
 }
