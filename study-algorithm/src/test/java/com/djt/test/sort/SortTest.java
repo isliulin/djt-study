@@ -1,9 +1,9 @@
 package com.djt.test.sort;
 
-import com.djt.sort.IArraySort;
-import com.djt.sort.impl.BubbleSort;
-import com.djt.sort.impl.SelectSort;
-import com.djt.test.utils.RandomUtils;
+import com.djt.algorithm.sort.IArraySort;
+import com.djt.algorithm.sort.impl.BubbleSort;
+import com.djt.algorithm.sort.impl.SelectSort;
+import com.djt.utils.RandomUtils;
 import org.junit.Before;
 import org.junit.Test;
 

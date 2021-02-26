@@ -1,6 +1,6 @@
-package com.djt.sort.impl;
+package com.djt.algorithm.sort.impl;
 
-import com.djt.sort.IArraySort;
+import com.djt.algorithm.sort.IArraySort;
 import org.apache.commons.lang3.Validate;
 
 import java.util.Arrays;

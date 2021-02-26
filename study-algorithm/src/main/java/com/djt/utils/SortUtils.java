@@ -1,4 +1,4 @@
-package com.djt.test.utils;
+package com.djt.utils;
 
 /**
  * @author 　djt317@qq.com
