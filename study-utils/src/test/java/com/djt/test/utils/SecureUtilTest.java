@@ -9,6 +9,7 @@ import cn.hutool.crypto.asymmetric.RSA;
 import cn.hutool.crypto.symmetric.AES;
 import cn.hutool.crypto.symmetric.DES;
 import cn.hutool.crypto.symmetric.SymmetricAlgorithm;
+import com.djt.utils.PasswordUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 

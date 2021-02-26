@@ -9,10 +9,7 @@ import org.apache.commons.lang3.Validate;
 import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author 　djt317@qq.com
@@ -101,9 +98,13 @@ public class StringTest {
     }
 
     @Test
-    public void testNull() {
-        Object a = (Integer) null;
-        System.out.println(a);
+    public void testList() {
+        List<String> list = new ArrayList<>(10);
+        list.add(0, "666");
+        //list.add(1, "A");
+        list.add(2, "B");
+        list.add(3, "C");
+        System.out.println(list);
     }
 
 }

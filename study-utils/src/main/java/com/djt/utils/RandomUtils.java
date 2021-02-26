@@ -1,4 +1,4 @@
-package com.djt.test.utils;
+package com.djt.utils;
 
 import org.apache.commons.lang3.StringUtils;
 

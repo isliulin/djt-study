@@ -1,4 +1,4 @@
-package com.djt.test.utils;
+package com.djt.utils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;

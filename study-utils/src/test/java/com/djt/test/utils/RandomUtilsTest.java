@@ -1,5 +1,6 @@
 package com.djt.test.utils;
 
+import com.djt.utils.RandomUtils;
 import org.junit.Test;
 
 /**
