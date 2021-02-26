@@ -2,8 +2,8 @@ package com.djt.dao.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.djt.dao.AbstractDao;
-import com.djt.test.utils.PasswordUtils;
-import com.djt.test.utils.RandomUtils;
+import com.djt.utils.PasswordUtils;
+import com.djt.utils.RandomUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.SQLException;

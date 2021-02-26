@@ -1,4 +1,4 @@
-package com.djt.test.utils;
+package com.djt.utils;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.Db;
