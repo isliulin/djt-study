@@ -1,8 +1,7 @@
 package com.djt.spark.action.impl
 
 import com.djt.spark.action.AbsStreamingAction
-import com.djt.test.utils.DataParseUtils
-import com.djt.utils.ParamConstant
+import com.djt.utils.{DataParseUtils, ParamConstant}
 import org.apache.spark.streaming.{StateSpec, StreamingContext}
 
 import java.util.Properties
