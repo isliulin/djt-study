@@ -13,7 +13,7 @@ import java.util.List;
  * 树测试类
  *
  * @author 　djt317@qq.com
- * @date 　  2021-02-25 14:47
+ * @since  　2021-02-25
  */
 public class TreeTest {
 
@@ -59,7 +59,7 @@ public class TreeTest {
 
 
         int height = TreeUtils.getHeight(searchTree.getRoot());
-        List<Integer>[] result2 = new ArrayList[height];
+        List<Integer>[] result2 = new ArrayList[10];
         TreeUtils.levelOrderScan(searchTree.getRoot(), 1, result2);
         for (int i = 0; i < result2.length; i++) {
             System.out.println("第 " + i + " 层：" + result2[i]);

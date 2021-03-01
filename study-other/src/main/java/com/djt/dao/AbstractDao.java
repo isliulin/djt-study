@@ -21,7 +21,7 @@ import java.util.Properties;
  * 数据库操作抽象类
  *
  * @author 　djt317@qq.com
- * @date 　  2021-01-29 13:54
+ * @since  　2021-01-29
  */
 public abstract class AbstractDao {
 

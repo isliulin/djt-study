@@ -13,7 +13,7 @@ import java.util.Properties;
 
 /**
  * @author 　djt317@qq.com
- * @date 　  2021-01-29 19:57
+ * @since  　2021-01-29
  */
 public abstract class DaoTest {
 

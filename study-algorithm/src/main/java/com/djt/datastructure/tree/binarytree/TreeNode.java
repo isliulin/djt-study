@@ -8,7 +8,7 @@ import lombok.ToString;
  * 二叉树节点
  *
  * @author 　djt317@qq.com
- * @date 　  2021-02-25 10:01
+ * @since  　2021-02-25
  */
 @Setter
 @Getter

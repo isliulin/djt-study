@@ -4,7 +4,7 @@ import org.apache.hadoop.hbase.HConstants
 
 /**
  * @author 　djt317@qq.com
- * @date 　  2021-02-03 10:22
+ * @since  　2021-02-03
  */
 object ParamConstant {
 

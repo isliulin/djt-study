@@ -10,7 +10,7 @@ import java.util.Queue;
  * 栈与队列测试
  *
  * @author 　djt317@qq.com
- * @date 　  2021-02-26 15:11
+ * @since  　2021-02-26
  */
 public class DequeAndQueueTest {
 

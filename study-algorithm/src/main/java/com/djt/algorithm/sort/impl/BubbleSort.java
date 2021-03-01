@@ -9,7 +9,7 @@ import java.util.Arrays;
  * 冒泡排序
  *
  * @author 　djt317@qq.com
- * @date 　  2021-01-22 11:15
+ * @since  　2021-01-22
  */
 public class BubbleSort implements IArraySort {
 

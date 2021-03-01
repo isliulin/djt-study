@@ -9,7 +9,7 @@ import java.util.Arrays;
  * 插入排序
  *
  * @author 　djt317@qq.com
- * @date 　  2021-01-28 10:03
+ * @since  　2021-01-28
  */
 public class InsertSort implements IArraySort {
 

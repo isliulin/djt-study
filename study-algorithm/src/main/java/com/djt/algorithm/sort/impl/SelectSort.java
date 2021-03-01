@@ -9,7 +9,7 @@ import java.util.Arrays;
  * 选择排序
  *
  * @author 　djt317@qq.com
- * @date 　  2021-01-27 20:07
+ * @since  　2021-01-27
  */
 public class SelectSort implements IArraySort {
 

@@ -12,7 +12,7 @@ import scala.collection.mutable.ListBuffer
  * 模拟实时统计单词频率
  *
  * @author 　djt317@qq.com
- * @date 　  2021-02-03 9:47
+ * @since  　2021-02-03
  */
 class WordCountStreamingAction(config: Properties) extends AbsStreamingAction(config) {
 

@@ -11,7 +11,7 @@ import scala.collection.mutable.ListBuffer
  * 模拟实时交易统计
  *
  * @author 　djt317@qq.com
- * @date 　  2021-02-03 9:47
+ * @since  　2021-02-03
  */
 class TradeStatStreamingAction(config: Properties) extends AbsStreamingAction(config) {
 

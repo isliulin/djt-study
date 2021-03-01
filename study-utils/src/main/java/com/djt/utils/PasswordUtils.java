@@ -12,7 +12,7 @@ import javax.crypto.SecretKey;
  * 密码工具类
  *
  * @author 　djt317@qq.com
- * @date 　  2021-01-28 20:00
+ * @since  　2021-01-28
  */
 public class PasswordUtils {
 

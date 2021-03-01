@@ -12,7 +12,7 @@ import java.util.Properties
  * Spark Streaming任务基础类
  *
  * @author 　djt317@qq.com
- * @date 　  2021-02-04 9:45
+ * @since  　2021-02-04
  */
 abstract class AbsStreamingAction(config: Properties) extends AbsSparkAction(config) {
 

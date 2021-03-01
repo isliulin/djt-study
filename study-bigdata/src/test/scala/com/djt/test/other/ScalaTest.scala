@@ -4,7 +4,7 @@ import org.junit.Test
 
 /**
  * @author 　djt317@qq.com
- * @date 　  2021-02-24 10:25
+ * @since  　2021-02-24
  */
 class ScalaTest {
 

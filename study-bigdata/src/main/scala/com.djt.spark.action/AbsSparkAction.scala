@@ -12,7 +12,7 @@ import java.util.Properties
  * spark任务基础类
  *
  * @author 　djt317@qq.com
- * @date 　  2021-02-02 15:23
+ * @since    2021-02-02
  */
 abstract class AbsSparkAction(config: Properties) extends Serializable {
 

@@ -11,7 +11,7 @@ import java.util.Properties
  * Spark Demo
  *
  * @author 　djt317@qq.com
- * @date 　  2021-02-03 10:20
+ * @since  　2021-02-03
  */
 class FirstSparkAction(config: Properties) extends AbsSparkAction(config) {
 
