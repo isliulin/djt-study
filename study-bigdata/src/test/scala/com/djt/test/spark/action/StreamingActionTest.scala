@@ -10,7 +10,7 @@ import java.util.Properties
  * 实时流测试类
  *
  * @author 　djt317@qq.com
- * @since  　2021-02-03
+ * @since 　 2021-02-03
  */
 class StreamingActionTest extends AbsActionTest {
 

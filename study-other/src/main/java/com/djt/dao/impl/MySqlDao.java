@@ -11,7 +11,7 @@ import java.util.Properties;
  * MySql DAO
  *
  * @author 　djt317@qq.com
- * @since  　2021-01-29
+ * @since 　 2021-01-29
  */
 @Slf4j
 public class MySqlDao extends AbstractDao {

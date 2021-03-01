@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
  * 二叉搜索树
  *
  * @author 　djt317@qq.com
- * @since  　2021-02-25
+ * @since 　 2021-02-25
  */
 @Setter
 @Getter
@@ -71,7 +71,6 @@ public class SearchTree {
             }
         }
     }
-
 
 
 }

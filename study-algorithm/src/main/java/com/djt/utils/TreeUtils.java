@@ -4,13 +4,15 @@ import com.djt.datastructure.tree.binarytree.TreeNode;
 import org.apache.commons.lang3.Validate;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * 树工具类
  *
  * @author 　djt317@qq.com
- * @since  　2021-02-25
+ * @since 　 2021-02-25
  */
 public class TreeUtils {
 
@@ -84,9 +86,40 @@ public class TreeUtils {
         result.add(root.getKey());
     }
 
+    /**
+     * 二叉树层序遍历
+     * 队列方式
+     *
+     * @param root   根节点
+     * @param result 遍历结果
+     */
+    public static void levelOrderScan(TreeNode root, List<Integer> result) {
+        if (root == null) {
+            return;
+        }
+
+        //队列
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            //获取队头节点并访问
+            TreeNode curNode = queue.poll();
+            result.add(curNode.getKey());
+            //分别将该节点的左节点与右节点加入队列
+            TreeNode left = curNode.getLeft();
+            if (left != null) {
+                queue.offer(left);
+            }
+            TreeNode right = curNode.getRight();
+            if (right != null) {
+                queue.offer(right);
+            }
+        }
+    }
 
     /**
      * 二叉树层序遍历
+     * 递归方式
      * 原理：按照先序遍历顺序 将每个节点的层级保存至二维数据
      * 数组下标即为层级，值即为该层的所有节点
      *

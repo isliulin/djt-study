@@ -4,7 +4,7 @@ package com.djt.algorithm.sort;
  * 数组排序
  *
  * @author 　djt317@qq.com
- * @since  　2021-01-22
+ * @since 　 2021-01-22
  */
 public interface IArraySort {
 

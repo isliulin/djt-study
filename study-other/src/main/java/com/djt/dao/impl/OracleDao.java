@@ -14,7 +14,7 @@ import java.util.Properties;
  * Oracle DAO
  *
  * @author 　djt317@qq.com
- * @since  　2021-02-01
+ * @since 　 2021-02-01
  */
 @Slf4j
 public class OracleDao extends AbstractDao {

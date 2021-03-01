@@ -7,7 +7,7 @@ import org.junit.Test;
  * 随机数工具类 测试类
  *
  * @author 　djt317@qq.com
- * @since  　2021-01-27
+ * @since 　 2021-01-27
  */
 public class RandomUtilsTest {
 
