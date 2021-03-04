@@ -1,9 +1,11 @@
 package com.djt.test.utils;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONValidator;
+import com.djt.utils.ParamaUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.junit.Test;
@@ -106,5 +108,73 @@ public class StringTest {
         list.add(3, "C");
         System.out.println(list);
     }
+
+    @Test
+    public void testInt() {
+        Integer a = new Integer(1);
+        Integer b = new Integer(1);
+        System.out.println(a == b);
+        System.out.println(a.equals(b));
+        System.out.println(a.compareTo(b));
+    }
+
+    @Test
+    public void testBean() {
+        JSONObject a = new JSONObject();
+        a.put("A", "1");
+        JSONObject b = new JSONObject();
+        BeanUtil.copyProperties(a, b, false);
+        System.out.println(b);
+        a.put("A", "2");
+        System.out.println(b);
+    }
+
+    @Test
+    public void testBean2() {
+        JSONObject a = new JSONObject();
+        JSONObject b = new JSONObject(a);
+        System.out.println(b);
+        a.put("A", "2");
+        System.out.println(b);
+    }
+
+    @Test
+    public void testBool() {
+        String a = null;
+        String b = null;
+        printAB(a, b);
+        a = "a";
+        printAB(a, b);
+        a = null;
+        b = "b";
+        printAB(a, b);
+        a = "a";
+        b = "b";
+        printAB(a, b);
+
+    }
+
+    private void printAB(String a, String b) {
+        if (a == null && b == null) {
+            System.out.println("ab都为空");
+        } else if (a != null && b == null) {
+            System.out.println("a不为空b为空");
+        } else if (a == null && b != null) {
+            System.out.println("a为空b不为空");
+        } else {
+            System.out.println("ab都不为空");
+        }
+    }
+
+    @Test
+    public void testParama() {
+        String a = "Abc_deF_GHI";
+        System.out.println(ParamaUtils.toLowerCamel(a));
+        System.out.println(ParamaUtils.toUpperUnderline(a));
+        String b = "abcDefGHi";
+        System.out.println(ParamaUtils.toLowerCamel(b));
+        System.out.println(ParamaUtils.toUpperUnderline(b));
+    }
+
 
 }
