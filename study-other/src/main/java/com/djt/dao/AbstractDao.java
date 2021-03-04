@@ -2,17 +2,23 @@ package com.djt.dao;
 
 import cn.hutool.db.Db;
 import cn.hutool.db.DbUtil;
+import cn.hutool.db.sql.SqlExecutor;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.util.JdbcUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
 import org.apache.commons.dbutils.handlers.MapListHandler;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -23,6 +29,7 @@ import java.util.Properties;
  * @author 　djt317@qq.com
  * @since 　 2021-01-29
  */
+@Slf4j
 public abstract class AbstractDao {
 
     /**
@@ -56,6 +63,10 @@ public abstract class AbstractDao {
      * 初始化数据源
      */
     protected abstract void initDataSource();
+
+    public DruidDataSource getDataSource() {
+        return dataSource;
+    }
 
     /**
      * 获取数据库连接
@@ -143,9 +154,40 @@ public abstract class AbstractDao {
         JdbcUtils.close(resultSet);
     }
 
-    public DruidDataSource getDataSource() {
-        return dataSource;
+    /**
+     * 从文件批量执行SQL
+     * 文件中每行是一个SQL语句
+     *
+     * @param filePath 文件路径
+     */
+    public void executeBatchFromFile(String filePath, int batchSize) {
+        File file = new File(filePath);
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            List<String> lines = FileUtils.readLines(file, "UTF-8");
+            int batchCount = 0;
+            List<String> sqlList = new ArrayList<>();
+            for (int i = 0; i < lines.size(); i++) {
+                String line = lines.get(i);
+                //若行尾有分号需要自动剔除
+                if (StringUtils.endsWith(line, ";")) {
+                    line = StringUtils.removeEnd(line, ";");
+                }
+                sqlList.add(line);
+                boolean isExecute = (i > 0 && i % batchSize == 0) || i == lines.size() - 1;
+                if (isExecute) {
+                    SqlExecutor.executeBatch(conn, sqlList);
+                    sqlList.clear();
+                    log.info("第 {} 批执行成功.", (++batchCount));
+                }
+            }
+            log.info("写入总条数：{}", lines.size());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            close(conn);
+        }
     }
-
 
 }

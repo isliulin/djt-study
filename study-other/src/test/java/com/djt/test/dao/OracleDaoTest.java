@@ -2,17 +2,14 @@ package com.djt.test.dao;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.sql.SqlExecutor;
-import cn.hutool.http.HttpUtil;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.djt.dao.impl.OracleDao;
 import com.djt.utils.RandomUtils;
+import com.djt.utils.RegionUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
-import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -26,6 +23,7 @@ import java.util.Optional;
  */
 @Slf4j
 public class OracleDaoTest extends DaoTest {
+
 
     @Override
     protected void initDao() {
@@ -51,14 +49,23 @@ public class OracleDaoTest extends DaoTest {
     }
 
     @Test
-    public void testInsertFromFile() {
+    public void testResetRegionMap() throws SQLException {
+        String sql = "delete from xdata_edw.t_region_map";
+        dao.executeSql(sql);
         String filePath = "C:\\Users\\duanjiatao\\Desktop\\数据中心\\我的开发\\2021\\迭代2\\地区经纬度\\t_region_map数据.sql";
-        insertFromFile(filePath);
+        dao.executeBatchFromFile(filePath, 1000);
     }
 
     @Test
     public void testGenRegionInfo() {
-        genRegionInfoByAddress();
+        genRegionInfo();
+    }
+
+    @Test
+    public void testUpdateRegionInfo() {
+        //String filePath = "C:\\Users\\duanjiatao\\Desktop\\update_tmp.sql";
+        //dao.executeBatchFromFile(filePath, 1000);
+        updateRegionInfo();
     }
 
     /**
@@ -105,32 +112,6 @@ public class OracleDaoTest extends DaoTest {
         }
     }
 
-    /**
-     * 从文件批量插入数据
-     * 文件中每行是一个insert语句
-     *
-     * @param filePath 文件路径
-     */
-    public void insertFromFile(String filePath) {
-        int batchSize = 1000;
-        File file = new File(filePath);
-        try {
-            List<String> lines = FileUtils.readLines(file, "UTF-8");
-            int batchCount = 0;
-            List<String> sqlList = new ArrayList<>();
-            for (int i = 0; i < lines.size(); i++) {
-                sqlList.add(lines.get(i));
-                if ((i > 0 && i % batchSize == 0) || i == lines.size() - 1) {
-                    SqlExecutor.executeBatch(conn, sqlList);
-                    sqlList.clear();
-                    log.info("第 {} 批插入成功.", (++batchCount));
-                }
-            }
-            log.info("写入总条数：{}", lines.size());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     /**
      * 批量插入数据
@@ -198,13 +179,10 @@ public class OracleDaoTest extends DaoTest {
         }
     }
 
-    public void genRegionInfoByAddress() {
-        //百度接口认证码
-        String ak = "edGc5mIugVxx7lwUx9YpraKeWmExG64o";  //xxx
-        //地址->经纬度
-        String url = "http://api.map.baidu.com/geocoding/v3/?ak={}&address={}&output=json";
-        //经纬度->地址  coordtype=wgs84ll
-        String url2 = "http://api.map.baidu.com/reverse_geocoding/v3/?ak={}&output=json&coordtype=bd09ll&location={}";
+    /**
+     * 根据 t_region_map 生成 t_region_map2
+     */
+    public void genRegionInfo() {
         String sql = "SELECT t1.*,\n" +
                 "       replace(t3.name||(case when t2.name<>t3.name then t2.name else '' end)||(case when t1.name<>t2.name then t1.name else '' end),' ','') AS all_name_left\n" +
                 "FROM xdata_edw.t_region_map t1\n" +
@@ -221,10 +199,10 @@ public class OracleDaoTest extends DaoTest {
             if (StringUtils.isBlank(address)) {
                 continue;
             }
-            String responseStr = HttpUtil.get(StrUtil.format(url, ak, address));
-            JSONObject regionInfo = JSON.parseObject(responseStr);
+
+            JSONObject regionInfo = RegionUtils.getRegionByAddress(address);
             if (regionInfo.getInteger("status") != 0) {
-                log.warn("正向地址解析失败！=>{}:{}", address, responseStr);
+                log.warn("正向地址解析失败！=>{}:{}", address, regionInfo);
                 continue;
             }
             regionInfo = regionInfo.getJSONObject("result").getJSONObject("location");
@@ -232,11 +210,9 @@ public class OracleDaoTest extends DaoTest {
             String lat = regionInfo.getString("lat");
             dataMap.put("LOG", lng);
             dataMap.put("LAT", lat);
-            String location = lat + "," + lng;
-            responseStr = HttpUtil.get(StrUtil.format(url2, ak, location));
-            regionInfo = JSON.parseObject(responseStr);
+            regionInfo = RegionUtils.getRegionByLngLat(lng, lat);
             if (regionInfo.getInteger("status") != 0) {
-                log.warn("反向地址解析失败！=>{}:{}:{}", location, address, responseStr);
+                log.warn("反向地址解析失败！=>{},{}:{}:{}", lng, lat, address, regionInfo);
                 continue;
             }
             regionInfo = regionInfo.getJSONObject("result").getJSONObject("addressComponent");
@@ -248,5 +224,48 @@ public class OracleDaoTest extends DaoTest {
         }
         insertRegionInfo(resultList);
     }
+
+    /**
+     * 更新 t_region_map2 的 all_name_right 字段
+     */
+    public void updateRegionInfo() {
+        String selectSql = "SELECT code,log,lat FROM xdata_edw.t_region_map2";
+        List<Map<String, Object>> resultList;
+        try {
+            resultList = dao.query(selectSql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        String updateSql = "UPDATE xdata_edw.t_region_map2 SET all_name_right='{}' WHERE code='{}'";
+        List<String> updateSqlList = new ArrayList<>();
+        for (Map<String, Object> dataMap : resultList) {
+            String code = Optional.ofNullable(dataMap.get("CODE")).orElse("").toString();
+            String lng = Optional.ofNullable(dataMap.get("LOG")).orElse("").toString();
+            String lat = Optional.ofNullable(dataMap.get("LAT")).orElse("").toString();
+            if (StringUtils.isAnyBlank(code, lng, lat)) {
+                continue;
+            }
+            JSONObject regionInfo = RegionUtils.getRegionByLngLat(lng, lat);
+            if (regionInfo.getInteger("status") != 0) {
+                log.warn("反向地址解析失败！=>{},{}:{}", lng, lat, regionInfo);
+                continue;
+            }
+            regionInfo = regionInfo.getJSONObject("result").getJSONObject("addressComponent");
+            String province = regionInfo.getString("province");
+            String city = regionInfo.getString("city");
+            String district = regionInfo.getString("district");
+            String adcode = regionInfo.getString("adcode");
+            String allNameRight = province + city + district + "&adcode=" + adcode;
+            String sql = StrUtil.format(updateSql, allNameRight, code);
+            updateSqlList.add(sql);
+        }
+        try {
+            SqlExecutor.executeBatch(conn, updateSqlList);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
 
 }
