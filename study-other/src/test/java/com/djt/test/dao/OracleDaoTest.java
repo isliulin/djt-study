@@ -170,6 +170,7 @@ public class OracleDaoTest extends DaoTest {
 
                 if ((i > 0 && i % batchSize == 0) || i == size - 1) {
                     SqlExecutor.executeBatch(conn, sql, paramsList);
+                    paramsList.clear();
                     log.info("第 {} 批插入成功.", (++batchCount));
                 }
             }

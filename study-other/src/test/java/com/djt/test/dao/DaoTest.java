@@ -49,6 +49,7 @@ public abstract class DaoTest {
     public void after() {
         if (dao != null) {
             dao.close(conn);
+            System.out.println("=======数据库连接关闭=======");
         }
     }
 

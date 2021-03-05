@@ -3,6 +3,8 @@ package com.djt.test.utils;
 import com.djt.utils.RandomUtils;
 import org.junit.Test;
 
+import java.util.Random;
+
 /**
  * 随机数工具类 测试类
  *
@@ -16,6 +18,18 @@ public class RandomUtilsTest {
     public void testRandomNumber() {
         System.out.println(RandomUtils.getRandomNumber(0, 10));
         System.out.println(RandomUtils.getRandomNumber(0L, 10L));
+        System.out.println(Long.MAX_VALUE);
+        System.out.println(RandomUtils.getRandomNumber(Long.MAX_VALUE - 2, Long.MAX_VALUE));
+    }
+
+    @Test
+    public void testRandomNumber2() {
+        int min = 1;
+        int max = 3;
+        Random random = new Random();
+        for (int i = 0; i < 10; i++) {
+            System.out.println(random.nextInt(max + 1) % (max - min + 1) + min);
+        }
     }
 
     @Test
