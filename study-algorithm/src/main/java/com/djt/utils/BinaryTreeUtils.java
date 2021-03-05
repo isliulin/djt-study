@@ -36,6 +36,16 @@ public class BinaryTreeUtils {
     }
 
     /**
+     * 获取树的宽度
+     *
+     * @param root 根节点
+     * @return width
+     */
+    public static int getWidth(AbsBinNode<?, ?> root) {
+        return 0;
+    }
+
+    /**
      * 二叉树前序遍历
      *
      * @param root   根节点
@@ -141,6 +151,15 @@ public class BinaryTreeUtils {
 
         levelOrderScan(root.getLeft(), level + 1, result);
         levelOrderScan(root.getRight(), level + 1, result);
+    }
+
+    /**
+     * 二叉树打印
+     *
+     * @param root 根节点
+     */
+    public static void printTree(AbsBinNode<?, ?> root) {
+
     }
 
 }

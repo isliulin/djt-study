@@ -117,14 +117,18 @@ public class TreeTest {
     }
 
     @Test
-    public void testDelete() {
+    public void testDelete1() {
         printLevelTree();
-        //deleteNode(23, true);
-        //deleteNode(19, true);
-        //deleteNode(15, true);
-        //deleteNode(40, true);
-        //deleteNode(30, true);
+        deleteNode(23, true);
+        deleteNode(19, true);
+        deleteNode(15, true);
+        deleteNode(40, true);
+        deleteNode(30, true);
+    }
 
+    @Test
+    public void testDelete2() {
+        printLevelTree();
         while (binarySearchTree.getSize() > 0) {
             deleteNode(binarySearchTree.getRoot().getKey(), false);
         }
