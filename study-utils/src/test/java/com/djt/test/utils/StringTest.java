@@ -5,7 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONValidator;
-import com.djt.utils.ParamaUtils;
+import com.djt.utils.ParamUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.junit.Test;
@@ -169,11 +169,22 @@ public class StringTest {
     @Test
     public void testParama() {
         String a = "Abc_deF_GHI";
-        System.out.println(ParamaUtils.toLowerCamel(a));
-        System.out.println(ParamaUtils.toUpperUnderline(a));
+        System.out.println(ParamUtils.toLowerCamel(a));
+        System.out.println(ParamUtils.toUpperUnderline(a));
         String b = "abcDefGHi";
-        System.out.println(ParamaUtils.toLowerCamel(b));
-        System.out.println(ParamaUtils.toUpperUnderline(b));
+        System.out.println(ParamUtils.toLowerCamel(b));
+        System.out.println(ParamUtils.toUpperUnderline(b));
+    }
+
+    @Test
+    public void testPrintChar() {
+        System.out.println("「￣￣");
+        System.out.println("│￣￣");
+        System.out.println("┍━━━━");
+        System.out.println("┕━━━━");
+        System.out.println("┍━━━━");
+        System.out.println("▁");
+        System.out.println("▏");
     }
 
 

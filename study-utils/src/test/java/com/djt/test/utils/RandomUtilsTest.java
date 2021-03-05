@@ -26,4 +26,13 @@ public class RandomUtilsTest {
         System.out.println(RandomUtils.getRandomDate(start, end, RandomUtils.YMD));
     }
 
+    @Test
+    public void testRandomName() {
+        for (int i = 0; i < 100; i++) {
+            int sexFlag = i % 2 == 0 ? 1 : 2;
+            String sex = sexFlag == 1 ? "男" : "女";
+            System.out.println(sex + ":" + RandomUtils.getRandomName((byte) sexFlag));
+        }
+    }
+
 }

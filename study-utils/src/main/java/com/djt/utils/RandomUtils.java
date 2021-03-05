@@ -1,6 +1,7 @@
 package com.djt.utils;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -85,4 +86,25 @@ public class RandomUtils {
         Instant instant = Instant.ofEpochSecond(diff);
         return LocalDateTime.ofInstant(instant, ZONE_ID).format(format);
     }
+
+    public static String getRandomName(byte sex) {
+        Validate.isTrue(sex == 1 || sex == 2, "性别不合法！");
+        //随机取个姓
+        int surNameIdx = getRandomNumber(0, CharConstant.SUR_NAME_ARR.length - 1);
+        String surName = CharConstant.SUR_NAME_ARR[surNameIdx];
+        //名字列表 分男女
+        String[] nameArr = sex == 1 ? CharConstant.NAME_MALE_ARR : CharConstant.NAME_FEMALE_ARR;
+        //随机名字长度 1-2
+        int nameLen = getRandomNumber(1, 2);
+        String char1 = nameArr[getRandomNumber(0, nameArr.length - 1)];
+        String char2 = "";
+        if (nameLen > 1) {
+            char2 = nameArr[getRandomNumber(0, nameArr.length - 1)];
+        }
+        String name = char1 + char2;
+        //返回 姓+名
+        return surName + name;
+    }
+
+
 }

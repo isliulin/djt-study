@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author 　djt317@qq.com
  * @since 　 2021-03-04
  */
-public class ParamaUtils {
+public class ParamUtils {
 
 
     /**
