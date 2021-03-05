@@ -1,6 +1,6 @@
 package com.djt.utils;
 
-import com.djt.datastructure.tree.binarytree.TreeNode;
+import com.djt.datastructure.tree.AbsBinNode;
 import org.apache.commons.lang3.Validate;
 
 import java.util.ArrayList;
@@ -9,20 +9,20 @@ import java.util.List;
 import java.util.Queue;
 
 /**
- * 树工具类
+ * 二叉树工具类
  *
  * @author 　djt317@qq.com
  * @since 　 2021-02-25
  */
-public class TreeUtils {
+public class BinaryTreeUtils {
 
     /**
-     * 计算树高度
+     * 计算二叉树高度
      *
      * @param root 根节点
      * @return height
      */
-    public static int getHeight(TreeNode root) {
+    public static int getHeight(AbsBinNode<?, ?> root) {
         if (root == null) {
             return 0;
         }
@@ -41,7 +41,7 @@ public class TreeUtils {
      * @param root   根节点
      * @param result 遍历结果
      */
-    public static void preOrderScan(TreeNode root, List<Integer> result) {
+    public static <K extends Comparable<K>, V> void preOrderScan(AbsBinNode<K, V> root, List<K> result) {
         if (root == null) {
             return;
         }
@@ -59,7 +59,7 @@ public class TreeUtils {
      * @param root   根节点
      * @param result 遍历结果
      */
-    public static void inOrderScan(TreeNode root, List<Integer> result) {
+    public static <K extends Comparable<K>, V> void inOrderScan(AbsBinNode<K, V> root, List<K> result) {
         if (root == null) {
             return;
         }
@@ -77,7 +77,7 @@ public class TreeUtils {
      * @param root   根节点
      * @param result 遍历结果
      */
-    public static void postOrderScan(TreeNode root, List<Integer> result) {
+    public static <K extends Comparable<K>, V> void postOrderScan(AbsBinNode<K, V> root, List<K> result) {
         if (root == null) {
             return;
         }
@@ -93,24 +93,24 @@ public class TreeUtils {
      * @param root   根节点
      * @param result 遍历结果
      */
-    public static void levelOrderScan(TreeNode root, List<Integer> result) {
+    public static <K extends Comparable<K>, V> void levelOrderScan(AbsBinNode<K, V> root, List<K> result) {
         if (root == null) {
             return;
         }
 
         //队列
-        Queue<TreeNode> queue = new LinkedList<>();
+        Queue<AbsBinNode<K, V>> queue = new LinkedList<>();
         queue.offer(root);
         while (!queue.isEmpty()) {
             //获取队头节点并访问
-            TreeNode curNode = queue.poll();
+            AbsBinNode<K, V> curNode = queue.poll();
             result.add(curNode.getKey());
             //分别将该节点的左节点与右节点加入队列
-            TreeNode left = curNode.getLeft();
+            AbsBinNode<K, V> left = curNode.getLeft();
             if (left != null) {
                 queue.offer(left);
             }
-            TreeNode right = curNode.getRight();
+            AbsBinNode<K, V> right = curNode.getRight();
             if (right != null) {
                 queue.offer(right);
             }
@@ -127,7 +127,7 @@ public class TreeUtils {
      * @param level  当前层级
      * @param result 遍历结果
      */
-    public static void levelOrderScan(TreeNode root, int level, List<Integer>[] result) {
+    public static <K extends Comparable<K>, V> void levelOrderScan(AbsBinNode<K, V> root, int level, List<K>[] result) {
         if (root == null) {
             return;
         }
@@ -142,6 +142,5 @@ public class TreeUtils {
         levelOrderScan(root.getLeft(), level + 1, result);
         levelOrderScan(root.getRight(), level + 1, result);
     }
-
 
 }
