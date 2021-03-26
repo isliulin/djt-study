@@ -1,6 +1,9 @@
 package com.djt.test.spark.action
 
 import com.djt.utils.ParamConstant
+import org.apache.commons.lang3.Validate
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.SparkSession
 import org.junit.Before
 import org.slf4j.LoggerFactory
 
@@ -12,9 +15,11 @@ import scala.collection.JavaConversions._
  * @author 　djt317@qq.com
  * @since 　 2021-02-03
  */
-abstract class AbsActionTest {
+abstract class AbsActionTest extends Serializable {
 
     private val LOG = LoggerFactory.getLogger(this.getClass)
+
+    private var sparkSession: SparkSession = _
 
     protected val config = new Properties
 
@@ -39,5 +44,36 @@ abstract class AbsActionTest {
     }
 
     protected def setConfig(config: Properties): Unit = {}
+
+    /**
+     * 获取 SparkSession
+     *
+     * @return ss
+     */
+    protected def getSparkSession: SparkSession = {
+        if (null == sparkSession) {
+            this.synchronized {
+                if (null == sparkSession) {
+                    sparkSession = SparkSession.builder.config(getSparkConf).enableHiveSupport.getOrCreate
+                }
+            }
+        }
+        sparkSession
+    }
+
+    /**
+     * 获取SparkConf
+     *
+     * @return sc
+     */
+    private def getSparkConf: SparkConf = {
+        val sparkMaster = config.getProperty(ParamConstant.SPARK_MASTER)
+        Validate.notNull(sparkMaster, ParamConstant.SPARK_MASTER + " can not be null!")
+        val sparkAppName = config.getProperty(ParamConstant.SPARK_APP_NAME, this.getClass.getSimpleName)
+        val sparkConf = new SparkConf()
+        sparkConf.setMaster(sparkMaster)
+        sparkConf.setAppName(sparkAppName)
+        sparkConf
+    }
 
 }

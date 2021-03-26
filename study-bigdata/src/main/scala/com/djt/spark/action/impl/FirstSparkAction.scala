@@ -205,6 +205,4 @@ object FirstSparkAction {
             }
         })
     }
-
-
 }
