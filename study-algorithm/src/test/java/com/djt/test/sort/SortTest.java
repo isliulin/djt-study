@@ -2,6 +2,7 @@ package com.djt.test.sort;
 
 import com.djt.algorithm.sort.IArraySort;
 import com.djt.algorithm.sort.impl.BubbleSort;
+import com.djt.algorithm.sort.impl.QuickSort;
 import com.djt.algorithm.sort.impl.SelectSort;
 import com.djt.utils.RandomUtils;
 import org.junit.Before;
@@ -17,11 +18,12 @@ import java.util.Arrays;
  */
 public class SortTest {
 
-    private final int[] arr = new int[10];
+    private final int ARRAY_SIZE = 10;
+    private final int[] arr = new int[ARRAY_SIZE];
 
     @Before
     public void before() {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < ARRAY_SIZE; i++) {
             arr[i] = RandomUtils.getRandomNumber(0, 10);
         }
     }
@@ -36,6 +38,13 @@ public class SortTest {
     @Test
     public void testSelectSort() throws Exception {
         IArraySort arraySort = new SelectSort();
+        printArray("排序前", arr);
+        printArray("排序后", arraySort.sort(arr));
+    }
+
+    @Test
+    public void testQuickSort() throws Exception {
+        IArraySort arraySort = new QuickSort();
         printArray("排序前", arr);
         printArray("排序后", arraySort.sort(arr));
     }
