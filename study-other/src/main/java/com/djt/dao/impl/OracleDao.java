@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
 /**
@@ -71,20 +72,23 @@ public class OracleDao extends AbstractDao {
      *
      * @param startDtStr 起始分区(yyyyMMdd)
      * @param endDtStr   截止分区(yyyyMMdd)
+     * @param dm         日月标识
      */
-    public void createPartition(String tableName, String startDtStr, String endDtStr) {
+    public void createPartition(String tableName, String startDtStr, String endDtStr, String dm) {
         LocalDate startDt = LocalDate.parse(startDtStr, RandomUtils.YMD);
         LocalDate endDt = LocalDate.parse(endDtStr, RandomUtils.YMD);
+        DateTimeFormatter dmFormatter = "D".equalsIgnoreCase(dm) ? RandomUtils.YMD : RandomUtils.YM;
         while (!startDt.isAfter(endDt)) {
-            String thisDate = startDt.format(RandomUtils.YMD);
+            String thisDate = startDt.format(dmFormatter);
             String sql = StrUtil.format("ALTER TABLE {} ADD PARTITION P{} VALUES ({})", tableName, thisDate, thisDate);
             try {
                 db.execute(sql);
             } catch (SQLException e) {
                 log.error("分区 " + thisDate + " 创建失败：" + e.getMessage());
             }
-            startDt = startDt.plusDays(1);
+            startDt = "D".equalsIgnoreCase(dm) ? startDt.plusDays(1) : startDt.plusMonths(1);
         }
     }
+
 
 }

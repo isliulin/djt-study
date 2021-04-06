@@ -1,6 +1,7 @@
 package com.djt.test.utils;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.HashUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -102,10 +103,11 @@ public class StringTest {
     @Test
     public void testList() {
         List<String> list = new ArrayList<>(10);
-        list.add(0, "666");
+        //list.add(0, "666");
         //list.add(1, "A");
-        list.add(2, "B");
-        list.add(3, "C");
+        //list.add(2, "B");
+        //list.add(3, "C");
+        list.set(1, "666");
         System.out.println(list);
     }
 
@@ -185,6 +187,73 @@ public class StringTest {
         System.out.println("┍━━━━");
         System.out.println("▁");
         System.out.println("▏");
+    }
+
+    @Test
+    public void testArray() {
+        char[] arr = new char[1];
+        System.out.println(arr);
+        String str = new String(arr);
+        System.out.println(str);
+        if (" ".equals(str)) {
+            System.out.println("char默认值是空格");
+        }
+
+        //浅拷贝
+        List<Map<String, String>> mapList = Collections.nCopies(3, new HashMap<>());
+        mapList.get(0).put("A", "1");
+        mapList.get(1).put("B", "2");
+        mapList.get(2).put("C", "3");
+        for (Map<String, String> map : mapList) {
+            System.out.println(map);
+        }
+
+        ArrayList<String> list = new ArrayList<>(3);
+        //list.set(1, "666"); //报错
+        System.out.println(list);
+    }
+
+    @Test
+    public void testBitSet() {
+        BitSet bitSet = new BitSet(10);
+        bitSet.set(1);
+        bitSet.set(3);
+        bitSet.set(5);
+        bitSet.set(7);
+        bitSet.set(11);
+        System.out.println(bitSet.get(2));
+        System.out.println(bitSet.get(7));
+        System.out.println(bitSet.toString());
+
+        String a = "666";
+        String b = "666";
+        System.out.println(a.hashCode());
+        System.out.println(b.hashCode());
+
+
+    }
+
+    @Test
+    public void testHash() {
+        int size = 10000;
+        Set<Integer> set = new HashSet<>();
+        for (int i = 1; i <= size; i++) {
+            int hash = HashUtil.oneByOneHash(String.valueOf(i));
+            System.out.println(hash);
+            set.add(hash);
+        }
+        System.out.println(set.size());
+    }
+
+    @Test
+    public void testMath() {
+        System.out.println(Math.pow(2, 3));
+    }
+
+    @Test
+    public void testAscii() {
+        String a = "0123456";
+        System.out.println(a.codePointAt(0));
     }
 
 

@@ -16,6 +16,7 @@ public class RandomUtils {
 
     public final static DateTimeFormatter YMDHMS_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     public final static DateTimeFormatter YMD = DateTimeFormatter.ofPattern("yyyyMMdd");
+    public final static DateTimeFormatter YM = DateTimeFormatter.ofPattern("yyyyMM");
     private final static ZoneId ZONE_ID = ZoneId.systemDefault();
     private final static ZoneOffset ZONE_OFFSET = OffsetDateTime.now().getOffset();
 

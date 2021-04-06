@@ -12,10 +12,7 @@ import org.junit.Test;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author 　djt317@qq.com
@@ -42,10 +39,12 @@ public class OracleDaoTest extends DaoTest {
 
     @Test
     public void testInsertBatchRandom() {
-        String startDt = "20201201";
-        String endDt = "20201231";
-        ((OracleDao) dao).createPartition("xdata_edw.bz_mer_check_term_trade_1d", startDt, endDt);
-        insertBatchRandom(startDt, endDt, 100, 10);
+        String startDt = "20210301";
+        String endDt = "20210331";
+        String table = "xdata_edw.agt_act_term_leave_1m";
+        ((OracleDao) dao).createPartition(table, startDt, endDt, "M");
+        truncateTable(table);
+        insertBatchRandom(startDt, endDt, 1000, 1000);
     }
 
     @Test
@@ -66,6 +65,15 @@ public class OracleDaoTest extends DaoTest {
         //String filePath = "C:\\Users\\duanjiatao\\Desktop\\update_tmp.sql";
         //dao.executeBatchFromFile(filePath, 1000);
         updateRegionInfo();
+    }
+
+    public void truncateTable(String table) {
+        String sql = "delete from " + table;
+        try {
+            dao.executeSql(sql);
+        } catch (SQLException throwables) {
+            throw new RuntimeException("表清空失败:" + table);
+        }
     }
 
     /**
@@ -123,49 +131,45 @@ public class OracleDaoTest extends DaoTest {
      * @param batchSize 分批大小
      */
     public void insertBatchRandom(String startDT, String endDT, int size, int batchSize) {
-        String sql = "insert into xdata_edw.BZ_MER_CHECK_TERM_TRADE_1D (TRANS_DATE,LMERCH_NO,LMERCH_NAME,LTERM_NO,PMERCH_NAME,TERM_SN,FEE_CALC_TYPE,STROKE_COUNT,AMOUNT_SUM,FEE_AMOUNT_SUM,PAYABLE_AMOUNT)\n" +
-                "values(?,?,?,?,?,?,?,?,?,?,?)";
+        String sql = "insert into xdata_edw.agt_act_term_leave_1m (STAT_month, BELONG_BRANCH, BRANCH_COMPANY, R_AGT_ID, R_AGT_NAME, PRODUCT_TYPE, TERM_TYPE)\n" +
+                "values(?,?,?,?,?,?,?)";
         try {
             int batchCount = 0;
             List<Object[]> paramsList = new ArrayList<>();
+
+            Map<Integer, String> pMap = new HashMap<>();
+            pMap.put(1, "MPOS-LSP");
+            pMap.put(2, "POSP");
+            pMap.put(3, "MPOS");
+            pMap.put(4, "LSPU");
+
+            Map<Integer, String> bMap = new HashMap<>();
+            bMap.put(1, "201809081044");
+            bMap.put(2, "201809171081");
+            bMap.put(3, "201809171082");
+            bMap.put(4, "201809051024");
+            bMap.put(5, "201809071028");
+            bMap.put(6, "201810081101");
+            bMap.put(7, "201809091001");
+
             for (int i = 0; i < size; i++) {
+                String f1 = RandomUtils.getRandomDate(startDT, endDT, RandomUtils.YM);
+                String f2 = bMap.get(RandomUtils.getRandomNumber(1, 7));
+                String f3 = null;
+                String f4 = RandomUtils.getString(0, 20000, 8);
+                String f5 = "测试" + RandomUtils.getRandomNumber(1, 100) + "公司";
+                String f6 = pMap.get(RandomUtils.getRandomNumber(1, 4));
+                String f7 = null;
 
-                /*
-                  TRANS_DATE       20200601,
-                  LMERCH_NO       '84931015812A00N',
-                  LMERCH_NAME     '杭州宝果科技有限公司',
-                  LTERM_NO        '60015518',
-                  PMERCH_NAME     '杭州宝果科技有限公司',
-                  TERM_SN         'N3000179885',
-                  FEE_CALC_TYPE   '02',
-                  STROKE_COUNT     10,
-                  AMOUNT_SUM       21060000,
-                  FEE_AMOUNT_SUM   113724,
-                  PAYABLE_AMOUNT   20946276
-                 */
+                Object[] params = new Object[7];
 
-                String TRANS_DATE = RandomUtils.getRandomDate(startDT, endDT, RandomUtils.YMD);
-                String LMERCH_NO = RandomUtils.getString(0, 10000, 15);
-                String LMERCH_NAME = "测试" + LMERCH_NO + "公司";
-                String LTERM_NO = RandomUtils.getString(0, 20000, 8);
-                String FEE_CALC_TYPE = RandomUtils.getString(0, 10, 2);
-                long STROKE_COUNT = RandomUtils.getRandomNumber(0, 100);
-                long AMOUNT_SUM = RandomUtils.getRandomNumber(0, 10000);
-                long FEE_AMOUNT_SUM = RandomUtils.getRandomNumber(0, 1000);
-                long PAYABLE_AMOUNT = RandomUtils.getRandomNumber(0, 1000);
-                Object[] params = new Object[11];
-
-                params[0] = Long.parseLong(TRANS_DATE);
-                params[1] = LMERCH_NO;
-                params[2] = LMERCH_NAME;
-                params[3] = LTERM_NO;
-                params[4] = LMERCH_NAME;
-                params[5] = LTERM_NO;
-                params[6] = FEE_CALC_TYPE;
-                params[7] = STROKE_COUNT;
-                params[8] = AMOUNT_SUM;
-                params[9] = FEE_AMOUNT_SUM;
-                params[10] = PAYABLE_AMOUNT;
+                params[0] = Long.parseLong(f1);
+                params[1] = f2;
+                params[2] = f3;
+                params[3] = f4;
+                params[4] = f5;
+                params[5] = f6;
+                params[6] = f7;
                 paramsList.add(params);
 
                 if ((i > 0 && i % batchSize == 0) || i == size - 1) {
