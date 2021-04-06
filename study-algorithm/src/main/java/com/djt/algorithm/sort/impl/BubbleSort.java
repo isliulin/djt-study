@@ -1,6 +1,7 @@
 package com.djt.algorithm.sort.impl;
 
 import com.djt.algorithm.sort.IArraySort;
+import com.djt.utils.SortUtils;
 import org.apache.commons.lang3.Validate;
 
 import java.util.Arrays;
@@ -31,9 +32,7 @@ public class BubbleSort implements IArraySort {
             boolean isSwap = false;
             for (int j = 0; j <= i; j++) {
                 if (sortArr[j] > sortArr[j + 1]) {
-                    int tmp = sortArr[j];
-                    sortArr[j] = sortArr[j + 1];
-                    sortArr[j + 1] = tmp;
+                    SortUtils.swap(sortArr, j, j + 1);
                     isSwap = true;
                 }
             }

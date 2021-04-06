@@ -1,6 +1,7 @@
 package com.djt.algorithm.sort.impl;
 
 import com.djt.algorithm.sort.IArraySort;
+import com.djt.utils.SortUtils;
 import org.apache.commons.lang3.Validate;
 
 import java.util.Arrays;
@@ -34,9 +35,7 @@ public class SelectSort implements IArraySort {
             }
             //非自身 则交换
             if (minIdx != i) {
-                int tmp = sortArr[i];
-                sortArr[i] = sortArr[minIdx];
-                sortArr[minIdx] = tmp;
+                SortUtils.swap(sortArr, i, minIdx);
             }
         }
 
