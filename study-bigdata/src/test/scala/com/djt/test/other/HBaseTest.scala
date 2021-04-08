@@ -7,7 +7,7 @@ import org.apache.hadoop.hbase.filter.{CompareFilter, MultiRowRangeFilter}
 import org.apache.hadoop.hbase.mapreduce.TableInputFormat
 import org.apache.hadoop.hbase.protobuf.ProtobufUtil
 import org.apache.hadoop.hbase.util.{Base64, Bytes}
-import org.apache.hadoop.hbase.{HBaseConfiguration, TableName}
+import org.apache.hadoop.hbase.{HBaseConfiguration, HConstants, TableName}
 import org.junit.{After, Before, Test}
 
 import scala.collection.mutable.ListBuffer
@@ -23,7 +23,8 @@ class HBaseTest {
     @Before
     def before(): Unit = {
         val hbaseConf = HBaseConfiguration.create()
-        //hbaseConf.set(HConstants.ZOOKEEPER_QUORUM, "172.20.4.81:2181,172.20.4.82:2181,172.20.4.83:2181")
+        hbaseConf.set(HConstants.ZOOKEEPER_QUORUM, "xdata-uat03.jlpay.io,cdh-dev01.jlpay.io,cdh-dev02.jlpay.io")
+        hbaseConf.set(HConstants.CLIENT_PORT_STR, "2181")
         conn = ConnectionFactory.createConnection(hbaseConf)
     }
 
@@ -109,8 +110,8 @@ class HBaseTest {
         println("查询===========================")
         val rangeList = new ListBuffer[MultiRowRangeFilter.RowRange]()
         for (x <- 0 to 9) {
-            val startRow = s"${x}_20210303"
-            val stopRow = s"${x}_20210306"
+            val startRow = s"${x}_0_20210303"
+            val stopRow = s"${x}_0_20210306"
             val rowrange = new MultiRowRangeFilter.RowRange(startRow, true, stopRow, false)
             rangeList.append(rowrange)
         }
@@ -151,7 +152,7 @@ class HBaseTest {
     def createRowkey(date: String, termNo: String, flag: String): String = {
         if (StringUtils.isAnyBlank(date, termNo, flag)) return null
         val randomNum = termNo.reverse.codePointAt(0).toString.last.toString
-        val demo = Array(randomNum, date, flag, termNo).mkString("_")
+        val demo = Array(randomNum, flag, date, termNo).mkString("_")
         StringUtils.rightPad(demo, 25, '0')
     }
 

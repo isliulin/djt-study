@@ -83,4 +83,9 @@ object ParamConstant {
      */
     val ES_MAPPING_DATE_RICH = "es.mapping.date.rich"
 
+    /**
+     * kudu地址
+     */
+    val KUDU_MASTER = "kudu.master"
+
 }

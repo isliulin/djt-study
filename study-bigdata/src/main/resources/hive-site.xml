@@ -4,7 +4,7 @@
 <configuration>
   <property>
     <name>hive.metastore.uris</name>
-    <value>thrift://xdata-uat03.jlpay.io:9083</value>
+    <value>thrift://cdh-dev02.jlpay.io:9083,thrift://cdh-dev03.jlpay.io:9083</value>
   </property>
   <property>
     <name>hive.metastore.client.socket.timeout</name>
@@ -184,7 +184,7 @@
   </property>
   <property>
     <name>hive.zookeeper.quorum</name>
-    <value>xdata-uat03.jlpay.io,xdata-uat02.jlpay.io,xdata-uat01.jlpay.io</value>
+    <value>cdh-dev01.jlpay.io,cdh-dev02.jlpay.io,cdh-dev03.jlpay.io</value>
   </property>
   <property>
     <name>hive.zookeeper.client.port</name>
@@ -196,7 +196,7 @@
   </property>
   <property>
     <name>hbase.zookeeper.quorum</name>
-    <value>xdata-uat03.jlpay.io,xdata-uat02.jlpay.io,xdata-uat01.jlpay.io</value>
+    <value>cdh-dev01.jlpay.io,cdh-dev02.jlpay.io,cdh-dev03.jlpay.io</value>
   </property>
   <property>
     <name>hbase.zookeeper.property.clientPort</name>

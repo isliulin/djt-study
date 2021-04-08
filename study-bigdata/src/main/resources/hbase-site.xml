@@ -104,7 +104,7 @@
   </property>
   <property>
     <name>hbase.zookeeper.quorum</name>
-    <value>xdata-uat03.jlpay.io,xdata-uat02.jlpay.io,xdata-uat01.jlpay.io</value>
+    <value>cdh-dev01.jlpay.io,cdh-dev02.jlpay.io,cdh-dev03.jlpay.io</value>
   </property>
   <property>
     <name>hbase.zookeeper.property.clientPort</name>
@@ -121,10 +121,5 @@
   <property>
     <name>hbase.regionserver.wal.codec</name>
     <value>org.apache.hadoop.hbase.regionserver.wal.IndexedWALEditCodec</value>
-  </property>
-
-  <property>
-    <name>phoenix.schema.mapSystemTablesToNamespace</name>
-    <value>true</value>
   </property>
 </configuration>

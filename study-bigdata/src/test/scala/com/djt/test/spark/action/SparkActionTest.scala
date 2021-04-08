@@ -1,9 +1,13 @@
 package com.djt.test.spark.action
 
 import com.djt.spark.action.impl.FirstSparkAction
+import com.djt.test.dto.CaseClass.Person
+import org.apache.spark.TaskContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 import org.junit.Test
+
+import scala.collection.mutable.ArrayBuffer
 
 /**
  * @author 　djt317@qq.com
@@ -32,6 +36,25 @@ class SparkActionTest extends AbsActionTest {
         personDF.show(20, truncate = false)
     }
 
-    case class Person(id: Int, name: String, age: Int)
+
+    @Test
+    def testSparkSql(): Unit = {
+        val sql = "select creator from base_info.t_diction"
+        val df = getSparkSession.sql(sql)
+
+        df.foreachPartition(iter => {
+            val partitionId = TaskContext.get.partitionId
+            val arr = new ArrayBuffer[String]()
+            while (iter.hasNext) {
+                val row = iter.next()
+                val creator = row.getAs[String]("creator")
+                arr.append(creator)
+            }
+            println(partitionId + "======666======" + arr)
+        })
+
+        df.write.partitionBy("creator")
+
+    }
 
 }

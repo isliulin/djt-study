@@ -16,43 +16,43 @@
   </property>
   <property>
     <name>ha.zookeeper.quorum</name>
-    <value>xdata-uat01.jlpay.io:2181,xdata-uat02.jlpay.io:2181,xdata-uat03.jlpay.io:2181</value>
+    <value>cdh-dev01.jlpay.io:2181,cdh-dev02.jlpay.io:2181,cdh-dev03.jlpay.io:2181</value>
   </property>
   <property>
     <name>dfs.ha.namenodes.nameserviceHA</name>
-    <value>namenode371,namenode368</value>
+    <value>namenode426,namenode423</value>
   </property>
   <property>
-    <name>dfs.namenode.rpc-address.nameserviceHA.namenode371</name>
-    <value>xdata-uat01.jlpay.io:8020</value>
+    <name>dfs.namenode.rpc-address.nameserviceHA.namenode426</name>
+    <value>cdh-dev01.jlpay.io:8020</value>
   </property>
   <property>
-    <name>dfs.namenode.servicerpc-address.nameserviceHA.namenode371</name>
-    <value>xdata-uat01.jlpay.io:8022</value>
+    <name>dfs.namenode.servicerpc-address.nameserviceHA.namenode426</name>
+    <value>cdh-dev01.jlpay.io:8022</value>
   </property>
   <property>
-    <name>dfs.namenode.http-address.nameserviceHA.namenode371</name>
-    <value>xdata-uat01.jlpay.io:50070</value>
+    <name>dfs.namenode.http-address.nameserviceHA.namenode426</name>
+    <value>cdh-dev01.jlpay.io:50070</value>
   </property>
   <property>
-    <name>dfs.namenode.https-address.nameserviceHA.namenode371</name>
-    <value>xdata-uat01.jlpay.io:50470</value>
+    <name>dfs.namenode.https-address.nameserviceHA.namenode426</name>
+    <value>cdh-dev01.jlpay.io:50470</value>
   </property>
   <property>
-    <name>dfs.namenode.rpc-address.nameserviceHA.namenode368</name>
-    <value>xdata-uat02.jlpay.io:8020</value>
+    <name>dfs.namenode.rpc-address.nameserviceHA.namenode423</name>
+    <value>cdh-dev02.jlpay.io:8020</value>
   </property>
   <property>
-    <name>dfs.namenode.servicerpc-address.nameserviceHA.namenode368</name>
-    <value>xdata-uat02.jlpay.io:8022</value>
+    <name>dfs.namenode.servicerpc-address.nameserviceHA.namenode423</name>
+    <value>cdh-dev02.jlpay.io:8022</value>
   </property>
   <property>
-    <name>dfs.namenode.http-address.nameserviceHA.namenode368</name>
-    <value>xdata-uat02.jlpay.io:50070</value>
+    <name>dfs.namenode.http-address.nameserviceHA.namenode423</name>
+    <value>cdh-dev02.jlpay.io:50070</value>
   </property>
   <property>
-    <name>dfs.namenode.https-address.nameserviceHA.namenode368</name>
-    <value>xdata-uat02.jlpay.io:50470</value>
+    <name>dfs.namenode.https-address.nameserviceHA.namenode423</name>
+    <value>cdh-dev02.jlpay.io:50470</value>
   </property>
   <property>
     <name>dfs.replication</name>

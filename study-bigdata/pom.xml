@@ -22,6 +22,7 @@
         <spark.version>2.1.0.cloudera2</spark.version>
         <hbase.version>1.2.0-cdh5.11.0</hbase.version>
         <hive.version>1.1.0-cdh5.11.0</hive.version>
+        <kudu.version>1.10.0-cdh6.3.2</kudu.version>
     </properties>
 
     <dependencies>
@@ -105,6 +106,12 @@
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch-spark-20_2.11</artifactId>
             <version>${elasticsearch.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.kudu</groupId>
+            <artifactId>kudu-spark2_2.11</artifactId>
+            <version>${kudu.version}</version>
         </dependency>
 
     </dependencies>
