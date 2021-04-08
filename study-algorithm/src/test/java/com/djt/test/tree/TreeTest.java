@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -153,16 +154,36 @@ public class TreeTest {
         System.out.println(node1 + " " + node2);
     }
 
-    /**
-     * 层序遍历 打印
-     */
+    @SuppressWarnings("unchecked")
+    @Test
     public void printLevelTree() {
         int height = BinaryTreeUtils.getHeight(binarySearchTree.getRoot());
         List<Integer>[] result2 = new ArrayList[height];
         BinaryTreeUtils.levelOrderScan(binarySearchTree.getRoot(), 1, result2);
         for (int i = 0; i < result2.length; i++) {
-            System.out.println("第 " + i + " 层：" + result2[i]);
+            System.out.println("第 " + (i + 1) + " 层：" + result2[i]);
         }
     }
+
+    @Test
+    public void testTwoWayBinNode() {
+        BinaryTreeUtils.TwoWayBinNode<Integer> node1 = new BinaryTreeUtils.TwoWayBinNode<>(1, 0);
+        BinaryTreeUtils.TwoWayBinNode<Integer> node2 = new BinaryTreeUtils.TwoWayBinNode<>(2, 0, node1);
+        BinaryTreeUtils.TwoWayBinNode<Integer> node3 = new BinaryTreeUtils.TwoWayBinNode<>(3, 0, node1);
+        node1.setLeft(node2);
+        node1.setRight(node3);
+        System.out.println(node1.getSide());
+        System.out.println(node2.getSide());
+        System.out.println(node3.getSide());
+    }
+
+    @Test
+    public void testLevelPrint() {
+        BinaryTreeUtils.levelPrint(binarySearchTree);
+        char[][] charsArr = new char[2][3];
+        BinaryTreeUtils.initCharArr(charsArr, ' ');
+        System.out.println(Arrays.deepToString(charsArr));
+    }
+
 
 }
