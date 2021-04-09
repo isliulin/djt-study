@@ -2,10 +2,13 @@ package com.djt.utils;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 /**
- * 常用字符串
+ * 常量类
  *
  * @author 　djt317@qq.com
  * @since 　 2021-03-05
@@ -17,6 +20,8 @@ public interface DjtConstant {
     DateTimeFormatter YMD = DateTimeFormatter.ofPattern("yyyyMMdd");
     DateTimeFormatter Y_M = DateTimeFormatter.ofPattern("yyyy-MM");
     DateTimeFormatter YM = DateTimeFormatter.ofPattern("yyyyMM");
+    ZoneId ZONE_ID = ZoneId.systemDefault();
+    ZoneOffset ZONE_OFFSET = OffsetDateTime.now().getOffset();
 
     /**
      * 常用姓

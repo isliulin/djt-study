@@ -16,6 +16,7 @@
         <module>study-bigdata</module>
         <module>study-other</module>
         <module>study-utils</module>
+        <module>tmp-tools</module>
     </modules>
 
     <properties>

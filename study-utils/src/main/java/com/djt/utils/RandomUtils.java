@@ -3,7 +3,10 @@ package com.djt.utils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -14,9 +17,6 @@ import java.time.format.DateTimeFormatter;
  */
 public class RandomUtils {
 
-
-    private final static ZoneId ZONE_ID = ZoneId.systemDefault();
-    private final static ZoneOffset ZONE_OFFSET = OffsetDateTime.now().getOffset();
 
     /**
      * 生成指定长度的数字字符串 末尾补0
@@ -77,11 +77,11 @@ public class RandomUtils {
     public static String getRandomDate(String start, String end, DateTimeFormatter format) {
         String startYmd = start.replaceAll("[-/:\\s]", "").substring(0, 8);
         String endYmd = end.replaceAll("[-/:\\s]", "").substring(0, 8);
-        long startTmp = LocalDateTime.of(LocalDate.parse(startYmd, DjtConstant.YMD), LocalTime.of(0, 0, 0)).toEpochSecond(ZONE_OFFSET);
-        long endTmp = LocalDateTime.of(LocalDate.parse(endYmd, DjtConstant.YMD), LocalTime.of(23, 59, 59)).toEpochSecond(ZONE_OFFSET);
+        long startTmp = LocalDateTime.of(LocalDate.parse(startYmd, DjtConstant.YMD), LocalTime.of(0, 0, 0)).toEpochSecond(DjtConstant.ZONE_OFFSET);
+        long endTmp = LocalDateTime.of(LocalDate.parse(endYmd, DjtConstant.YMD), LocalTime.of(23, 59, 59)).toEpochSecond(DjtConstant.ZONE_OFFSET);
         long diff = getRandomNumber(startTmp, endTmp);
         Instant instant = Instant.ofEpochSecond(diff);
-        return LocalDateTime.ofInstant(instant, ZONE_ID).format(format);
+        return LocalDateTime.ofInstant(instant, DjtConstant.ZONE_ID).format(format);
     }
 
     /**
