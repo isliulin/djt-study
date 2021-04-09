@@ -1,6 +1,6 @@
 package com.djt.test.utils;
 
-import com.djt.utils.RandomUtils;
+import com.djt.utils.DjtConstant;
 import org.junit.Test;
 
 import java.time.LocalDate;
@@ -17,7 +17,7 @@ public class OtherTest {
         LocalDate date = LocalDate.now();
         for (int i = 0; i < size; i++) {
             LocalDate dateTmp = date.minusDays(i);
-            int num = Integer.parseInt(dateTmp.format(RandomUtils.YMD));
+            int num = Integer.parseInt(dateTmp.format(DjtConstant.YMD));
             System.out.println(num + "======" + num % size);
         }
     }

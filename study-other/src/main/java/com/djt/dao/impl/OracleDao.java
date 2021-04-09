@@ -2,8 +2,8 @@ package com.djt.dao.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.djt.dao.AbstractDao;
+import com.djt.utils.DjtConstant;
 import com.djt.utils.PasswordUtils;
-import com.djt.utils.RandomUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.SQLException;
@@ -75,9 +75,9 @@ public class OracleDao extends AbstractDao {
      * @param dm         日月标识
      */
     public void createPartition(String tableName, String startDtStr, String endDtStr, String dm) {
-        LocalDate startDt = LocalDate.parse(startDtStr, RandomUtils.YMD);
-        LocalDate endDt = LocalDate.parse(endDtStr, RandomUtils.YMD);
-        DateTimeFormatter dmFormatter = "D".equalsIgnoreCase(dm) ? RandomUtils.YMD : RandomUtils.YM;
+        LocalDate startDt = LocalDate.parse(startDtStr, DjtConstant.YMD);
+        LocalDate endDt = LocalDate.parse(endDtStr, DjtConstant.YMD);
+        DateTimeFormatter dmFormatter = "D".equalsIgnoreCase(dm) ? DjtConstant.YMD : DjtConstant.YM;
         while (!startDt.isAfter(endDt)) {
             String thisDate = startDt.format(dmFormatter);
             String sql = StrUtil.format("ALTER TABLE {} ADD PARTITION P{} VALUES ({})", tableName, thisDate, thisDate);

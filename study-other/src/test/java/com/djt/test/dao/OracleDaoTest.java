@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.sql.SqlExecutor;
 import com.alibaba.fastjson.JSONObject;
 import com.djt.dao.impl.OracleDao;
+import com.djt.utils.DjtConstant;
 import com.djt.utils.RandomUtils;
 import com.djt.utils.RegionUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -153,7 +154,7 @@ public class OracleDaoTest extends DaoTest {
             bMap.put(7, "201809091001");
 
             for (int i = 0; i < size; i++) {
-                String f1 = RandomUtils.getRandomDate(startDT, endDT, RandomUtils.YM);
+                String f1 = RandomUtils.getRandomDate(startDT, endDT, DjtConstant.YM);
                 String f2 = bMap.get(RandomUtils.getRandomNumber(1, 7));
                 String f3 = null;
                 String f4 = RandomUtils.getString(0, 20000, 8);

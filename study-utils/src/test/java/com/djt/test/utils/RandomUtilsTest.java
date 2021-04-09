@@ -1,5 +1,6 @@
 package com.djt.test.utils;
 
+import com.djt.utils.DjtConstant;
 import com.djt.utils.RandomUtils;
 import org.junit.Test;
 
@@ -37,7 +38,7 @@ public class RandomUtilsTest {
         String start = "2020-01-01 00:00:00";
         String end = "2020-12-31 23:59:59";
         System.out.println(RandomUtils.getRandomDate(start, end));
-        System.out.println(RandomUtils.getRandomDate(start, end, RandomUtils.YMD));
+        System.out.println(RandomUtils.getRandomDate(start, end, DjtConstant.YMD));
     }
 
     @Test

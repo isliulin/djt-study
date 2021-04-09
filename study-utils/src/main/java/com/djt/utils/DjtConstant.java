@@ -2,13 +2,21 @@ package com.djt.utils;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.format.DateTimeFormatter;
+
 /**
  * 常用字符串
  *
  * @author 　djt317@qq.com
  * @since 　 2021-03-05
  */
-public interface CharConstant {
+public interface DjtConstant {
+
+    DateTimeFormatter YMDHMS_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    DateTimeFormatter Y_M_D = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    DateTimeFormatter YMD = DateTimeFormatter.ofPattern("yyyyMMdd");
+    DateTimeFormatter Y_M = DateTimeFormatter.ofPattern("yyyy-MM");
+    DateTimeFormatter YM = DateTimeFormatter.ofPattern("yyyyMM");
 
     /**
      * 常用姓

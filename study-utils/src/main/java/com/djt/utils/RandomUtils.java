@@ -14,9 +14,7 @@ import java.time.format.DateTimeFormatter;
  */
 public class RandomUtils {
 
-    public final static DateTimeFormatter YMDHMS_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    public final static DateTimeFormatter YMD = DateTimeFormatter.ofPattern("yyyyMMdd");
-    public final static DateTimeFormatter YM = DateTimeFormatter.ofPattern("yyyyMM");
+
     private final static ZoneId ZONE_ID = ZoneId.systemDefault();
     private final static ZoneOffset ZONE_OFFSET = OffsetDateTime.now().getOffset();
 
@@ -65,7 +63,7 @@ public class RandomUtils {
     public static String getRandomDate(String start, String end) {
         String startYmd = start.replaceAll("[-/:\\s]", "").substring(0, 8);
         String endYmd = end.replaceAll("[-/:\\s]", "").substring(0, 8);
-        return getRandomDate(startYmd, endYmd, YMDHMS_FORMAT);
+        return getRandomDate(startYmd, endYmd, DjtConstant.YMDHMS_FORMAT);
     }
 
     /**
@@ -79,8 +77,8 @@ public class RandomUtils {
     public static String getRandomDate(String start, String end, DateTimeFormatter format) {
         String startYmd = start.replaceAll("[-/:\\s]", "").substring(0, 8);
         String endYmd = end.replaceAll("[-/:\\s]", "").substring(0, 8);
-        long startTmp = LocalDateTime.of(LocalDate.parse(startYmd, YMD), LocalTime.of(0, 0, 0)).toEpochSecond(ZONE_OFFSET);
-        long endTmp = LocalDateTime.of(LocalDate.parse(endYmd, YMD), LocalTime.of(23, 59, 59)).toEpochSecond(ZONE_OFFSET);
+        long startTmp = LocalDateTime.of(LocalDate.parse(startYmd, DjtConstant.YMD), LocalTime.of(0, 0, 0)).toEpochSecond(ZONE_OFFSET);
+        long endTmp = LocalDateTime.of(LocalDate.parse(endYmd, DjtConstant.YMD), LocalTime.of(23, 59, 59)).toEpochSecond(ZONE_OFFSET);
         long diff = getRandomNumber(startTmp, endTmp);
         Instant instant = Instant.ofEpochSecond(diff);
         return LocalDateTime.ofInstant(instant, ZONE_ID).format(format);
@@ -95,10 +93,10 @@ public class RandomUtils {
     public static String getRandomName(byte sex) {
         Validate.isTrue(sex == 1 || sex == 2, "性别不合法！");
         //随机取个姓
-        int surNameIdx = getRandomNumber(0, CharConstant.SUR_NAME_ARR.length - 1);
-        String surName = CharConstant.SUR_NAME_ARR[surNameIdx];
+        int surNameIdx = getRandomNumber(0, DjtConstant.SUR_NAME_ARR.length - 1);
+        String surName = DjtConstant.SUR_NAME_ARR[surNameIdx];
         //根据性别取名字列表
-        String[] nameArr = sex == 1 ? CharConstant.NAME_MALE_ARR : CharConstant.NAME_FEMALE_ARR;
+        String[] nameArr = sex == 1 ? DjtConstant.NAME_MALE_ARR : DjtConstant.NAME_FEMALE_ARR;
         //随机名字长度 1-2
         int nameLen = getRandomNumber(1, 2);
         String char1 = nameArr[getRandomNumber(0, nameArr.length - 1)];
