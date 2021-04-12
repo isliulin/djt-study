@@ -12,10 +12,12 @@ import java.nio.charset.StandardCharsets;
  */
 public abstract class AbsTools {
 
+    public static final String CONFIG_PATH = "file:" + System.getProperty("user.dir") + "/config/config.properties";
+
     /**
      * 加载配置
      */
-    protected Props props = Props.getProp("config.properties", StandardCharsets.UTF_8);
+    protected Props props = Props.getProp(CONFIG_PATH, StandardCharsets.UTF_8);
 
     abstract public void execute(String[] args) throws Exception;
 

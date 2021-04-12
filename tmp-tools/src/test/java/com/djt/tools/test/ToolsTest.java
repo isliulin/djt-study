@@ -20,6 +20,7 @@ public class ToolsTest {
     @Before
     public void before() {
         start = System.currentTimeMillis();
+        log.info("当前工作目录：{}", System.getProperty("user.dir"));
     }
 
     @After
@@ -32,4 +33,5 @@ public class ToolsTest {
     public void testHdfsTools() throws Exception {
         new HdfsTools().execute(null);
     }
+
 }
