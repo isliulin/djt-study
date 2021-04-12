@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -59,7 +60,7 @@ public class HdfsTools extends AbsTools {
             }
 
             String line = dateTime + "\t" + filePath.toString() + "\n";
-            FileUtils.write(resultFile, line, true);
+            FileUtils.write(resultFile, line, StandardCharsets.UTF_8, true);
             log.info(line);
         }
     }
