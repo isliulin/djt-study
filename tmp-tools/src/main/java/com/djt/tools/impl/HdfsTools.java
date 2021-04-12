@@ -29,10 +29,12 @@ public class HdfsTools extends AbsTools {
 
     private static final Logger log = LogManager.getLogger(HdfsTools.class);
 
-
+    /**
+     * 扫描指定路径下的文件 根据条件过滤
+     */
     @Override
-    public void execute(String[] args) throws Exception {
-        String hdfsUrl = props.getStr("hdfs.url");
+    public void doExecute(String[] args) throws Exception {
+        String hdfsUrl = PROPS.getStr("hdfs.url");
         Validate.notBlank(hdfsUrl, "hdfs.url不能为空！");
         String today = LocalDate.now().format(DjtConstant.YMD);
 

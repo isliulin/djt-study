@@ -1,5 +1,6 @@
 package com.djt.tools.test;
 
+import com.djt.tools.AbsTools;
 import com.djt.tools.impl.HdfsTools;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,23 +16,18 @@ public class ToolsTest {
 
     private static final Logger log = LogManager.getLogger(ToolsTest.class);
 
-    private static long start;
-
     @Before
     public void before() {
-        start = System.currentTimeMillis();
-        log.info("当前工作目录：{}", System.getProperty("user.dir"));
     }
 
     @After
     public void after() {
-        long stop = System.currentTimeMillis();
-        log.info("运行完成...耗时：{} s", (stop - start) / 1000);
     }
 
     @Test
-    public void testHdfsTools() throws Exception {
-        new HdfsTools().execute(null);
+    public void testHdfsTools() {
+        AbsTools tools = new HdfsTools();
+        tools.execute(null);
     }
 
 }

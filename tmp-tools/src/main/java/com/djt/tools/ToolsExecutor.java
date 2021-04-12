@@ -5,6 +5,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
+ * 程序主类
+ *
  * @author 　djt317@qq.com
  * @since 　 2021-04-09
  */
@@ -15,7 +17,8 @@ public class ToolsExecutor {
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
         try {
-            new HdfsTools().execute(null);
+            AbsTools tools = new HdfsTools();
+            tools.execute(null);
         } catch (Exception e) {
             log.error("程序运行出错：{}", e.getMessage());
         } finally {

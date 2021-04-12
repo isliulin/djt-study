@@ -1,6 +1,6 @@
 package com.djt.test.other
 
-import com.djt.utils.RandomUtils
+import com.djt.utils.{DjtConstant, RandomUtils}
 import org.apache.commons.lang3.StringUtils
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.filter.{CompareFilter, MultiRowRangeFilter}
@@ -94,7 +94,7 @@ class HBaseTest {
         val field = Bytes.toBytes("TERM_NO")
         println("写入===========================")
         for (_ <- 1 to 100) {
-            val date = RandomUtils.getRandomDate("20210301", "20210310", RandomUtils.YMD)
+            val date = RandomUtils.getRandomDate("20210301", "20210310", DjtConstant.YMD)
             val termNo = RandomUtils.getRandomNumber(100, 10000).toString
             val flag = RandomUtils.getRandomNumber(0, 1).toString
             val rowkey = createRowkey(date, termNo, flag)
