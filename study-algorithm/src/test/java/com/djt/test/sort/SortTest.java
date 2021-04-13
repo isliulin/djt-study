@@ -2,6 +2,7 @@ package com.djt.test.sort;
 
 import com.djt.algorithm.sort.IArraySort;
 import com.djt.algorithm.sort.impl.BubbleSort;
+import com.djt.algorithm.sort.impl.InsertSort;
 import com.djt.algorithm.sort.impl.QuickSort;
 import com.djt.algorithm.sort.impl.SelectSort;
 import com.djt.utils.RandomUtils;
@@ -45,6 +46,13 @@ public class SortTest {
     @Test
     public void testQuickSort() throws Exception {
         IArraySort arraySort = new QuickSort();
+        printArray("排序前", arr);
+        printArray("排序后", arraySort.sort(arr));
+    }
+
+    @Test
+    public void testInsertSort() throws Exception {
+        IArraySort arraySort = new InsertSort();
         printArray("排序前", arr);
         printArray("排序后", arraySort.sort(arr));
     }

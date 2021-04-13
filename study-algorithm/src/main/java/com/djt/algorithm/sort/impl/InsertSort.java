@@ -24,10 +24,15 @@ public class InsertSort implements IArraySort {
         //数组拷贝，不改变参数内容
         int[] sortArr = Arrays.copyOf(sourceArray, sourceArray.length);
 
-        for (int i = 0; i < sortArr.length; i++) {
-
+        for (int i = 1; i < sortArr.length; i++) {
+            int tmp = sortArr[i];
+            int j = i - 1;
+            while (j >= 0 && sortArr[j] > tmp) {
+                sortArr[j + 1] = sortArr[j];
+                --j;
+            }
+            sortArr[j + 1] = tmp;
         }
-
         return sortArr;
     }
 }
