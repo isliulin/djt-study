@@ -15,15 +15,7 @@ public class ToolsExecutor {
     private static final Logger log = LogManager.getLogger(ToolsExecutor.class);
 
     public static void main(String[] args) {
-        long start = System.currentTimeMillis();
-        try {
-            AbsTools tools = new HdfsTools();
-            tools.execute(null);
-        } catch (Exception e) {
-            log.error("程序运行出错：{}", e.getMessage());
-        } finally {
-            long stop = System.currentTimeMillis();
-            log.info("运行完成...耗时：{} s", (stop - start) / 1000);
-        }
+        AbsTools tools = new HdfsTools();
+        tools.execute(null);
     }
 }

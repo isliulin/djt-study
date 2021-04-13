@@ -27,6 +27,7 @@ public abstract class AbsTools {
     public static final Props PROPS = Props.getProp(CONFIG_PATH, StandardCharsets.UTF_8);
 
     public void execute(String[] args) {
+        log.info("程序开始运行...");
         long start = System.currentTimeMillis();
         try {
             doExecute(args);
