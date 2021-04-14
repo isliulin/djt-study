@@ -1,0 +1,16 @@
+#!/bin/bash
+
+today=$(date +'%Y-%m-%d')
+
+file_list=$(sudo -u hdfs hdfs dfs -ls -R /user/hive/warehouse | awk -F ' ' '{print $6,$8}' OFS=':')
+i=0
+for file in $file_list; do
+  f_date=$(echo $file | awk -F ':' '{print $1}')
+  f_path=$(echo $file | awk -F ':' '{print $2}')
+  f_name=$(echo $f_path | awk -F '/' '{print $NF}')
+  #echo $file | grep -q '2'   && [ $? = 0 ]
+  if [ $f_date == $today ]; then
+    i=$((i + 1))
+    echo $i $f_date $f_name
+  fi
+done
