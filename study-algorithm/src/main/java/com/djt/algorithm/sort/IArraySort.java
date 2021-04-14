@@ -13,7 +13,8 @@ public interface IArraySort {
      *
      * @param sourceArray 待排序数组
      * @return 排序后的数组
-     * @throws Exception 异常
      */
-    int[] sort(final int[] sourceArray) throws Exception;
+    int[] sort(final int[] sourceArray);
+
+    String getName();
 }

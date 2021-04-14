@@ -21,9 +21,8 @@ public class SelectSort implements IArraySort {
      */
 
     @Override
-    public int[] sort(final int[] sourceArray) throws Exception {
+    public int[] sort(final int[] sourceArray) {
         Validate.notNull(sourceArray);
-        //数组拷贝，不改变参数内容
         int[] sortArr = Arrays.copyOf(sourceArray, sourceArray.length);
 
         for (int i = 0; i < sortArr.length - 1; i++) {
@@ -41,4 +40,10 @@ public class SelectSort implements IArraySort {
 
         return sortArr;
     }
+
+    @Override
+    public String getName() {
+        return "选择排序";
+    }
+
 }

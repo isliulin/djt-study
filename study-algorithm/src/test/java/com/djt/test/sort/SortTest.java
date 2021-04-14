@@ -1,10 +1,7 @@
 package com.djt.test.sort;
 
 import com.djt.algorithm.sort.IArraySort;
-import com.djt.algorithm.sort.impl.BubbleSort;
-import com.djt.algorithm.sort.impl.InsertSort;
-import com.djt.algorithm.sort.impl.QuickSort;
-import com.djt.algorithm.sort.impl.SelectSort;
+import com.djt.algorithm.sort.impl.*;
 import com.djt.utils.RandomUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,36 +27,34 @@ public class SortTest {
     }
 
     @Test
-    public void testBubbleSort() throws Exception {
-        IArraySort arraySort = new BubbleSort();
-        printArray("排序前", arr);
-        printArray("排序后", arraySort.sort(arr));
+    public void testBubbleSort() {
+        sortAndPrint(new BubbleSort());
     }
 
     @Test
-    public void testSelectSort() throws Exception {
-        IArraySort arraySort = new SelectSort();
-        printArray("排序前", arr);
-        printArray("排序后", arraySort.sort(arr));
+    public void testSelectSort() {
+        sortAndPrint(new SelectSort());
     }
 
     @Test
-    public void testQuickSort() throws Exception {
-        IArraySort arraySort = new QuickSort();
-        printArray("排序前", arr);
-        printArray("排序后", arraySort.sort(arr));
+    public void testQuickSort() {
+        sortAndPrint(new QuickSort());
     }
 
     @Test
-    public void testInsertSort() throws Exception {
-        IArraySort arraySort = new InsertSort();
-        printArray("排序前", arr);
-        printArray("排序后", arraySort.sort(arr));
+    public void testInsertSort() {
+        sortAndPrint(new InsertSort());
     }
 
-    public static void printArray(String msg, int[] arr) {
-        System.out.println(msg + " " + Arrays.toString(arr));
+    @Test
+    public void testShellSort() {
+        sortAndPrint(new ShellSort());
     }
 
+    private void sortAndPrint(IArraySort sort) {
+        System.out.println(sort.getName());
+        System.out.println("排序前 " + Arrays.toString(arr));
+        System.out.println("排序后 " + Arrays.toString(sort.sort(arr)));
+    }
 
 }

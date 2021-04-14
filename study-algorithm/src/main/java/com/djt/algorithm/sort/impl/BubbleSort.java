@@ -22,9 +22,8 @@ public class BubbleSort implements IArraySort {
      */
 
     @Override
-    public int[] sort(final int[] sourceArray) throws Exception {
+    public int[] sort(final int[] sourceArray) {
         Validate.notNull(sourceArray);
-        //数组拷贝，不改变参数内容
         int[] sortArr = Arrays.copyOf(sourceArray, sourceArray.length);
 
         for (int i = sortArr.length - 2; i >= 0; i--) {
@@ -43,5 +42,10 @@ public class BubbleSort implements IArraySort {
         }
 
         return sortArr;
+    }
+
+    @Override
+    public String getName() {
+        return "冒泡排序";
     }
 }

@@ -15,7 +15,7 @@ public class QuickSort implements IArraySort {
 
 
     @Override
-    public int[] sort(int[] sourceArray) throws Exception {
+    public int[] sort(int[] sourceArray) {
         Validate.notNull(sourceArray);
         int[] sortArr = Arrays.copyOf(sourceArray, sourceArray.length);
         sort(sortArr, 0, sortArr.length - 1);
@@ -58,4 +58,10 @@ public class QuickSort implements IArraySort {
         array[left] = base;
         return left;
     }
+
+    @Override
+    public String getName() {
+        return "快速排序";
+    }
+
 }
