@@ -1,20 +1,25 @@
-<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.1.0 http://maven.apache.org/xsd/assembly-2.1.0.xsd">
     <id>release</id>
     <formats>
         <format>tar.gz</format>
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
-    <fileSets>
 
-        <fileSet>
-            <directory>src/main</directory>
-            <outputDirectory>./${artifactId}</outputDirectory>
-            <excludes>
-                <exclude>**/*</exclude>
-            </excludes>
-        </fileSet>
+    <dependencySets>
+
+        <dependencySet>
+            <!-->是否添加自身jar包<-->
+            <useProjectArtifact>true</useProjectArtifact>
+            <!--三方包输出路径-->
+            <outputDirectory>./${artifactId}/lib</outputDirectory>
+            <!--是否将三方包解压成class文件-->
+            <unpack>false</unpack>
+        </dependencySet>
+
+    </dependencySets>
+
+    <fileSets>
 
         <fileSet>
             <directory>${project.build.directory}/classes</directory>
@@ -30,22 +35,6 @@
             <outputDirectory>./${artifactId}/</outputDirectory>
             <includes>
                 <include>start.sh</include>
-            </includes>
-        </fileSet>
-
-        <fileSet>
-            <directory>${project.build.directory}</directory>
-            <outputDirectory>./${artifactId}/lib</outputDirectory>
-            <includes>
-                <include>*.jar</include>
-            </includes>
-        </fileSet>
-
-        <fileSet>
-            <directory>${project.build.directory}/lib</directory>
-            <outputDirectory>./${artifactId}/lib</outputDirectory>
-            <includes>
-                <include>*.jar</include>
             </includes>
         </fileSet>
 
