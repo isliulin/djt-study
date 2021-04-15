@@ -83,31 +83,13 @@ class HBaseTest {
     }
 
     @Test
-    def testPutAndScan(): Unit = {
-        //先批量插入
+    def testScan(): Unit = {
         import scala.collection.JavaConversions._
         val tableName = "EDW:AGT_INC_ACT_TERMS_1D"
         clearHbaseData(tableName)
         val table = conn.getTable(TableName.valueOf(tableName))
         val cf = Bytes.toBytes("cf")
-        val putList = new ListBuffer[Put]()
-        val field = Bytes.toBytes("TERM_NO")
-        println("写入===========================")
-        for (_ <- 1 to 100) {
-            val date = RandomUtils.getRandomDate("20210301", "20210310", DjtConstant.YMD)
-            val termNo = RandomUtils.getRandomNumber(100, 10000).toString
-            val flag = RandomUtils.getRandomNumber(0, 1).toString
-            val rowkey = createRowkey(date, termNo, flag)
-            println(rowkey)
-            val put = new Put(Bytes.toBytes(rowkey))
-            val value = Bytes.toBytes(termNo)
-            put.addColumn(cf, field, value)
-            putList.append(put)
-        }
-        table.put(putList)
 
-        //再查询
-        println("查询===========================")
         val rangeList = new ListBuffer[MultiRowRangeFilter.RowRange]()
         for (x <- 0 to 9) {
             val startRow = s"${x}_0_20210303"
@@ -125,6 +107,29 @@ class HBaseTest {
             println(rowString)
         }
         table.close()
+    }
+
+    @Test
+    def testBathPut(): Unit = {
+        import scala.collection.JavaConversions._
+        val tableName = "EDW:AGT_INC_ACT_TERMS_1D"
+        clearHbaseData(tableName)
+        val table = conn.getTable(TableName.valueOf(tableName))
+        val cf = Bytes.toBytes("cf")
+        val putList = new ListBuffer[Put]()
+        val field = Bytes.toBytes("TERM_NO")
+        for (_ <- 1 to 100) {
+            val date = RandomUtils.getRandomDate("20210301", "20210310", DjtConstant.YMD)
+            val termNo = RandomUtils.getRandomNumber(100, 10000).toString
+            val flag = RandomUtils.getRandomNumber(0, 1).toString
+            val rowkey = createRowkey(date, termNo, flag)
+            println(rowkey)
+            val put = new Put(Bytes.toBytes(rowkey))
+            val value = Bytes.toBytes(termNo)
+            put.addColumn(cf, field, value)
+            putList.append(put)
+        }
+        table.put(putList)
     }
 
 

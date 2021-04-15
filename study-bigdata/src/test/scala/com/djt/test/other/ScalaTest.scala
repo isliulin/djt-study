@@ -12,4 +12,14 @@ class ScalaTest {
     def testNull(): Unit = {
         println(null.asInstanceOf[Int])
     }
+
+    @Test
+    def testIndex(): Unit = {
+        val keyList = Array[String]("t_table_1", "t_table_2", "t_table_3", "t_table_3", "t_table_4", "t_table_5")
+        println(keyList.indexOf("t_table_1"))
+        println(keyList.indexOf("t_table_2"))
+        println(keyList.indexOf("t_table_3"))
+        println(keyList.indexOf("t_table_4"))
+        println(keyList.indexOf("t_table_5"))
+    }
 }

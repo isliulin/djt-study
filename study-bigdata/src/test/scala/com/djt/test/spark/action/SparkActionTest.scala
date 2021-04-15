@@ -2,12 +2,13 @@ package com.djt.test.spark.action
 
 import com.djt.spark.action.impl.FirstSparkAction
 import com.djt.test.dto.CaseClass.Person
-import org.apache.spark.TaskContext
+import com.djt.utils.RandomUtils
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
+import org.apache.spark.{Partitioner, TaskContext}
 import org.junit.Test
 
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
 /**
  * @author 　djt317@qq.com
@@ -54,7 +55,57 @@ class SparkActionTest extends AbsActionTest {
         })
 
         df.write.partitionBy("creator")
-
     }
+
+
+    @Test
+    def testRepartition(): Unit = {
+        val sparkSession = getSparkSession
+        val keyList = Array[String]("t_table_1", "t_table_2", "t_table_3", "t_table_4", "t_table_5")
+
+
+        val dataList = new ListBuffer[(String, (Int, Int))]()
+        for (_ <- 1 to 100) {
+            val table = keyList(RandomUtils.getRandomNumber(0, keyList.length))
+            val id = RandomUtils.getRandomNumber(0, 100)
+            val amt = RandomUtils.getRandomNumber(0, 10000)
+            val pos = RandomUtils.getRandomNumber(1, 5)
+            dataList.append((s"$table#$id", (amt, pos)))
+        }
+
+
+        val rdd = sparkSession.sparkContext.parallelize(dataList, 10).cache()
+        //打印原数据
+        rdd.foreachPartition(iter => {
+            println(s"分区号：${TaskContext.get.partitionId} 数据：${iter.toList}")
+        })
+
+        println("正经分割线=====================================================================")
+
+        rdd.reduceByKey(new MyPartitioner(keyList), (data1, data2) => {
+            if (data1._2 > data2._2) {
+                data1
+            } else {
+                data2
+            }
+        }).foreachPartition(iter => {
+            println(s"分区号：${TaskContext.get.partitionId} 数据：${iter.toList}")
+        })
+    }
+
+
+    /**
+     * 自定义分区器
+     */
+    class MyPartitioner(keyList: Array[String]) extends Partitioner {
+
+        def numPartitions: Int = keyList.length
+
+        def getPartition(key: Any): Int = {
+            val table = key.toString.split("#")(0)
+            keyList.indexOf(table)
+        }
+    }
+
 
 }
