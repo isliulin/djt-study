@@ -27,6 +27,16 @@ public class SortTest {
     }
 
     @Test
+    public void testAllSort() {
+        sortAndPrint(new BubbleSort());
+        sortAndPrint(new SelectSort());
+        sortAndPrint(new QuickSort());
+        sortAndPrint(new InsertSort());
+        sortAndPrint(new ShellSort());
+        sortAndPrint(new MergeSort());
+    }
+
+    @Test
     public void testBubbleSort() {
         sortAndPrint(new BubbleSort());
     }
@@ -49,6 +59,11 @@ public class SortTest {
     @Test
     public void testShellSort() {
         sortAndPrint(new ShellSort());
+    }
+
+    @Test
+    public void testMergeSort() {
+        sortAndPrint(new MergeSort());
     }
 
     private void sortAndPrint(IArraySort sort) {
