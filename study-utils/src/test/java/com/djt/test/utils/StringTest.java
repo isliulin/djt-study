@@ -254,6 +254,13 @@ public class StringTest {
     public void testAscii() {
         String a = "0123456";
         System.out.println(a.codePointAt(0));
+        System.out.println(a.codePointAt(a.length() - 1));
+        System.out.println(StringUtils.substring(a, -1));
+    }
+
+    @Test
+    public void testJoin() {
+
     }
 
 

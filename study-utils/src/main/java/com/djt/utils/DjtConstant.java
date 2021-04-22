@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 public interface DjtConstant {
 
     DateTimeFormatter YMDHMS_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    DateTimeFormatter YMDHMSS_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
     DateTimeFormatter Y_M_D = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     DateTimeFormatter YMD = DateTimeFormatter.ofPattern("yyyyMMdd");
     DateTimeFormatter Y_M = DateTimeFormatter.ofPattern("yyyy-MM");
