@@ -17,7 +17,7 @@ import scala.collection.mutable.ListBuffer
  */
 class KuduTest extends AbsActionTest {
 
-    var kuduMaster: String = _
+    private var kuduMaster: String = _
     private var kuduContext: KuduContext = _
     private var kuduClient: KuduClient = _
 
@@ -68,9 +68,7 @@ class KuduTest extends AbsActionTest {
         row.addString("min_trd_date", "20210406")
         session.apply(insert)
 
-        val upsert = table.newUpsert()
-        val row2 = upsert.getRow
-
+        //val upsert = table.newUpsert()
 
         session.close()
     }

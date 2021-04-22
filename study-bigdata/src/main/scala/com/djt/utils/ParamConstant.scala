@@ -88,4 +88,9 @@ object ParamConstant {
      */
     val KUDU_MASTER = "kudu.master"
 
+    /**
+     * phoenix zk地址
+     */
+    val PHOENIX_ZK_URL = "phoenix.zk.url"
+
 }

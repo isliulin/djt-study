@@ -22,5 +22,6 @@ object CaseClass {
                         term_type: String = null,
                         min_trd_date: String = null) extends Serializable
 
+    case class TestCase(f1: String, f2: String, f3: String)
 
 }
