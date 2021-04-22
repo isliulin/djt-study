@@ -1,9 +1,12 @@
 package com.djt.test.other
 
+import com.djt.test.spark.action.AbsActionTest
 import com.djt.utils.{DjtConstant, RandomUtils}
 import org.apache.commons.lang3.StringUtils
+import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.filter.{CompareFilter, MultiRowRangeFilter}
+import org.apache.hadoop.hbase.io.ImmutableBytesWritable
 import org.apache.hadoop.hbase.mapreduce.TableInputFormat
 import org.apache.hadoop.hbase.protobuf.ProtobufUtil
 import org.apache.hadoop.hbase.util.{Base64, Bytes}
@@ -16,13 +19,14 @@ import scala.collection.mutable.ListBuffer
  * @author 　djt317@qq.com
  * @since 　 2021-03-24
  */
-class HBaseTest {
+class HBaseTest extends AbsActionTest {
 
+    val hbaseConf: Configuration = HBaseConfiguration.create()
     var conn: Connection = _
 
     @Before
-    def before(): Unit = {
-        val hbaseConf = HBaseConfiguration.create()
+    override def before(): Unit = {
+        super.before()
         hbaseConf.set(HConstants.ZOOKEEPER_QUORUM, "xdata-uat03.jlpay.io,cdh-dev01.jlpay.io,cdh-dev02.jlpay.io")
         hbaseConf.set(HConstants.CLIENT_PORT_STR, "2181")
         conn = ConnectionFactory.createConnection(hbaseConf)
@@ -58,6 +62,7 @@ class HBaseTest {
 
     @Test
     def testNewApi(): Unit = {
+        val sparkSession = getSparkSession
         val cf = Bytes.toBytes("cf")
         val hbaseConf = HBaseConfiguration.create()
         hbaseConf.set(TableInputFormat.INPUT_TABLE, "EDW:AGT_INC_ACT_TERMS_1D")
@@ -65,8 +70,8 @@ class HBaseTest {
         import scala.collection.JavaConversions._
         val rangeList = new ListBuffer[MultiRowRangeFilter.RowRange]()
         for (x <- 0 to 9) {
-            val startRow = s"${x}_20210224_0"
-            val stopRow = s"${x}_20210224_0"
+            val startRow = s"${x}_0_20210303"
+            val stopRow = s"${x}_0_20210306"
             rangeList.append(new MultiRowRangeFilter.RowRange(startRow, true, stopRow, true))
         }
         val multiRowRangeFilter = new MultiRowRangeFilter(rangeList)
@@ -75,11 +80,13 @@ class HBaseTest {
         val scanToString = Base64.encodeBytes(proto.toByteArray)
         hbaseConf.set(TableInputFormat.SCAN, scanToString)
 
-        //sparkSession.sparkContext.newAPIHadoopRDD(
-        //    hbaseConf,
-        //    classOf[TableInputFormat],
-        //    classOf[ImmutableBytesWritable],
-        //    classOf[Result])
+        sparkSession.sparkContext.newAPIHadoopRDD(
+            hbaseConf,
+            classOf[TableInputFormat],
+            classOf[ImmutableBytesWritable],
+            classOf[Result]).foreach(tup2 => {
+            println(Bytes.toString(tup2._2.getRow))
+        })
     }
 
     @Test
@@ -99,6 +106,23 @@ class HBaseTest {
         }
         val multiRowRangeFilter = new MultiRowRangeFilter(rangeList)
         val scan = new Scan().addFamily(cf).setFilter(multiRowRangeFilter)
+        val resultScanner = table.getScanner(scan)
+        val iter = resultScanner.iterator()
+        while (iter.hasNext) {
+            val result = iter.next()
+            val rowString = Bytes.toString(result.getRow)
+            println(rowString)
+        }
+        table.close()
+    }
+
+    @Test
+    def testScan2(): Unit = {
+        val tableName = "TEST:T_TEST_DJT"
+        val table = conn.getTable(TableName.valueOf(tableName))
+        val cf = Bytes.toBytes("cf")
+
+        val scan = new Scan().addFamily(cf)
         val resultScanner = table.getScanner(scan)
         val iter = resultScanner.iterator()
         while (iter.hasNext) {
@@ -130,6 +154,17 @@ class HBaseTest {
             putList.append(put)
         }
         table.put(putList)
+    }
+
+    @Test
+    def testBathPut2(): Unit = {
+        val tableName = "TEST.T_TEST_DJT"
+        val table = conn.getTable(TableName.valueOf(tableName))
+        val cf = Bytes.toBytes("0")
+        val put = new Put(Bytes.toBytes("444"))
+        put.addColumn(cf, Bytes.toBytes("F2"), Bytes.toBytes("444"))
+        put.addColumn(cf, Bytes.toBytes("F3"), Bytes.toBytes("444"))
+        table.put(put)
     }
 
 
