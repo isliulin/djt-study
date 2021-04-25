@@ -31,7 +31,6 @@ public class KafkaTest {
     public void testKafkaProducer() throws InterruptedException {
         String topic = "TEST_DJT";
         String table = "test.t_test_djt";
-        //KafkaDemo.startConsumer(props, topic);
         Producer<String, String> producer = KafkaDemo.createProducer(props);
         for (int i = 0; i < 1; i++) {
             String time = LocalDateTime.now().format(DjtConstant.YMDHMSS_FORMAT);
@@ -45,8 +44,8 @@ public class KafkaTest {
             message.put("before", new JSONObject());
             JSONObject after = new JSONObject();
             after.put("F1", "1");
-            after.put("F2", "111");
-            after.put("F3", "111");
+            after.put("F2", "11111");
+            after.put("F3", "11111");
             message.put("after", after);
             String msgStr = JSONObject.toJSONString(message, SerializerFeature.WRITE_MAP_NULL_FEATURES);
             KafkaDemo.sendMessage(producer, topic, String.valueOf(i), msgStr);
@@ -57,6 +56,8 @@ public class KafkaTest {
 
     @Test
     public void testKafkaConsumer() {
-
+        String topic = "TEST_DJT";
+        props.put("kafka.group.id", "GP_TEST_DJT");
+        KafkaDemo.startConsumer(props, topic);
     }
 }
