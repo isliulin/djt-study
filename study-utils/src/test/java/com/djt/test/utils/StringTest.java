@@ -259,8 +259,9 @@ public class StringTest {
     }
 
     @Test
-    public void testJoin() {
-
+    public void testReplace() {
+        String str = "abc${aaa}";
+        System.out.println(str.replace("${aaa}", "666"));
     }
 
 

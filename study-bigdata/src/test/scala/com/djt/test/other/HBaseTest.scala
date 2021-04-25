@@ -120,7 +120,7 @@ class HBaseTest extends AbsActionTest {
     def testScan2(): Unit = {
         val tableName = "TEST:T_TEST_DJT"
         val table = conn.getTable(TableName.valueOf(tableName))
-        val cf = Bytes.toBytes("cf")
+        val cf = Bytes.toBytes("0")
 
         val scan = new Scan().addFamily(cf)
         val resultScanner = table.getScanner(scan)

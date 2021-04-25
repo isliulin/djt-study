@@ -1,5 +1,6 @@
 package com.djt.test.other
 
+import org.apache.commons.lang3.StringUtils
 import org.junit.Test
 
 /**
@@ -22,4 +23,12 @@ class ScalaTest {
         println(keyList.indexOf("t_table_4"))
         println(keyList.indexOf("t_table_5"))
     }
+
+    @Test
+    def testOption(): Unit = {
+        println(Option("").getOrElse("10"))
+        println(StringUtils.trimToNull(""))
+        println(Option(StringUtils.trimToNull("")).getOrElse("10"))
+    }
+
 }
