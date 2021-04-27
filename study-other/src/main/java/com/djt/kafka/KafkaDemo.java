@@ -9,7 +9,6 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -37,7 +36,7 @@ public class KafkaDemo {
         kafkaProps.put("retries", props.getProperty("kafka.retries", "0"));
         kafkaProps.put("compression.type", props.getProperty("kafka.compression.type", "snappy"));
         kafkaProps.put("batch.size", props.getProperty("kafka.batch.size", "100"));
-        kafkaProps.put("linger.ms", props.getProperty("kafka.linger.ms", "1"));
+        kafkaProps.put("linger.ms", props.getProperty("kafka.linger.ms", "0"));
         kafkaProps.put("buffer.memory", props.getProperty("kafka.buffer.memory", "33554432"));
         kafkaProps.put("max.in.flight.requests.per.connection", props.getProperty("kafka.max.in.flight.requests.per.connection", "1"));
         kafkaProps.put("bootstrap.servers", props.getProperty("kafka.bootstrap.servers"));
@@ -57,9 +56,12 @@ public class KafkaDemo {
         kafkaProps.put("bootstrap.servers", props.getProperty("kafka.bootstrap.servers"));
         kafkaProps.put("group.id", props.getProperty("kafka.group.id"));
         kafkaProps.put("enable.auto.commit", props.getProperty("kafka.enable.auto.commit", "true"));
+        kafkaProps.put("max.poll.interval.ms", props.getProperty("kafka.max.poll.interval.ms", "1000"));
+        kafkaProps.put("max.poll.records", props.getProperty("kafka.max.poll.records", "2"));
         kafkaProps.put("auto.commit.interval.ms", props.getProperty("kafka.auto.commit.interval.ms", "1000"));
         kafkaProps.put("auto.offset.reset", props.getProperty("kafka.auto.offset.reset", "earliest"));
         kafkaProps.put("session.timeout.ms", props.getProperty("kafka.session.timeout.ms", "30000"));
+        kafkaProps.put("heartbeat.interval.ms", props.getProperty("kafka.heartbeat.interval.ms", "1000"));
         kafkaProps.put("key.deserializer", props.getProperty("kafka.key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer"));
         kafkaProps.put("value.deserializer", props.getProperty("kafka.value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer"));
         return new KafkaConsumer<>(kafkaProps);
@@ -81,10 +83,13 @@ public class KafkaDemo {
     /**
      * 启动消费者线程
      *
-     * @param props  配置信息
-     * @param topics 消费主题列表
+     * @param props       配置信息
+     * @param pollMs      拉取时间
+     * @param dealMs      处理时间
+     * @param isPrintData 是否打印数据
+     * @param topics      消费主题列表
      */
-    public static void startConsumer(Properties props, String... topics) {
+    public static void startConsumer(Properties props, long pollMs, long dealMs, boolean isPrintData, String... topics) {
         ExecutorService pool = Executors.newSingleThreadExecutor();
         Consumer<String, String> consumer = createConsumer(props);
         boolean isAutoCommit = Boolean.parseBoolean(props.getProperty("kafka.enable.auto.commit", "true"));
@@ -93,15 +98,31 @@ public class KafkaDemo {
         log.info("启动消费者，消费主题=>{}", topicList);
         pool.execute(() -> {
             while (true) {
-                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
-                for (ConsumerRecord<String, String> record : records) {
-                    log.info("消费数据=>topic:{} offset:{} key:{} value:{}", record.topic(), record.offset(), record.key(), record.value());
+                ConsumerRecords<String, String> records = consumer.poll(pollMs);
+                int count = records.count();
+                log.info("收到消息条数:{}", count);
+                if (isPrintData) {
+                    for (ConsumerRecord<String, String> record : records) {
+                        log.info("消费数据=>topic:{} offset:{} key:{} value:{}", record.topic(), record.offset(), record.key(), record.value());
+                    }
                 }
+
+                //手动等待一段时间 模拟数据处理时间
+                if (count > 0 && dealMs > 0) {
+                    try {
+                        Thread.sleep(dealMs);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                //若非自动提交 则手动提交
                 if (!isAutoCommit) {
                     consumer.commitSync();
                 }
             }
         });
+        pool.shutdown();
     }
 
 }

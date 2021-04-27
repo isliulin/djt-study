@@ -28,11 +28,11 @@ public class KafkaTest {
     }
 
     @Test
-    public void testKafkaProducer() throws InterruptedException {
+    public void testKafkaProducerETL() throws InterruptedException {
         String topic = "TEST_DJT";
         String table = "test.t_test_djt";
         Producer<String, String> producer = KafkaDemo.createProducer(props);
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 100; i++) {
             String time = LocalDateTime.now().format(DjtConstant.YMDHMSS_FORMAT);
             String timestamp = String.valueOf(System.currentTimeMillis());
             JSONObject message = new JSONObject();
@@ -55,9 +55,29 @@ public class KafkaTest {
     }
 
     @Test
+    public void testKafkaProducer() {
+        String topic = "TEST_DJT";
+        Producer<String, String> producer = KafkaDemo.createProducer(props);
+        for (int i = 0; i < 10000; i++) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("F1", i);
+            jsonObject.put("F2", i);
+            jsonObject.put("F3", i);
+            String msgStr = JSONObject.toJSONString(jsonObject, SerializerFeature.WRITE_MAP_NULL_FEATURES);
+            KafkaDemo.sendMessage(producer, topic, String.valueOf(i), msgStr);
+        }
+        producer.flush();
+    }
+
+
+    @Test
     public void testKafkaConsumer() {
         String topic = "TEST_DJT";
-        props.put("kafka.group.id", "GP_TEST_DJT");
-        KafkaDemo.startConsumer(props, topic);
+        props.put("kafka.session.timeout.ms", "6000");
+        props.put("kafka.heartbeat.interval.ms", "1000");
+        //props.put("kafka.max.poll.interval.ms", "15000");
+        props.put("kafka.max.poll.records", "10");
+        KafkaDemo.startConsumer(props, 5000, 9000, false, topic);
+        while (true) ;
     }
 }

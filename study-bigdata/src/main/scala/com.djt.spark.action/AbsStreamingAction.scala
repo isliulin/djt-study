@@ -1,9 +1,15 @@
 package com.djt.spark.action
 
 import com.djt.utils.ParamConstant
-import org.apache.commons.lang3.StringUtils
+import org.apache.commons.lang3.{StringUtils, Validate}
+import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.apache.kafka.common.serialization.StringDeserializer
+import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.streaming.dstream.ReceiverInputDStream
+import org.apache.spark.streaming.dstream.{InputDStream, ReceiverInputDStream}
+import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
+import org.apache.spark.streaming.kafka010.KafkaUtils
+import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 import org.apache.spark.streaming.{Seconds, State, StreamingContext}
 
 import java.util.Properties
@@ -19,6 +25,14 @@ abstract class AbsStreamingAction(config: Properties) extends AbsSparkAction(con
     @transient
     private var streamingContext: StreamingContext = _
 
+    override protected def setSparkConf(sparkConf: SparkConf): Unit = {
+        super.setSparkConf(sparkConf)
+        sparkConf.set("spark.streaming.backpressure.enabled", config.getProperty(ParamConstant.SPARK_STREAMING_BACKPRESSURE, "true"))
+        sparkConf.set("spark.streaming.kafka.maxRatePerPartition", config.getProperty(ParamConstant.SPARK_STREAMING_KAFKA_MAX_RATE, "100"))
+        sparkConf.set("spark.streaming.kafka.consumer.poll.ms", config.getProperty(ParamConstant.SPARK_STREAMING_KAFKA_CONSUMER_POLL, "5000"))
+        sparkConf.set("spark.streaming.stopGracefullyOnShutdown", config.getProperty(ParamConstant.SPARK_STREAMING_STOP_GRACEFULLY, "true"))
+    }
+
     /**
      * 任务入口
      */
@@ -28,6 +42,8 @@ abstract class AbsStreamingAction(config: Properties) extends AbsSparkAction(con
         try {
             getStreamingContext
             executeAction(streamingContext)
+            streamingContext.start()
+            streamingContext.awaitTermination()
         } catch {
             case e: Exception =>
                 LOG.error("系统异常！", e)
@@ -62,7 +78,7 @@ abstract class AbsStreamingAction(config: Properties) extends AbsSparkAction(con
                 if (null == streamingContext) {
                     val sc = getSparkSession.sparkContext
                     sc.setLogLevel(config.getProperty(ParamConstant.SPARK_LOG_LEVEL, "ERROR"))
-                    val batchDuration = Seconds(config.getProperty(ParamConstant.SPARK_STREAMING_DURATION_SECONDS, "1").toLong)
+                    val batchDuration = Seconds(config.getProperty(ParamConstant.SPARK_STREAMING_DURATION_SECONDS, "5").toLong)
                     streamingContext = new StreamingContext(sc, batchDuration)
                 }
             }
@@ -117,6 +133,40 @@ abstract class AbsStreamingAction(config: Properties) extends AbsSparkAction(con
     def updateAddFunction(values: Seq[Long], state: Option[Long]): Option[Long] = {
         val sumValue = state.getOrElse(0L) + values.sum
         Some(sumValue)
+    }
+
+    /**
+     * 获取kafka配置
+     *
+     * @return
+     */
+    def getKafkaParams: Map[String, Object] = {
+        Map[String, Object](
+            "bootstrap.servers" -> config.getProperty(ParamConstant.KAFKA_BOOTSTRAP_SERVERS),
+            "key.deserializer" -> classOf[StringDeserializer],
+            "value.deserializer" -> classOf[StringDeserializer],
+            "group.id" -> config.getProperty(ParamConstant.KAFKA_GROUP_ID, "SPARK_ETL_DJT"),
+            "auto.offset.reset" -> config.getProperty(ParamConstant.KAFKA_AUTO_OFFSET_RESET, "latest"),
+            "enable.auto.commit" -> config.getProperty(ParamConstant.KAFKA_ENABLE_AUTO_COMMIT, "false"),
+            "session.timeout.ms" -> config.getProperty(ParamConstant.KAFKA_SESSION_TIMEOUT_MS, "30000"),
+            "heartbeat.interval.ms" -> config.getProperty(ParamConstant.KAFKA_HEARTBEAT_INTERVAL_MS, "5000"),
+            "max.poll.records" -> config.getProperty(ParamConstant.KAFKA_MAX_POLL_RECORDS, "10"),
+            "max.poll.interval.ms" -> config.getProperty(ParamConstant.KAFKA_MAX_POLL_INTERVAL_MS, "300000"))
+    }
+
+    /**
+     * 创建输入流
+     *
+     * @return
+     */
+    def createDirectStream(): InputDStream[ConsumerRecord[String, String]] = {
+        val topics = config.getProperty(ParamConstant.KAFKA_CONSUMER_TOPICS)
+        Validate.notBlank(topics, s"${ParamConstant.KAFKA_CONSUMER_TOPICS} can not be null!")
+        val topicList = topics.split(",").map(_.trim)
+        KafkaUtils.createDirectStream[String, String](
+            getStreamingContext,
+            PreferConsistent,
+            Subscribe[String, String](topicList, getKafkaParams))
     }
 
 }

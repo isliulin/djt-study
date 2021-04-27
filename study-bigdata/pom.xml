@@ -90,6 +90,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming-kafka-0-10_2.11</artifactId>
+            <version>${spark.version}</version>
+        </dependency>
+
         <!--        <dependency>-->
         <!--            <groupId>org.apache.hbase</groupId>-->
         <!--            <artifactId>hbase-server</artifactId>-->

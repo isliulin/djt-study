@@ -26,15 +26,22 @@ abstract class AbsActionTest extends Serializable {
     @Before
     def before(): Unit = {
         LOG.info("=======初始化开始...=======")
-        config.setProperty(ParamConstant.SPARK_MASTER, "local[4]")
+        //Spark
+        config.setProperty(ParamConstant.SPARK_MASTER, "local[*]")
         config.setProperty(ParamConstant.SPARK_APP_NAME, "SparkTest")
         config.setProperty(ParamConstant.SPARK_LOG_LEVEL, "WARN")
+        //Es
         config.setProperty(ParamConstant.ES_HOST, "172.20.11.23:9200,172.20.20.183:9200,172.20.20.184:9200")
         config.setProperty(ParamConstant.ES_INDEX_AUTO_CREATE, "false")
+        //HBase
         config.setProperty(ParamConstant.HBASE_ZK_QUORUM, "172.20.7.33:2181,172.20.7.34:2181,172.20.7.35:2181")
         //config.setProperty(ParamConstant.HBASE_ZK_PORT, "2181")
+        //Kudu
         config.setProperty(ParamConstant.KUDU_MASTER, "172.20.7.36:7051,172.20.7.37:7051,172.20.7.38:7051")
+        //Phoenix
         config.setProperty(ParamConstant.PHOENIX_ZK_URL, "172.20.7.33:2181")
+
+        //Others
         config.setProperty("中文", "中文测试")
         setConfig(config)
         config.keySet().foreach(key => {

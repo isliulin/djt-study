@@ -42,8 +42,8 @@ class WordCountStreamingAction(config: Properties) extends AbsStreamingAction(co
         //使用 updateStateByKey 则无上述问题
         //dStream.updateStateByKey(updateAddFunction).print()
 
-        streamingContext.start()
-        streamingContext.awaitTermination()
+        //streamingContext.start()
+        //streamingContext.awaitTermination()
     }
 
 }

@@ -45,8 +45,8 @@ class TradeStatStreamingAction(config: Properties) extends AbsStreamingAction(co
         dStream.mapWithState(stateSpec).print()
         //dStream.updateStateByKey(updateAddFunction).print()
 
-        streamingContext.start()
-        streamingContext.awaitTermination()
+        //streamingContext.start()
+        //streamingContext.awaitTermination()
     }
 
 }

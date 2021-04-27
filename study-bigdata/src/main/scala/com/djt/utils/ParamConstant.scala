@@ -44,6 +44,26 @@ object ParamConstant {
     val MAX_TOSTRING_FIELDS = "spark.debug.maxToStringFields"
 
     /**
+     * spark streaming 背压机制
+     */
+    val SPARK_STREAMING_BACKPRESSURE = "spark.streaming.backpressure.enabled"
+
+    /**
+     * spark streaming kafka每个分区最大读取条数
+     */
+    val SPARK_STREAMING_KAFKA_MAX_RATE = "spark.streaming.kafka.maxRatePerPartition"
+
+    /**
+     * spark streaming kafka consumer poll时间
+     */
+    val SPARK_STREAMING_KAFKA_CONSUMER_POLL = "spark.streaming.kafka.consumer.poll.ms"
+
+    /**
+     * spark streaming 是否优雅停止
+     */
+    val SPARK_STREAMING_STOP_GRACEFULLY = "spark.streaming.stopGracefullyOnShutdown"
+
+    /**
      * hbase zk节点
      */
     val HBASE_ZK_QUORUM: String = HConstants.ZOOKEEPER_QUORUM
@@ -92,5 +112,51 @@ object ParamConstant {
      * phoenix zk地址
      */
     val PHOENIX_ZK_URL = "phoenix.zk.url"
+
+    /**
+     * Kafka 地址
+     */
+    val KAFKA_BOOTSTRAP_SERVERS = "kafka.bootstrap.servers"
+
+    /**
+     * Kafka 消费主题列表
+     */
+    val KAFKA_CONSUMER_TOPICS = "kafka.consumer.topics"
+
+    /**
+     * Kafka 消费者组
+     */
+    val KAFKA_GROUP_ID = "kafka.group.id"
+
+    /**
+     * Kafka 初始化消费起点
+     */
+    val KAFKA_AUTO_OFFSET_RESET = "kafka.auto.offset.reset"
+
+    /**
+     * Kafka 自动提交
+     */
+    val KAFKA_ENABLE_AUTO_COMMIT = "kafka.enable.auto.commit"
+
+    /**
+     * Kafka 会话超时时间
+     */
+    val KAFKA_SESSION_TIMEOUT_MS = "kafka.session.timeout.ms"
+
+    /**
+     * Kafka 心跳发送间隔
+     */
+    val KAFKA_HEARTBEAT_INTERVAL_MS = "kafka.heartbeat.interval.ms"
+
+    /**
+     * Kafka 单次拉取最大消息数
+     */
+    val KAFKA_MAX_POLL_RECORDS = "kafka.max.poll.records"
+
+    /**
+     * Kafka 最大数据处理时间(此参数在0.10.1及之后的版本才有)
+     */
+    val KAFKA_MAX_POLL_INTERVAL_MS = "kafka.max.poll.interval.ms"
+
 
 }
