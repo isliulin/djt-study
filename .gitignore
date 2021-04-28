@@ -4,3 +4,7 @@
 /study-other/study-other.iml
 /study-utils/study-utils.iml
 /tmp-tools/tmp-tools.iml
+/*/logs/
+/*/target/
+/*/metastore_db/
+/*/derby.log
