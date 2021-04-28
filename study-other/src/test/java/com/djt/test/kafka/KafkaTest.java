@@ -28,11 +28,11 @@ public class KafkaTest {
     }
 
     @Test
-    public void testKafkaProducerETL() throws InterruptedException {
-        String topic = "TEST_DJT";
+    public void testKafkaProducerETL() {
+        String topic = "ETL_CHANGE_DATA";
         String table = "test.t_test_djt";
         Producer<String, String> producer = KafkaDemo.createProducer(props);
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             String time = LocalDateTime.now().format(DjtConstant.YMDHMSS_FORMAT);
             String timestamp = String.valueOf(System.currentTimeMillis());
             JSONObject message = new JSONObject();
@@ -43,14 +43,14 @@ public class KafkaTest {
             message.put("pos", timestamp);
             message.put("before", new JSONObject());
             JSONObject after = new JSONObject();
-            after.put("F1", "1");
-            after.put("F2", "11111");
-            after.put("F3", "11111");
+            after.put("F1", String.valueOf(i));
+            after.put("F2", String.valueOf(i));
+            after.put("F3", String.valueOf(i));
             message.put("after", after);
             String msgStr = JSONObject.toJSONString(message, SerializerFeature.WRITE_MAP_NULL_FEATURES);
             KafkaDemo.sendMessage(producer, topic, String.valueOf(i), msgStr);
-            Thread.sleep(1000);
         }
+        producer.flush();
 
     }
 
