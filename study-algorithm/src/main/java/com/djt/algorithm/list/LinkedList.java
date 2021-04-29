@@ -89,7 +89,7 @@ public class LinkedList<V extends Comparable<V>> {
      * 递归反转子链表
      *
      * @param curNode 子链表的起始节点
-     * @return 反转后的链表起点
+     * @return 反转后的链表起始节点
      */
     public ListNode<V> reverse(ListNode<V> curNode) {
         if (curNode == null || curNode.getNext() == null) {

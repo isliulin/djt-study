@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class TreeTest {
 
-    private BinarySearchTree binarySearchTree = null;
+    private BinarySearchTree<Integer, Integer> binarySearchTree = null;
 
     @Before
     public void before() {
@@ -31,19 +31,19 @@ public class TreeTest {
      *
      * @return list
      */
-    public List<BinarySearchNode> getNodeList() {
-        List<BinarySearchNode> nodeList = new ArrayList<>();
-        nodeList.add(new BinarySearchNode(30));
-        nodeList.add(new BinarySearchNode(15));
-        nodeList.add(new BinarySearchNode(7));
-        nodeList.add(new BinarySearchNode(21));
-        nodeList.add(new BinarySearchNode(19));
-        nodeList.add(new BinarySearchNode(20));
-        nodeList.add(new BinarySearchNode(26));
-        nodeList.add(new BinarySearchNode(23));
-        nodeList.add(new BinarySearchNode(29));
-        nodeList.add(new BinarySearchNode(40));
-        nodeList.add(new BinarySearchNode(35));
+    public List<Integer> getNodeList() {
+        List<Integer> nodeList = new ArrayList<>();
+        nodeList.add(30);
+        nodeList.add(15);
+        nodeList.add(7);
+        nodeList.add(21);
+        nodeList.add(19);
+        nodeList.add(20);
+        nodeList.add(26);
+        nodeList.add(23);
+        nodeList.add(29);
+        nodeList.add(40);
+        nodeList.add(35);
         return nodeList;
     }
 
@@ -51,9 +51,9 @@ public class TreeTest {
      * 重建二叉树
      */
     public void resetTree() {
-        binarySearchTree = new BinarySearchTree();
-        for (BinarySearchNode node : getNodeList()) {
-            binarySearchTree.insert(node);
+        binarySearchTree = new BinarySearchTree<>();
+        for (int num : getNodeList()) {
+            binarySearchTree.insert(num, num);
         }
     }
 
@@ -84,25 +84,25 @@ public class TreeTest {
     @Test
     public void testSearch() {
         //查找已存在的
-        BinarySearchNode node1 = new BinarySearchNode(20);
-        BinarySearchNode find = binarySearchTree.search(node1);
+        BinarySearchNode<Integer, Integer> find = binarySearchTree.searchNode(26);
         System.out.println(find);
 
         //查找不存在的
-        BinarySearchNode node2 = new BinarySearchNode(6);
-        find = binarySearchTree.search(node2);
+        find = binarySearchTree.searchNode(6);
         System.out.println(find);
 
         //更新不存在的
-        binarySearchTree.update(node2);
-        find = binarySearchTree.search(node2);
+        binarySearchTree.update(6, 66);
+        find = binarySearchTree.searchNode(6);
         System.out.println(find);
 
         //更新已存在的
-        BinarySearchNode node3 = new BinarySearchNode(6, "666");
-        binarySearchTree.update(node3);
-        find = binarySearchTree.search(node2);
+        binarySearchTree.update(6, 666);
+        find = binarySearchTree.searchNode(6);
         System.out.println(find);
+
+        int value = binarySearchTree.searchValue(6);
+        System.out.println(value);
     }
 
     @Test
@@ -111,7 +111,7 @@ public class TreeTest {
         System.out.println(binarySearchTree.findMin().getKey());
 
         //先找到一颗子树
-        BinarySearchNode node = binarySearchTree.search(new BinarySearchNode(21));
+        BinarySearchNode<Integer, Integer> node = binarySearchTree.searchNode(21);
         //取子树最大最小值
         System.out.println(binarySearchTree.findMaxOrMinWithParent(node, true).getKey().getKey());
         System.out.println(binarySearchTree.findMaxOrMinWithParent(node, false).getKey().getKey());
@@ -138,15 +138,15 @@ public class TreeTest {
     private void deleteNode(int key, boolean isResetTree) {
         if (isResetTree) resetTree();
         System.out.println("==================删除节点" + key);
-        binarySearchTree.delete(new BinarySearchNode(key));
+        binarySearchTree.delete(key);
         printLevelTree();
     }
 
 
     @Test
     public void testBean() {
-        BinarySearchNode node1 = new BinarySearchNode(30);
-        BinarySearchNode node2 = new BinarySearchNode(10);
+        BinarySearchNode<Integer, Integer> node1 = new BinarySearchNode<>(30);
+        BinarySearchNode<Integer, Integer> node2 = new BinarySearchNode<>(10);
         System.out.println(node1 + " " + node2);
         BeanUtil.copyProperties(node1, node2, false);
         System.out.println(node1 + " " + node2);

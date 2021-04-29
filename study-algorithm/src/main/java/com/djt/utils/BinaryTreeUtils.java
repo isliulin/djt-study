@@ -155,7 +155,7 @@ public class BinaryTreeUtils {
      *
      * @param binTree 二叉树对象
      */
-    public static <K extends Comparable<K>> void levelPrint(AbsBinTree<? extends AbsBinNode<K, ?>> binTree) {
+    public static <K extends Comparable<K>> void levelPrint(AbsBinTree<K, ?> binTree) {
         if (binTree == null) {
             return;
         }

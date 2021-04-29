@@ -11,16 +11,24 @@ import lombok.Setter;
  */
 @Setter
 @Getter
-public abstract class AbsBinTree<N extends AbsBinNode<?, ?>> implements Tree<N> {
+public abstract class AbsBinTree<K extends Comparable<K>, V> implements Tree<K, V> {
 
     /**
      * 根节点
      */
-    protected N root;
+    protected AbsBinNode<K, V> root;
 
     /**
      * 节点个数
      */
     protected int size;
 
+    @Override
+    public V searchValue(K key) {
+        AbsBinNode<K, V> node = (AbsBinNode<K, V>) searchNode(key);
+        if (null == node) {
+            return null;
+        }
+        return node.getValue();
+    }
 }

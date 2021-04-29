@@ -14,13 +14,13 @@ import lombok.ToString;
 @Setter
 @Getter
 @ToString(callSuper = true)
-public class BinarySearchNode extends AbsBinNode<Integer, String> {
+public class BinarySearchNode<K extends Comparable<K>, V> extends AbsBinNode<K, V> {
 
-    public BinarySearchNode(Integer key) {
+    public BinarySearchNode(K key) {
         super(key);
     }
 
-    public BinarySearchNode(Integer key, String value) {
+    public BinarySearchNode(K key, V value) {
         super(key, value);
     }
 
