@@ -48,13 +48,12 @@ class StreamingActionTest extends AbsActionTest {
 
     @Test
     def testKafkaStreamingAction(): Unit = {
-        config.setProperty(ParamConstant.KAFKA_CONSUMER_TOPICS, "TEST_DJT")
+        config.setProperty(ParamConstant.KAFKA_CONSUMER_TOPICS, "SPARK_ETL_DJT_1,SPARK_ETL_DJT_2,SPARK_ETL_DJT_3")
         config.setProperty(ParamConstant.SPARK_STREAMING_DURATION_SECONDS, "5")
         config.setProperty(ParamConstant.KAFKA_SESSION_TIMEOUT_MS, "30000")
         config.setProperty(ParamConstant.KAFKA_HEARTBEAT_INTERVAL_MS, "5000")
         config.setProperty(ParamConstant.KAFKA_MAX_POLL_INTERVAL_MS, "300000")
-        config.setProperty(ParamConstant.KAFKA_MAX_POLL_RECORDS, "10")
-
+        config.setProperty(ParamConstant.KAFKA_MAX_POLL_RECORDS, "5")
         config.setProperty(ParamConstant.SPARK_STREAMING_BACKPRESSURE, "true")
         config.setProperty(ParamConstant.SPARK_STREAMING_KAFKA_MAX_RATE, "10")
         config.setProperty(ParamConstant.SPARK_STREAMING_KAFKA_CONSUMER_POLL, "3000")
