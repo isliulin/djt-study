@@ -2,7 +2,6 @@ package com.djt.test.list;
 
 import com.djt.algorithm.list.LinkedList;
 import com.djt.utils.LinkedListUtils;
-import com.djt.utils.RandomUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,15 +18,15 @@ public class ListTest {
     @Before
     public void before() {
         for (int i = 0; i < 10; i++) {
-            int num = RandomUtils.getRandomNumber(0, 10);
-            list.insert(num);
+            list.insert(i);
         }
         LinkedListUtils.printList(list);
     }
 
     @Test
-    public void test1() {
-
+    public void testReverse1() {
+        list.reverse();
+        LinkedListUtils.printList(list);
     }
 
 }
