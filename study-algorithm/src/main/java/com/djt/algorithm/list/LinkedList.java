@@ -75,4 +75,31 @@ public class LinkedList<V extends Comparable<V>> {
         head = newHead;
     }
 
+    /**
+     * 链表反转-递归
+     */
+    public void reverse2() {
+        if (size <= 1) {
+            return;
+        }
+        head = reverse(head);
+    }
+
+    /**
+     * 递归反转子链表
+     *
+     * @param curNode 子链表的起始节点
+     * @return 反转后的链表起点
+     */
+    public ListNode<V> reverse(ListNode<V> curNode) {
+        if (curNode == null || curNode.getNext() == null) {
+            return curNode;
+        }
+        ListNode<V> nextNode = curNode.getNext();
+        ListNode<V> newHead = reverse(nextNode);
+        curNode.setNext(null);
+        nextNode.setNext(curNode);
+        return newHead;
+    }
+
 }

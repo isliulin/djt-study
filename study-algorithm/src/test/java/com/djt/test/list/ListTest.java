@@ -29,4 +29,10 @@ public class ListTest {
         LinkedListUtils.printList(list);
     }
 
+    @Test
+    public void testReverse2() {
+        list.reverse2();
+        LinkedListUtils.printList(list);
+    }
+
 }
