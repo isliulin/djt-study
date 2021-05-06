@@ -247,7 +247,10 @@ public class StringTest {
 
     @Test
     public void testMath() {
-        System.out.println(Math.pow(2, 3));
+        System.out.println((int) Math.pow(2, 3));
+        System.out.println((int) Math.floor(1 / 2));
+        System.out.println((int) Math.floor(31 / 2));
+        System.out.println(31 / 2);
     }
 
     @Test

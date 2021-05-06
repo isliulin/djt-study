@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.djt.datastructure.tree.binarytree.BinarySearchNode;
 import com.djt.datastructure.tree.binarytree.BinarySearchTree;
 import com.djt.utils.BinaryTreeUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,14 +37,18 @@ public class TreeTest {
         nodeList.add(30);
         nodeList.add(15);
         nodeList.add(7);
-        nodeList.add(21);
-        nodeList.add(19);
+        nodeList.add(5);
+        nodeList.add(10);
         nodeList.add(20);
-        nodeList.add(26);
-        nodeList.add(23);
-        nodeList.add(29);
+        nodeList.add(18);
+        nodeList.add(25);
+        nodeList.add(45);
         nodeList.add(40);
         nodeList.add(35);
+        nodeList.add(42);
+        nodeList.add(55);
+        nodeList.add(50);
+        nodeList.add(60);
         return nodeList;
     }
 
@@ -162,6 +167,19 @@ public class TreeTest {
         BinaryTreeUtils.levelOrderScan(binarySearchTree.getRoot(), 1, result2);
         for (int i = 0; i < result2.length; i++) {
             System.out.println("第 " + (i + 1) + " 层：" + result2[i]);
+        }
+    }
+
+    @Test
+    public void printLevelTree2() {
+        List<Pair<Integer, Integer>>[] result = BinaryTreeUtils.levelCollect(binarySearchTree.getRoot());
+        for (int i = 0; i < result.length; i++) {
+            List<Pair<Integer, Integer>> list = result[i];
+            StringBuilder sb = new StringBuilder();
+            for (Pair<Integer, Integer> pair : list) {
+                sb.append(pair.getKey()).append(":").append(pair.getValue()).append(",");
+            }
+            System.out.println("第 " + (i + 1) + " 层：" + sb);
         }
     }
 

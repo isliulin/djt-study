@@ -19,7 +19,7 @@ import java.util.*;
  */
 public class BinaryTreeUtils {
 
-    public static final char[] LINE_CHAR_ARR = {'┏', '━', '┓', '┃'};
+    public static final String[] CHAR_ARR = {"┏", "━", "┓", "┃"};
 
     /**
      * 计算二叉树高度
@@ -149,6 +149,94 @@ public class BinaryTreeUtils {
     }
 
 
+    public static <K extends Comparable<K>, V> List<Pair<K, Integer>>[] levelCollect(AbsBinNode<K, V> root) {
+        if (root == null) {
+            return null;
+        }
+
+        //获取树高度
+        int height = BinaryTreeUtils.getHeight(root);
+        List<Pair<K, Integer>>[] listArr = new ArrayList[height];
+        for (int i = 0; i < listArr.length; i++) {
+            listArr[i] = new ArrayList<>();
+        }
+
+        //获取树宽度
+        int width = (int) Math.pow(2, height) - 1;
+        //创建打印二维数组 height*2行 width列
+        String[][] printArrs = new String[height * 2][width];
+        initStrArr(printArrs, " ");
+        //坐标平移距离
+        int move = width / 2;
+
+
+        //队列 <节点,层级,坐标>
+        Queue<Triple<AbsBinNode<K, V>, Integer, Integer>> queue = new LinkedList<>();
+        queue.offer(Triple.of(root, 1, 0));
+        while (!queue.isEmpty()) {
+            //出队头节点
+            Triple<AbsBinNode<K, V>, Integer, Integer> curTriple = queue.poll();
+            AbsBinNode<K, V> node = curTriple.getLeft();
+            int level = curTriple.getMiddle();
+            int index = curTriple.getRight();
+
+            int lineIdx = level * 2 - 2;
+            int colIdx = index + move;
+            printArrs[lineIdx][colIdx] = node.getKey().toString();
+
+            listArr[level - 1].add(Pair.of(node.getKey(), index));
+
+            int dis = (int) Math.pow(2, (height - 2 - (level - 1)));
+
+            //分别将该节点的左节点与右节点加入队列
+            AbsBinNode<K, V> left = node.getLeft();
+            if (left != null) {
+                queue.offer(Triple.of(left, level + 1, index - dis));
+                for (int i = 1; i < dis; i++) {
+                    printArrs[lineIdx][colIdx - i] = CHAR_ARR[1];
+                }
+                printArrs[lineIdx][colIdx - dis] = CHAR_ARR[0];
+                printArrs[lineIdx + 1][colIdx - dis] = CHAR_ARR[3];
+            }
+            AbsBinNode<K, V> right = node.getRight();
+            if (right != null) {
+                queue.offer(Triple.of(right, level + 1, index + dis));
+                for (int i = 1; i < dis; i++) {
+                    printArrs[lineIdx][colIdx + i] = CHAR_ARR[1];
+                }
+                printArrs[lineIdx][colIdx + dis] = CHAR_ARR[2];
+                printArrs[lineIdx + 1][colIdx + dis] = CHAR_ARR[3];
+            }
+        }
+        printArrs(printArrs);
+        return listArr;
+    }
+
+    public static void printArrs(String[][] arrs) {
+        if (arrs == null) {
+            return;
+        }
+        for (String[] arr : arrs) {
+            for (String s : arr) {
+                System.out.print(s);
+            }
+            System.out.println();
+        }
+    }
+
+    public static <K extends Comparable<K>, V> void treePrint(AbsBinNode<K, V> root) {
+        List<Pair<K, Integer>>[] lisrArr = levelCollect(root);
+        for (int i = 0; i < lisrArr.length; i++) {
+            List<Pair<K, Integer>> list = lisrArr[i];
+            StringBuilder sb = new StringBuilder();
+            for (Pair<K, Integer> pair : list) {
+                sb.append(pair.getKey()).append(":").append(pair.getValue()).append(",");
+            }
+            System.out.println("第 " + (i + 1) + " 层：" + sb);
+        }
+    }
+
+
     /**
      * 打印二叉树
      * 队列方式 结果保存 key + 层级
@@ -165,7 +253,6 @@ public class BinaryTreeUtils {
         Queue<Triple<AbsBinNode<K, ?>, Integer, Pair<K, TreeEnums.ChildSide>>> queue = new LinkedList<>();
         queue.offer(Triple.of(root, 1, Pair.of(null, null)));
 
-
         int height = getHeight(root);
         //节点的元数据 List元素个数与层级相同 key：key  + 中点距离 + 父节点key + 左右子key
         List<Map<K, TwoWayBinNode<K>>> nodeMetaList = new ArrayList<>(height);
@@ -178,6 +265,7 @@ public class BinaryTreeUtils {
             nodeMetaList.add(i, lineMap);
         }
 
+        //层序遍历 动态调整
         while (!queue.isEmpty()) {
             //出队头节点
             Triple<AbsBinNode<K, ?>, Integer, Pair<K, TreeEnums.ChildSide>> triple = queue.poll();
@@ -233,7 +321,6 @@ public class BinaryTreeUtils {
                 queue.offer(Triple.of(right, curLevel + 1, Pair.of(curNode.getKey(), TreeEnums.ChildSide.RIGHT)));
             }
         }
-        System.out.println();
     }
 
     /**
@@ -245,6 +332,15 @@ public class BinaryTreeUtils {
     public static void initCharArr(char[][] charsArr, char c) {
         for (int i = 0; i < charsArr.length; i++) {
             char[] charArr = charsArr[i];
+            for (int j = 0; j < charArr.length; j++) {
+                charsArr[i][j] = c;
+            }
+        }
+    }
+
+    public static void initStrArr(String[][] charsArr, String c) {
+        for (int i = 0; i < charsArr.length; i++) {
+            String[] charArr = charsArr[i];
             for (int j = 0; j < charArr.length; j++) {
                 charsArr[i][j] = c;
             }
