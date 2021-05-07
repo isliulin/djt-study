@@ -149,9 +149,9 @@ public class BinaryTreeUtils {
     }
 
 
-    public static <K extends Comparable<K>, V> List<Pair<K, Integer>>[] levelCollect(AbsBinNode<K, V> root) {
+    public static <K extends Comparable<K>, V> void levelCollect(AbsBinNode<K, V> root) {
         if (root == null) {
-            return null;
+            return;
         }
 
         //获取树高度
@@ -165,10 +165,9 @@ public class BinaryTreeUtils {
         int width = (int) Math.pow(2, height) - 1;
         //创建打印二维数组 height*2行 width列
         String[][] printArrs = new String[height * 2][width];
-        initStrArr(printArrs, " ");
+        initStrArr(printArrs, "  ");
         //坐标平移距离
         int move = width / 2;
-
 
         //队列 <节点,层级,坐标>
         Queue<Triple<AbsBinNode<K, V>, Integer, Integer>> queue = new LinkedList<>();
@@ -205,11 +204,12 @@ public class BinaryTreeUtils {
                     printArrs[lineIdx][colIdx + i] = CHAR_ARR[1];
                 }
                 printArrs[lineIdx][colIdx + dis] = CHAR_ARR[2];
+
                 printArrs[lineIdx + 1][colIdx + dis] = CHAR_ARR[3];
             }
         }
         printArrs(printArrs);
-        return listArr;
+        printPairList(listArr);
     }
 
     public static void printArrs(String[][] arrs) {
@@ -224,13 +224,16 @@ public class BinaryTreeUtils {
         }
     }
 
-    public static <K extends Comparable<K>, V> void treePrint(AbsBinNode<K, V> root) {
-        List<Pair<K, Integer>>[] lisrArr = levelCollect(root);
-        for (int i = 0; i < lisrArr.length; i++) {
-            List<Pair<K, Integer>> list = lisrArr[i];
+    public static <K extends Comparable<K>, V> void printPairList(List<Pair<K, Integer>>[] result) {
+        for (int i = 0; i < result.length; i++) {
+            List<Pair<K, Integer>> list = result[i];
             StringBuilder sb = new StringBuilder();
-            for (Pair<K, Integer> pair : list) {
-                sb.append(pair.getKey()).append(":").append(pair.getValue()).append(",");
+            for (int j = 0; j < list.size(); j++) {
+                Pair<K, Integer> pair = list.get(j);
+                sb.append(pair.getKey()).append(":").append(pair.getValue());
+                if (j < list.size() - 1) {
+                    sb.append(",");
+                }
             }
             System.out.println("第 " + (i + 1) + " 层：" + sb);
         }

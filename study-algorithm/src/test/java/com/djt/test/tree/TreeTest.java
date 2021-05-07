@@ -4,7 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import com.djt.datastructure.tree.binarytree.BinarySearchNode;
 import com.djt.datastructure.tree.binarytree.BinarySearchTree;
 import com.djt.utils.BinaryTreeUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -172,15 +171,7 @@ public class TreeTest {
 
     @Test
     public void printLevelTree2() {
-        List<Pair<Integer, Integer>>[] result = BinaryTreeUtils.levelCollect(binarySearchTree.getRoot());
-        for (int i = 0; i < result.length; i++) {
-            List<Pair<Integer, Integer>> list = result[i];
-            StringBuilder sb = new StringBuilder();
-            for (Pair<Integer, Integer> pair : list) {
-                sb.append(pair.getKey()).append(":").append(pair.getValue()).append(",");
-            }
-            System.out.println("第 " + (i + 1) + " 层：" + sb);
-        }
+        BinaryTreeUtils.levelCollect(binarySearchTree.getRoot());
     }
 
     @Test
