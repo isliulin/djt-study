@@ -34,6 +34,7 @@ public class SortTest {
         sortAndPrint(new InsertSort());
         sortAndPrint(new ShellSort());
         sortAndPrint(new MergeSort());
+        sortAndPrint(new HeapSort());
     }
 
     @Test
@@ -64,6 +65,11 @@ public class SortTest {
     @Test
     public void testMergeSort() {
         sortAndPrint(new MergeSort());
+    }
+
+    @Test
+    public void testHeapSort() {
+        sortAndPrint(new HeapSort());
     }
 
     private void sortAndPrint(IArraySort sort) {
