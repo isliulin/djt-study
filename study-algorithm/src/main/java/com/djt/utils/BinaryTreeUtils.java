@@ -1,15 +1,15 @@
 package com.djt.utils;
 
 import com.djt.datastructure.tree.AbsBinNode;
-import com.djt.datastructure.tree.AbsBinTree;
-import com.djt.enums.TreeEnums;
-import lombok.Getter;
-import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 /**
  * 二叉树工具类
@@ -169,6 +169,8 @@ public class BinaryTreeUtils {
         //坐标平移距离
         int move = width / 2;
 
+        int numWid = 2;
+
         //队列 <节点,层级,坐标>
         Queue<Triple<AbsBinNode<K, V>, Integer, Integer>> queue = new LinkedList<>();
         queue.offer(Triple.of(root, 1, 0));
@@ -181,7 +183,7 @@ public class BinaryTreeUtils {
 
             int lineIdx = level * 2 - 2;
             int colIdx = index + move;
-            printArrs[lineIdx][colIdx] = node.getKey().toString();
+            printArrs[lineIdx][colIdx] = StringUtils.rightPad(node.getKey().toString(), numWid, " ");
 
             listArr[level - 1].add(Pair.of(node.getKey(), index));
 
@@ -224,7 +226,7 @@ public class BinaryTreeUtils {
         }
     }
 
-    public static <K extends Comparable<K>, V> void printPairList(List<Pair<K, Integer>>[] result) {
+    public static <K extends Comparable<K>> void printPairList(List<Pair<K, Integer>>[] result) {
         for (int i = 0; i < result.length; i++) {
             List<Pair<K, Integer>> list = result[i];
             StringBuilder sb = new StringBuilder();
@@ -236,93 +238,6 @@ public class BinaryTreeUtils {
                 }
             }
             System.out.println("第 " + (i + 1) + " 层：" + sb);
-        }
-    }
-
-
-    /**
-     * 打印二叉树
-     * 队列方式 结果保存 key + 层级
-     *
-     * @param binTree 二叉树对象
-     */
-    public static <K extends Comparable<K>> void levelPrint(AbsBinTree<K, ?> binTree) {
-        if (binTree == null) {
-            return;
-        }
-        AbsBinNode<K, ?> root = binTree.getRoot();
-
-        //创建层序遍历队列 队列元素内容：<节点, 层级, <父节点key,左右>>
-        Queue<Triple<AbsBinNode<K, ?>, Integer, Pair<K, TreeEnums.ChildSide>>> queue = new LinkedList<>();
-        queue.offer(Triple.of(root, 1, Pair.of(null, null)));
-
-        int height = getHeight(root);
-        //节点的元数据 List元素个数与层级相同 key：key  + 中点距离 + 父节点key + 左右子key
-        List<Map<K, TwoWayBinNode<K>>> nodeMetaList = new ArrayList<>(height);
-        for (int i = 0; i < height; i++) {
-            int size = (int) Math.pow(2, i);
-            HashMap<K, TwoWayBinNode<K>> lineMap = new HashMap<>(size);
-            if (i == 0) {
-                lineMap.put(root.getKey(), new TwoWayBinNode<>(root.getKey(), 0));
-            }
-            nodeMetaList.add(i, lineMap);
-        }
-
-        //层序遍历 动态调整
-        while (!queue.isEmpty()) {
-            //出队头节点
-            Triple<AbsBinNode<K, ?>, Integer, Pair<K, TreeEnums.ChildSide>> triple = queue.poll();
-            AbsBinNode<K, ?> curNode = triple.getLeft();
-            int curLevel = triple.getMiddle();
-            Pair<K, TreeEnums.ChildSide> parent = triple.getRight();
-            K parentKey = parent.getLeft();
-            TreeEnums.ChildSide childSide = parent.getRight();
-
-            //计算当前节点中点距离
-            int curMidLen = 0;
-            TwoWayBinNode<K> parentMetaNode = null;
-            //当前节点非根节点
-            if (parentKey != null && curLevel > 1) {
-                //获取父节点所在行的元数据
-                Map<K, TwoWayBinNode<K>> parentMetaMap = nodeMetaList.get(curLevel - 2);
-                parentMetaNode = parentMetaMap.get(parentKey);
-                int parentMidLen = parentMetaNode.getMidLen();
-                //此处需要区分自己是父节点的左还是右 左=p-1 右=p+1
-                if (childSide == TreeEnums.ChildSide.LEFT) {
-                    curMidLen = parentMidLen - 1;
-                } else {
-                    curMidLen = parentMidLen + 1;
-                }
-            }
-
-            //获取当前行元数据 取中点距离的最大值
-            Map<K, TwoWayBinNode<K>> curMetaMap = nodeMetaList.get(curLevel - 1);
-            int maxMidLen = curMetaMap.values().stream().map(TwoWayBinNode::getMidLen).max(Integer::compareTo).orElse(Integer.MIN_VALUE);
-            //判断当前位置是否被占 未被占则正常打印 被占则向上调整
-            //节点节点之间至少相隔一个位置
-            if (curMidLen > maxMidLen + 1) {
-                curMetaMap.put(curNode.getKey(), new TwoWayBinNode<>(curNode.getKey(), curMidLen, parentMetaNode));
-            } else {
-                /*
-                 * 向上调整逻辑： 主要是对 nodeMetaList 进行调整
-                 * 当前节点：C  父节点：P  父节点左子树：P-L  父节点左子树：P-R
-                 * 若P存在，则C一定是P-L，且P-R一定未被打印
-                 * 1. P+1 ：父节点向右移动一个距离，无需关心P-R，因为其尚未打印
-                 * 2. PP-L-1 ：即叔叔节点向左扩展
-                 * 3. 判断
-                 *
-                 */
-            }
-
-            //分别将该节点的左节点与右节点加入队列
-            AbsBinNode<K, ?> left = curNode.getLeft();
-            if (left != null) {
-                queue.offer(Triple.of(left, curLevel + 1, Pair.of(curNode.getKey(), TreeEnums.ChildSide.LEFT)));
-            }
-            AbsBinNode<K, ?> right = curNode.getRight();
-            if (right != null) {
-                queue.offer(Triple.of(right, curLevel + 1, Pair.of(curNode.getKey(), TreeEnums.ChildSide.RIGHT)));
-            }
         }
     }
 
@@ -349,69 +264,5 @@ public class BinaryTreeUtils {
             }
         }
     }
-
-    /**
-     * 打印时用双向节点
-     */
-    @Setter
-    @Getter
-    public static class TwoWayBinNode<K extends Comparable<K>> {
-
-        /**
-         * 节点key
-         */
-        private K key;
-
-        /**
-         * 中点距离
-         */
-        private int midLen;
-
-        /**
-         * 父节点
-         */
-        private TwoWayBinNode<K> parent;
-
-        /**
-         * 左子节点
-         */
-        private TwoWayBinNode<K> left;
-
-        /**
-         * 右子节点
-         */
-        private TwoWayBinNode<K> right;
-
-        public TwoWayBinNode(K key, int midLen) {
-            this.key = key;
-            this.midLen = midLen;
-        }
-
-        public TwoWayBinNode(K key, int midLen, TwoWayBinNode<K> parent) {
-            this.key = key;
-            this.midLen = midLen;
-            this.parent = parent;
-        }
-
-        /**
-         * 判断当前节点是其父节点的左或右
-         *
-         * @return left/right/null
-         */
-        public TreeEnums.ChildSide getSide() {
-            if (parent == null) {
-                return null;
-            }
-            if (key.equals(parent.left.key)) {
-                return TreeEnums.ChildSide.LEFT;
-            }
-            if (key.equals(parent.right.key)) {
-                return TreeEnums.ChildSide.RIGHT;
-            }
-            return null;
-        }
-
-    }
-
 
 }

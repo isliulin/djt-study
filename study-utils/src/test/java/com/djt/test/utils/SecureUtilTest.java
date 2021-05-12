@@ -11,6 +11,7 @@ import cn.hutool.crypto.symmetric.DES;
 import cn.hutool.crypto.symmetric.SymmetricAlgorithm;
 import com.djt.utils.PasswordUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.Test;
 
 import javax.crypto.SecretKey;
@@ -78,4 +79,13 @@ public class SecureUtilTest {
         String de = PasswordUtils.decrypt(en);
         System.out.println("解密后:" + de);
     }
+
+    @Test
+    public void testDigestUtils() {
+        String str = "123456";
+        String md5 = DigestUtils.md5Hex(str);
+        System.out.println(md5);
+    }
+
+
 }

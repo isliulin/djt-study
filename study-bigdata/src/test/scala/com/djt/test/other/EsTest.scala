@@ -1,10 +1,12 @@
 package com.djt.test.other
 
 import com.djt.test.spark.action.AbsActionTest
-import com.djt.utils.{ParamConstant, RandomUtils}
+import com.djt.utils.RandomUtils
 import org.apache.commons.lang3.Validate
 import org.apache.http.HttpHost
+import org.elasticsearch.action.bulk.BulkRequest
 import org.elasticsearch.action.search.SearchRequest
+import org.elasticsearch.action.update.UpdateRequest
 import org.elasticsearch.action.{ActionRequest, ActionResponse}
 import org.elasticsearch.client.{RequestOptions, RestClient, RestHighLevelClient}
 import org.elasticsearch.common.settings.Settings
@@ -14,6 +16,7 @@ import org.elasticsearch.search.SearchModule
 import org.elasticsearch.search.builder.SearchSourceBuilder
 import org.junit.{After, Before, Test}
 
+import java.util
 import java.util.Collections
 import java.util.concurrent.Executors
 
@@ -29,7 +32,8 @@ class EsTest extends AbsActionTest {
     @Before
     override def before(): Unit = {
         super.before()
-        val esHosts = config.getProperty(ParamConstant.ES_HOST)
+        //val esHosts = config.getProperty(ParamConstant.ES_HOST)
+        val esHosts = "172.20.20.183:9201"
         esClient = new RestHighLevelClient(RestClient.builder(extractHosts(esHosts): _*))
     }
 
@@ -101,9 +105,35 @@ class EsTest extends AbsActionTest {
         //printRR(request, response)
     }
 
+    def insert(size: Int): Unit = {
+        val bulkRequest = new BulkRequest
+        for (_ <- 1 to size) {
+            val startTime = "2020-01-01"
+            val endTime = "2020-10-31"
+            val dateTime = RandomUtils.getRandomDate(startTime, endTime)
+            val indexName = s"t_acc_merge_withdraw_list_${dateTime.replaceAll("[-/:\\s]", "").substring(0, 6)}m"
+            val indexType = "xdata"
+            val id = RandomUtils.getString(0, Long.MaxValue, 28)
+            val dataMap = new util.HashMap[String, Any]()
+            dataMap.put("TRANS_TIME", dateTime)
+            dataMap.put("WITHDRAW_TIME", dateTime)
+            dataMap.put("MER_NO", RandomUtils.getRandomNumber(0, Long.MaxValue).toString)
+            dataMap.put("AMOUNT", RandomUtils.getRandomNumber(0, 100000000).toString)
+            dataMap.put("FEE", RandomUtils.getRandomNumber(0, 10000).toString)
+            dataMap.put("ORDER_ID", id)
+            dataMap.put("RET_CODE", "00")
+            val updateRequest = new UpdateRequest(indexName, indexType, id).doc(dataMap).upsert(dataMap)
+            bulkRequest.add(updateRequest)
+            //val response = esClient.update(request, options)
+            //printRR(request, response)
+        }
+        val bulkResponse = esClient.bulk(bulkRequest, options)
+        //printRR(bulkRequest, bulkResponse)
+    }
+
     @Test
-    def testQuery(): Unit = {
-        val size = 5000
+    def testQueryAndWrite(): Unit = {
+        val size = 3000
         val startTime = "2018-01-01"
         val endTime = "2021-05-06"
         val pool = Executors.newFixedThreadPool(size)
@@ -111,10 +141,13 @@ class EsTest extends AbsActionTest {
             pool.execute(new Runnable {
                 override def run(): Unit = {
                     val start = System.currentTimeMillis()
+                    insert(100)
+                    val insertEnd = System.currentTimeMillis()
                     val randTime = RandomUtils.getRandomDate(startTime, endTime)
                     query(randTime)
-                    val stop = System.currentTimeMillis()
-                    println(s"${Thread.currentThread().getName} 查询耗时：${stop - start} ms")
+                    val end = System.currentTimeMillis()
+                    println(s"${Thread.currentThread().getName} 请求总耗时：${(end - start) / 1000}s " +
+                            s"插入耗时：${(insertEnd - start) / 1000}s 查询耗时：${(end - insertEnd) / 1000}s")
                 }
             })
         }
