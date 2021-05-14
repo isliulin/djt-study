@@ -59,7 +59,7 @@ class EsTest extends AbsActionTest {
     }
 
     def query(transTime: String): Unit = {
-        val index = "t_acc_merge_withdraw_list_read"
+        val index = "t_test_oom_*"
         val query =
             s"""
                |{
@@ -67,12 +67,15 @@ class EsTest extends AbsActionTest {
                |  "aggs": {
                |    "test_group_by": {
                |      "terms": {
-               |        "field": "RET_CODE"
+               |        "field": "F3",
+               |        "order": {
+               |          "amt": "desc"
+               |        }
                |      },
                |      "aggs": {
                |        "amt": {
                |          "sum": {
-               |            "field": "AMOUNT"
+               |            "field": "F2"
                |          }
                |        }
                |      }
@@ -83,7 +86,7 @@ class EsTest extends AbsActionTest {
                |      "must": [
                |        {
                |          "range": {
-               |            "TRANS_TIME": {
+               |            "F1": {
                |              "gte": "$transTime"
                |            }
                |          }
@@ -109,19 +112,17 @@ class EsTest extends AbsActionTest {
         val bulkRequest = new BulkRequest
         for (_ <- 1 to size) {
             val startTime = "2020-01-01"
-            val endTime = "2020-10-31"
+            val endTime = "2020-09-30"
             val dateTime = RandomUtils.getRandomDate(startTime, endTime)
-            val indexName = s"t_acc_merge_withdraw_list_${dateTime.replaceAll("[-/:\\s]", "").substring(0, 6)}m"
+            val indexName = s"t_test_oom_${dateTime.replaceAll("[-/:\\s]", "").substring(0, 6)}"
             val indexType = "xdata"
-            val id = RandomUtils.getString(0, Long.MaxValue, 28)
+            val id = System.currentTimeMillis() + RandomUtils.getString(0, Long.MaxValue - 1, 14).substring(0, 14)
             val dataMap = new util.HashMap[String, Any]()
-            dataMap.put("TRANS_TIME", dateTime)
-            dataMap.put("WITHDRAW_TIME", dateTime)
-            dataMap.put("MER_NO", RandomUtils.getRandomNumber(0, Long.MaxValue).toString)
-            dataMap.put("AMOUNT", RandomUtils.getRandomNumber(0, 100000000).toString)
-            dataMap.put("FEE", RandomUtils.getRandomNumber(0, 10000).toString)
-            dataMap.put("ORDER_ID", id)
-            dataMap.put("RET_CODE", "00")
+            dataMap.put("F1", dateTime)
+            for (i <- 2 to 20) {
+                dataMap.put(s"F$i", RandomUtils.getRandomNumber(0, Long.MaxValue - 1).toString)
+            }
+
             val updateRequest = new UpdateRequest(indexName, indexType, id).doc(dataMap).upsert(dataMap)
             bulkRequest.add(updateRequest)
             //val response = esClient.update(request, options)
@@ -131,17 +132,59 @@ class EsTest extends AbsActionTest {
         //printRR(bulkRequest, bulkResponse)
     }
 
+    val poolSize = 200
+
     @Test
-    def testQueryAndWrite(): Unit = {
-        val size = 3000
-        val startTime = "2018-01-01"
-        val endTime = "2021-05-06"
-        val pool = Executors.newFixedThreadPool(size)
-        for (_ <- 1 to size) {
+    def testInsert(): Unit = {
+        val pool = Executors.newFixedThreadPool(poolSize)
+        while (true) {
             pool.execute(new Runnable {
                 override def run(): Unit = {
                     val start = System.currentTimeMillis()
-                    insert(100)
+                    insert(1000)
+                    val end = System.currentTimeMillis()
+                    println(s"${Thread.currentThread().getName} 插入耗时：${(end - start) / 1000}s")
+                }
+            })
+            Thread.sleep(10)
+        }
+        pool.shutdown()
+        while (!pool.isTerminated) ()
+    }
+
+    @Test
+    def testQuery(): Unit = {
+        val startTime = "2020-01-01"
+        val endTime = "2020-09-30"
+        val pool = Executors.newFixedThreadPool(poolSize)
+        while (true) {
+            pool.execute(new Runnable {
+                override def run(): Unit = {
+                    val start = System.currentTimeMillis()
+                    val dateTime = RandomUtils.getRandomDate(startTime, endTime)
+                    query(dateTime)
+                    val end = System.currentTimeMillis()
+                    println(s"${Thread.currentThread().getName} 查询耗时：${(end - start) / 1000}s")
+                }
+            })
+            Thread.sleep(10)
+        }
+        pool.shutdown()
+        while (!pool.isTerminated) ()
+    }
+
+
+    @Test
+    def testQueryAndWrite(): Unit = {
+        val size = 500
+        val startTime = "2018-01-01"
+        val endTime = "2021-05-06"
+        val pool = Executors.newFixedThreadPool(size)
+        while (true) {
+            pool.execute(new Runnable {
+                override def run(): Unit = {
+                    val start = System.currentTimeMillis()
+                    insert(1000)
                     val insertEnd = System.currentTimeMillis()
                     val randTime = RandomUtils.getRandomDate(startTime, endTime)
                     query(randTime)
@@ -150,6 +193,7 @@ class EsTest extends AbsActionTest {
                             s"插入耗时：${(insertEnd - start) / 1000}s 查询耗时：${(end - insertEnd) / 1000}s")
                 }
             })
+            Thread.sleep(100)
         }
         pool.shutdown()
         while (!pool.isTerminated) ()
@@ -160,5 +204,14 @@ class EsTest extends AbsActionTest {
         println("响应 => ", response)
     }
 
+    @Test
+    def testSys(): Unit = {
+        val timestamp = System.currentTimeMillis()
+        val randNum = RandomUtils.getString(0, Long.MaxValue - 1, 14).substring(0, 14)
+        val ss = timestamp + randNum
+        println(timestamp)
+        println(randNum)
+        println(ss)
+    }
 
 }
