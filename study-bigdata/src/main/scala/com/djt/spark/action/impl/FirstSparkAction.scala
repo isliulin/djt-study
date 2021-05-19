@@ -78,7 +78,7 @@ object FirstSparkAction {
      */
     def oracleDataTmpView(sparkSession: SparkSession): Unit = {
         val select = "select * from xxx where 1=1"
-        val fetchSize = "100000"
+        val fetchSize = "10000"
         val partitions = 10
         val options = mutable.Map[String, String]()
         options.put("driver", "xxx")
