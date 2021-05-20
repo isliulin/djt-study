@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
  */
 public abstract class AbsTools {
 
-    private static final Logger log = LogManager.getLogger(AbsTools.class);
+    private static final Logger LOG = LogManager.getLogger(AbsTools.class);
 
     /**
      * 配置文件路径
@@ -27,15 +27,15 @@ public abstract class AbsTools {
     public static final Props PROPS = Props.getProp(CONFIG_PATH, StandardCharsets.UTF_8);
 
     public void execute(String[] args) {
-        log.info("程序开始运行...");
+        LOG.info("程序开始运行...");
         long start = System.currentTimeMillis();
         try {
             doExecute(args);
         } catch (Exception e) {
-            log.error("程序运行出错：{}", e.getMessage());
+            LOG.error("程序运行出错：{}", e.getMessage());
         } finally {
             long stop = System.currentTimeMillis();
-            log.info("运行完成...耗时：{} s", (stop - start) / 1000);
+            LOG.info("运行完成...耗时：{} s", (stop - start) / 1000);
         }
     }
 

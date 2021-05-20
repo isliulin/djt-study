@@ -1,9 +1,5 @@
 package com.djt.tools;
 
-import com.djt.tools.impl.HdfsTools;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 /**
  * 程序主类
  *
@@ -12,10 +8,14 @@ import org.apache.logging.log4j.Logger;
  */
 public class ToolsExecutor {
 
-    private static final Logger log = LogManager.getLogger(ToolsExecutor.class);
-
     public static void main(String[] args) {
-        AbsTools tools = new HdfsTools();
-        tools.execute(null);
+        try {
+            Class<?> toolClass = Class.forName(AbsTools.PROPS.getStr("execute.class"));
+            AbsTools tools = (AbsTools) toolClass.newInstance();
+            tools.execute(null);
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
+
 }
