@@ -1,24 +1,33 @@
 package com.djt.test.other
 
 import com.djt.test.spark.action.AbsActionTest
-import com.djt.utils.RandomUtils
+import com.djt.utils.{ParamConstant, RandomUtils}
 import org.apache.commons.lang3.Validate
 import org.apache.http.HttpHost
+import org.apache.http.client.config.RequestConfig
+import org.apache.http.entity.ContentType
+import org.apache.http.nio.entity.NStringEntity
+import org.apache.spark.SparkConf
 import org.elasticsearch.action.bulk.BulkRequest
 import org.elasticsearch.action.search.SearchRequest
 import org.elasticsearch.action.update.UpdateRequest
 import org.elasticsearch.action.{ActionRequest, ActionResponse}
-import org.elasticsearch.client.{RequestOptions, RestClient, RestHighLevelClient}
+import org.elasticsearch.client._
+import org.elasticsearch.client.indices.GetMappingsRequest
 import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.common.xcontent.{LoggingDeprecationHandler, NamedXContentRegistry, XContentFactory, XContentType}
 import org.elasticsearch.plugins.SearchPlugin
 import org.elasticsearch.search.SearchModule
 import org.elasticsearch.search.builder.SearchSourceBuilder
+import org.elasticsearch.spark.rdd.EsSpark
 import org.junit.{After, Before, Test}
 
 import java.util
 import java.util.Collections
 import java.util.concurrent.Executors
+import scala.collection.JavaConversions._
+import scala.collection.mutable.ListBuffer
+
 
 /**
  * @author 　djt317@qq.com
@@ -28,17 +37,51 @@ class EsTest extends AbsActionTest {
 
     var esClient: RestHighLevelClient = _
     val options: RequestOptions = RequestOptions.DEFAULT
+    var esHosts: String = _
+
+    var restClient: RestClient = _
+
+    val clientPoolSize = 10
+    val clientPool = new util.Vector[RestHighLevelClient](clientPoolSize)
 
     @Before
     override def before(): Unit = {
         super.before()
-        //val esHosts = config.getProperty(ParamConstant.ES_HOST)
-        val esHosts = "172.20.20.183:9201"
-        esClient = new RestHighLevelClient(RestClient.builder(extractHosts(esHosts): _*))
+        //esHosts = config.getProperty(ParamConstant.ES_HOST)
+        esHosts = "172.20.20.183:9200"
+        esClient = createClient
+
+        for (_ <- 0 until clientPoolSize) {
+            clientPool.add(createClient)
+        }
+        println(s"连接池大小:${clientPool.size()}")
+        restClient = createRestClient()
     }
 
     @After
     def afterTest(): Unit = {
+        closeClient(esClient)
+        restClient.close()
+        clientPool.foreach(_.close())
+    }
+
+    override def setSparkConf(sparkConf: SparkConf): Unit = {
+        super.setSparkConf(sparkConf)
+        sparkConf.set("es.nodes", config.getProperty(ParamConstant.ES_HOST))
+        sparkConf.set("es.mapping.date.rich", "false")
+        //sparkConf.set("es.port", "")
+    }
+
+    def createClient: RestHighLevelClient = {
+        new RestHighLevelClient(RestClient.builder(extractHosts(esHosts): _*))
+    }
+
+    def getClientFromPool: RestHighLevelClient = {
+        val index = RandomUtils.getRandomNumber(0, clientPool.size() - 1)
+        clientPool.get(index)
+    }
+
+    def closeClient(esClient: RestHighLevelClient): Unit = {
         try if (esClient != null) {
             esClient.close()
         }
@@ -58,44 +101,63 @@ class EsTest extends AbsActionTest {
         httpHostArray
     }
 
+    def createRestClient(): RestClient = {
+        val builder = RestClient.builder(extractHosts(esHosts): _*).setRequestConfigCallback(new RestClientBuilder.RequestConfigCallback {
+            override def customizeRequestConfig(requestConfigBuilder: RequestConfig.Builder): RequestConfig.Builder = {
+                requestConfigBuilder.setConnectTimeout(300000)
+                requestConfigBuilder.setSocketTimeout(300000)
+                requestConfigBuilder.setConnectionRequestTimeout(300000)
+                requestConfigBuilder
+            }
+        }).setMaxRetryTimeoutMillis(300000)
+        builder.build
+    }
+
+    def getQuery(transTime: String): String = {
+        s"""
+           |{
+           |  "size": 0,
+           |  "aggs": {
+           |    "test_group_by": {
+           |      "terms": {
+           |        "field": "F3",
+           |        "order": {
+           |          "amt": "desc"
+           |        }
+           |      },
+           |      "aggs": {
+           |        "amt": {
+           |          "sum": {
+           |            "field": "F2"
+           |          }
+           |        }
+           |      }
+           |    }
+           |  },
+           |  "query": {
+           |    "bool": {
+           |      "must": [
+           |        {
+           |          "range": {
+           |            "F1": {
+           |              "gte": "$transTime"
+           |            }
+           |          }
+           |        }
+           |      ]
+           |    }
+           |  },
+           |  "sort": {
+           |    "F1": "DESC",
+           |    "F10": "ASC"
+           |  }
+           |}
+           |""".stripMargin
+    }
+
     def query(transTime: String): Unit = {
         val index = "t_test_oom_*"
-        val query =
-            s"""
-               |{
-               |  "size": 0,
-               |  "aggs": {
-               |    "test_group_by": {
-               |      "terms": {
-               |        "field": "F3",
-               |        "order": {
-               |          "amt": "desc"
-               |        }
-               |      },
-               |      "aggs": {
-               |        "amt": {
-               |          "sum": {
-               |            "field": "F2"
-               |          }
-               |        }
-               |      }
-               |    }
-               |  },
-               |  "query": {
-               |    "bool": {
-               |      "must": [
-               |        {
-               |          "range": {
-               |            "F1": {
-               |              "gte": "$transTime"
-               |            }
-               |          }
-               |        }
-               |      ]
-               |    }
-               |  }
-               |}
-               |""".stripMargin
+        val query = getQuery(transTime)
 
         val searchModule = new SearchModule(Settings.EMPTY, false, Collections.emptyList[SearchPlugin]())
         val registry = new NamedXContentRegistry(searchModule.getNamedXContents)
@@ -104,8 +166,34 @@ class EsTest extends AbsActionTest {
         //searchSourceBuilder.size(10);
         val request = new SearchRequest(index)
         request.source(searchSourceBuilder)
+        val esClient = getClientFromPool
         val response = esClient.search(request, options)
+        //closeClient(esClient)
         //printRR(request, response)
+    }
+
+    def query2(transTime: String): Unit = {
+        val index = "t_test_oom_*/xdata"
+        val query = getQuery(transTime)
+
+        val endpoint = index + "/_search"
+
+        val entity = new NStringEntity(query, ContentType.APPLICATION_JSON)
+        val request = new Request("POST", endpoint)
+        request.setEntity(entity)
+        //val restClient = createRestClient()
+        val response = restClient.performRequest(request)
+        //restClient.close()
+        //val str = EntityUtils.toString(response.getEntity)
+        //println(str)
+    }
+
+    def query3(): Unit = {
+        val index = "t_test_oom_202001"
+        val request = new GetMappingsRequest().indices(index)
+        val client = createClient
+        val response = client.indices.getMapping(request, RequestOptions.DEFAULT)
+        client.close()
     }
 
     def insert(size: Int): Unit = {
@@ -128,22 +216,26 @@ class EsTest extends AbsActionTest {
             //val response = esClient.update(request, options)
             //printRR(request, response)
         }
+        val esClient = getClientFromPool
         val bulkResponse = esClient.bulk(bulkRequest, options)
         //printRR(bulkRequest, bulkResponse)
     }
 
-    val poolSize = 200
+    var poolSize = 2000
 
     @Test
     def testInsert(): Unit = {
+        poolSize = 1
         val pool = Executors.newFixedThreadPool(poolSize)
         while (true) {
             pool.execute(new Runnable {
                 override def run(): Unit = {
-                    val start = System.currentTimeMillis()
-                    insert(1000)
-                    val end = System.currentTimeMillis()
-                    println(s"${Thread.currentThread().getName} 插入耗时：${(end - start) / 1000}s")
+                    while (true) {
+                        val start = System.currentTimeMillis()
+                        insert(100)
+                        val end = System.currentTimeMillis()
+                        println(s"${Thread.currentThread().getName} 插入耗时：${(end - start) / 1000}s")
+                    }
                 }
             })
             Thread.sleep(10)
@@ -154,17 +246,22 @@ class EsTest extends AbsActionTest {
 
     @Test
     def testQuery(): Unit = {
+        poolSize = 100
         val startTime = "2020-01-01"
         val endTime = "2020-09-30"
         val pool = Executors.newFixedThreadPool(poolSize)
         while (true) {
             pool.execute(new Runnable {
                 override def run(): Unit = {
-                    val start = System.currentTimeMillis()
-                    val dateTime = RandomUtils.getRandomDate(startTime, endTime)
-                    query(dateTime)
-                    val end = System.currentTimeMillis()
-                    println(s"${Thread.currentThread().getName} 查询耗时：${(end - start) / 1000}s")
+                    while (true) {
+                        val start = System.currentTimeMillis()
+                        val dateTime = RandomUtils.getRandomDate(startTime, endTime)
+                        query(dateTime)
+                        //query2(dateTime)
+                        //query3()
+                        val end = System.currentTimeMillis()
+                        println(s"${Thread.currentThread().getName} 查询耗时：${(end - start) / 1000}s")
+                    }
                 }
             })
             Thread.sleep(10)
@@ -173,6 +270,46 @@ class EsTest extends AbsActionTest {
         while (!pool.isTerminated) ()
     }
 
+    @Test
+    def testSparkWrite(): Unit = {
+        poolSize = 10
+        val sparkSession = getSparkSession
+        val partitions = 100
+        val indexName = "t_test_oom_202009/xdata"
+        val startTime = "2020-07-01"
+        val endTime = "2020-09-30"
+        val pool = Executors.newFixedThreadPool(poolSize)
+        while (true) {
+            pool.execute(new Runnable {
+                override def run(): Unit = {
+                    while (true) {
+                        val dataList = new ListBuffer[(String, util.HashMap[String, Any])]()
+                        for (_ <- 1 to 1000) {
+                            val dateTime = RandomUtils.getRandomDate(startTime, endTime)
+                            val id = System.currentTimeMillis() + RandomUtils.getString(0, Long.MaxValue - 1, 14).substring(0, 14)
+                            val dataMap = new util.HashMap[String, Any]()
+                            dataMap.put("F1", dateTime)
+                            for (i <- 2 to 20) {
+                                dataMap.put(s"F$i", RandomUtils.getRandomNumber(0, Long.MaxValue - 1).toString)
+                            }
+                            dataList.append((id, dataMap))
+                        }
+                        val esRdd = sparkSession.sparkContext.parallelize(dataList, partitions)
+                        EsSpark.saveToEsWithMeta(esRdd, indexName)
+                    }
+                }
+            })
+            Thread.sleep(10)
+        }
+    }
+
+    @Test
+    def testSparkQuery(): Unit = {
+        val index = "t_test_oom_202001/xdata"
+        val query = getQuery("2020-01-01 00:00:00")
+        val count = EsSpark.esRDD(getSparkSession.sparkContext, index, query).count()
+        println("==================" + count)
+    }
 
     @Test
     def testQueryAndWrite(): Unit = {
