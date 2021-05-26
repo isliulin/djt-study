@@ -1,12 +1,10 @@
 package com.djt.kafka;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.Consumer;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
 import java.util.Arrays;
@@ -32,16 +30,16 @@ public class KafkaDemo {
      */
     public static Producer<String, String> createProducer(Properties props) {
         Properties kafkaProps = new Properties();
-        kafkaProps.put("acks", props.getProperty("kafka.acks", "all"));
-        kafkaProps.put("retries", props.getProperty("kafka.retries", "0"));
-        kafkaProps.put("compression.type", props.getProperty("kafka.compression.type", "snappy"));
-        kafkaProps.put("batch.size", props.getProperty("kafka.batch.size", "100"));
-        kafkaProps.put("linger.ms", props.getProperty("kafka.linger.ms", "0"));
-        kafkaProps.put("buffer.memory", props.getProperty("kafka.buffer.memory", "33554432"));
-        kafkaProps.put("max.in.flight.requests.per.connection", props.getProperty("kafka.max.in.flight.requests.per.connection", "1"));
-        kafkaProps.put("bootstrap.servers", props.getProperty("kafka.bootstrap.servers"));
-        kafkaProps.put("key.serializer", props.getProperty("kafka.key.serializer", "org.apache.kafka.common.serialization.StringSerializer"));
-        kafkaProps.put("value.serializer", props.getProperty("kafka.value.serializer", "org.apache.kafka.common.serialization.StringSerializer"));
+        kafkaProps.put(ProducerConfig.ACKS_CONFIG, props.getProperty("kafka.acks", "all"));
+        kafkaProps.put(ProducerConfig.RETRIES_CONFIG, props.getProperty("kafka.retries", "0"));
+        kafkaProps.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, props.getProperty("kafka.compression.type", "snappy"));
+        kafkaProps.put(ProducerConfig.BATCH_SIZE_CONFIG, props.getProperty("kafka.batch.size", "100"));
+        kafkaProps.put(ProducerConfig.LINGER_MS_CONFIG, props.getProperty("kafka.linger.ms", "0"));
+        kafkaProps.put(ProducerConfig.BUFFER_MEMORY_CONFIG, props.getProperty("kafka.buffer.memory", "33554432"));
+        kafkaProps.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, props.getProperty("kafka.max.in.flight.requests.per.connection", "1"));
+        kafkaProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, props.getProperty("kafka.bootstrap.servers"));
+        kafkaProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, props.getProperty("kafka.key.serializer", "org.apache.kafka.common.serialization.StringSerializer"));
+        kafkaProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, props.getProperty("kafka.value.serializer", "org.apache.kafka.common.serialization.StringSerializer"));
         return new KafkaProducer<>(kafkaProps);
     }
 
@@ -53,17 +51,18 @@ public class KafkaDemo {
      */
     public static Consumer<String, String> createConsumer(Properties props) {
         Properties kafkaProps = new Properties();
-        kafkaProps.put("bootstrap.servers", props.getProperty("kafka.bootstrap.servers"));
-        kafkaProps.put("group.id", props.getProperty("kafka.group.id"));
-        kafkaProps.put("enable.auto.commit", props.getProperty("kafka.enable.auto.commit", "true"));
+        kafkaProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, props.getProperty("kafka.bootstrap.servers"));
+        kafkaProps.put(ConsumerConfig.GROUP_ID_CONFIG, props.getProperty("kafka.group.id"));
+        kafkaProps.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, props.getProperty("kafka.enable.auto.commit", "true"));
+        //此参数在0.10.1及之后的版本才有
         kafkaProps.put("max.poll.interval.ms", props.getProperty("kafka.max.poll.interval.ms", "1000"));
-        kafkaProps.put("max.poll.records", props.getProperty("kafka.max.poll.records", "2"));
-        kafkaProps.put("auto.commit.interval.ms", props.getProperty("kafka.auto.commit.interval.ms", "1000"));
-        kafkaProps.put("auto.offset.reset", props.getProperty("kafka.auto.offset.reset", "earliest"));
-        kafkaProps.put("session.timeout.ms", props.getProperty("kafka.session.timeout.ms", "30000"));
-        kafkaProps.put("heartbeat.interval.ms", props.getProperty("kafka.heartbeat.interval.ms", "1000"));
-        kafkaProps.put("key.deserializer", props.getProperty("kafka.key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer"));
-        kafkaProps.put("value.deserializer", props.getProperty("kafka.value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer"));
+        kafkaProps.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, props.getProperty("kafka.max.poll.records", "2"));
+        kafkaProps.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, props.getProperty("kafka.auto.commit.interval.ms", "1000"));
+        kafkaProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, props.getProperty("kafka.auto.offset.reset", "earliest"));
+        kafkaProps.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, props.getProperty("kafka.session.timeout.ms", "30000"));
+        kafkaProps.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, props.getProperty("kafka.heartbeat.interval.ms", "1000"));
+        kafkaProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, props.getProperty("kafka.key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer"));
+        kafkaProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, props.getProperty("kafka.value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer"));
         return new KafkaConsumer<>(kafkaProps);
     }
 
@@ -123,6 +122,8 @@ public class KafkaDemo {
             }
         });
         pool.shutdown();
+        while (!pool.isTerminated()) {
+        }
     }
 
 }
