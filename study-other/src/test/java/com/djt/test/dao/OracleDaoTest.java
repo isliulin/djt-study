@@ -270,8 +270,20 @@ public class OracleDaoTest extends DaoTest {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
     }
 
+    @Test
+    public void updateTable() {
+        String sql = "UPDATE order_user.t_pay_order_0101 SET order_id = ${id}";
+        for (int i = 1; i < 1000; i++) {
+            try {
+                log.info("id更新=>{}", i);
+                dao.executeSql(sql.replace("${id}", String.valueOf(i)));
+                Thread.sleep(1000);
+            } catch (SQLException | InterruptedException throwables) {
+                log.error("更新出错!");
+            }
+        }
+    }
 
 }

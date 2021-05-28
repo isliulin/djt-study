@@ -56,19 +56,19 @@ public class KafkaTest {
 
     @Test
     public void testKafkaProducer() throws InterruptedException {
-        //String topic = "TEST_DJT";
-        String topic = "SPARK_ETL_DJT_1";
+        String topic = "TEST_DJT";
+        //String topic = "SPARK_ETL_DJT_1";
         Producer<String, String> producer = KafkaDemo.createProducer(props);
-        for (int i = 0; i < 10000; i++) {
-            int topicNo = (i % 3) + 1;
-            topic = "SPARK_ETL_DJT_" + topicNo;
+        for (int i = 0; i < 10000000; i++) {
+            //int topicNo = (i % 3) + 1;
+            //topic = "SPARK_ETL_DJT_" + topicNo;
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("F1", i);
             jsonObject.put("F2", i);
             jsonObject.put("F3", i);
             String msgStr = JSONObject.toJSONString(jsonObject, SerializerFeature.WRITE_MAP_NULL_FEATURES);
             KafkaDemo.sendMessage(producer, topic, String.valueOf(i), msgStr);
-            Thread.sleep(500);
+            Thread.sleep(1000);
         }
         producer.flush();
     }
@@ -76,12 +76,11 @@ public class KafkaTest {
 
     @Test
     public void testKafkaConsumer() {
-        String topic = "TEST_DJT";
+        String topic = "ORDER_DATA_PLATFORM_NOTIFY_TRUE";
         props.put("kafka.session.timeout.ms", "6000");
         props.put("kafka.heartbeat.interval.ms", "1000");
         //props.put("kafka.max.poll.interval.ms", "15000");
         props.put("kafka.max.poll.records", "10");
-        KafkaDemo.startConsumer(props, 5000, 9000, false, topic);
-        while (true) ;
+        KafkaDemo.startConsumer(props, 1000, 0, true, topic);
     }
 }
