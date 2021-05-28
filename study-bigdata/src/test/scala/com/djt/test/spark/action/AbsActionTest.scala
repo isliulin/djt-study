@@ -31,7 +31,7 @@ abstract class AbsActionTest extends Serializable {
         config.setProperty(ParamConstant.SPARK_APP_NAME, "SparkTest")
         config.setProperty(ParamConstant.SPARK_LOG_LEVEL, "WARN")
         //Es
-        config.setProperty(ParamConstant.ES_HOST, "172.20.11.23:9200,172.20.20.183:9200,172.20.20.184:9200")
+        config.setProperty(ParamConstant.ES_HOST, "172.20.11.23:9200,172.20.20.183:9200,172.20.20.184:9200,172.20.11.23:9201,172.20.20.183:9201,172.20.20.184:9201")
         config.setProperty(ParamConstant.ES_INDEX_AUTO_CREATE, "false")
         //HBase
         config.setProperty(ParamConstant.HBASE_ZK_QUORUM, "172.20.7.33:2181,172.20.7.34:2181,172.20.7.35:2181")

@@ -1,5 +1,6 @@
 package com.djt.test.spark.action
 
+import com.alibaba.fastjson.JSONObject
 import com.djt.spark.action.impl.FirstSparkAction
 import com.djt.test.dto.CaseClass.Person
 import com.djt.utils.RandomUtils
@@ -63,7 +64,6 @@ class SparkActionTest extends AbsActionTest {
         val sparkSession = getSparkSession
         val keyList = Array[String]("t_table_1", "t_table_2", "t_table_3", "t_table_4", "t_table_5")
 
-
         val dataList = new ListBuffer[(String, (Int, Int))]()
         for (_ <- 1 to 100) {
             val table = keyList(RandomUtils.getRandomNumber(0, keyList.length))
@@ -72,7 +72,6 @@ class SparkActionTest extends AbsActionTest {
             val pos = RandomUtils.getRandomNumber(1, 5)
             dataList.append((s"$table#$id", (amt, pos)))
         }
-
 
         val rdd = sparkSession.sparkContext.parallelize(dataList, 10).cache()
         //打印原数据
@@ -93,6 +92,32 @@ class SparkActionTest extends AbsActionTest {
         })
     }
 
+    @Test
+    def testTakeOrder(): Unit = {
+        val sparkSession = getSparkSession
+        val dataList = Array[Int](1, 2, 3, 4, 5, 6, 7, 8, 9)
+        val rdd = sparkSession.sparkContext.parallelize(dataList, 1).cache()
+        val order = new Ordering[Int] {
+            override def compare(x: Int, y: Int): Int = {
+                x.compareTo(y)
+            }
+        }
+        rdd.takeOrdered(5)(order).foreach(println(_))
+
+        val dataList2 = ArrayBuffer[JSONObject]()
+        for (i <- 1 to 10) {
+            val json = new JSONObject()
+            json.put("f1", i)
+            dataList2.append(json)
+        }
+        val rdd2 = sparkSession.sparkContext.parallelize(dataList2, 1).cache()
+        val order2 = new Ordering[JSONObject] {
+            override def compare(x: JSONObject, y: JSONObject): Int = {
+                x.getIntValue("f1").compareTo(y.getIntValue("f1"))
+            }
+        }
+        rdd2.takeOrdered(5)(order2).foreach(println(_))
+    }
 
     /**
      * 自定义分区器

@@ -25,6 +25,7 @@ import org.junit.{After, Before, Test}
 import java.util
 import java.util.Collections
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
 
@@ -44,11 +45,14 @@ class EsTest extends AbsActionTest {
     val clientPoolSize = 10
     val clientPool = new util.Vector[RestHighLevelClient](clientPoolSize)
 
+    val atoInt: AtomicInteger = new AtomicInteger(0)
+
     @Before
     override def before(): Unit = {
         super.before()
         //esHosts = config.getProperty(ParamConstant.ES_HOST)
-        esHosts = "172.20.20.183:9200"
+        //esHosts = "172.20.20.183:9200"
+        esHosts = "172.20.4.87:9200,172.20.4.88:9200,172.20.4.89:9200"
         esClient = createClient
 
         for (_ <- 0 until clientPoolSize) {
@@ -76,9 +80,25 @@ class EsTest extends AbsActionTest {
         new RestHighLevelClient(RestClient.builder(extractHosts(esHosts): _*))
     }
 
+    /**
+     * 轮询获取客户端
+     *
+     * @return
+     */
     def getClientFromPool: RestHighLevelClient = {
-        val index = RandomUtils.getRandomNumber(0, clientPool.size() - 1)
+        var index = atoInt.getAndAdd(1)
+        if (index >= clientPoolSize) {
+            index = 0
+            atoInt.set(1)
+        }
         clientPool.get(index)
+    }
+
+    @Test
+    def testGetClientFromPool(): Unit = {
+        for (_ <- 1 to 100) {
+            getClientFromPool
+        }
     }
 
     def closeClient(esClient: RestHighLevelClient): Unit = {
@@ -225,7 +245,7 @@ class EsTest extends AbsActionTest {
 
     @Test
     def testInsert(): Unit = {
-        poolSize = 1
+        poolSize = 100
         val pool = Executors.newFixedThreadPool(poolSize)
         while (true) {
             pool.execute(new Runnable {
@@ -246,7 +266,7 @@ class EsTest extends AbsActionTest {
 
     @Test
     def testQuery(): Unit = {
-        poolSize = 100
+        poolSize = 1
         val startTime = "2020-01-01"
         val endTime = "2020-09-30"
         val pool = Executors.newFixedThreadPool(poolSize)
