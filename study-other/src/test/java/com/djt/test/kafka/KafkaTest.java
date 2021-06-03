@@ -1,6 +1,7 @@
 package com.djt.test.kafka;
 
-import com.alibaba.druid.pool.ha.PropertiesUtils;
+import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.setting.dialect.PropsUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.djt.kafka.KafkaDemo;
@@ -24,7 +25,12 @@ public class KafkaTest {
 
     @Before
     public void before() {
-        props = PropertiesUtils.loadProperties("/config.properties");
+        props = PropsUtil.get("config.properties");
+    }
+
+    @Test
+    public void nothing() {
+
     }
 
     @Test
@@ -55,7 +61,7 @@ public class KafkaTest {
     }
 
     @Test
-    public void testKafkaProducer() throws InterruptedException {
+    public void testKafkaProducer() {
         String topic = "TEST_DJT";
         //String topic = "SPARK_ETL_DJT_1";
         Producer<String, String> producer = KafkaDemo.createProducer(props);
@@ -68,19 +74,18 @@ public class KafkaTest {
             jsonObject.put("F3", i);
             String msgStr = JSONObject.toJSONString(jsonObject, SerializerFeature.WRITE_MAP_NULL_FEATURES);
             KafkaDemo.sendMessage(producer, topic, String.valueOf(i), msgStr);
-            Thread.sleep(1000);
+            ThreadUtil.sleep(1000);
         }
         producer.flush();
     }
 
-
     @Test
     public void testKafkaConsumer() {
-        String topic = "ORDER_DATA_PLATFORM_NOTIFY_TRUE";
+        String topic = "TEST_DJT";
         props.put("kafka.session.timeout.ms", "6000");
         props.put("kafka.heartbeat.interval.ms", "1000");
         //props.put("kafka.max.poll.interval.ms", "15000");
-        props.put("kafka.max.poll.records", "10");
+        props.put("kafka.max.poll.records", "100");
         KafkaDemo.startConsumer(props, 1000, 0, true, topic);
     }
 }

@@ -1,5 +1,6 @@
 package com.djt.kafka;
 
+import cn.hutool.core.thread.ThreadUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -75,8 +76,8 @@ public class KafkaDemo {
      * @param value    消息体
      */
     public static void sendMessage(Producer<String, String> producer, String topic, String key, String value) {
-        log.info("生产数据=>topic:{} key:{} value:{}", topic, key, value);
         producer.send(new ProducerRecord<>(topic, key, value));
+        log.info("生产数据=>topic:{} key:{} value:{}", topic, key, value);
     }
 
     /**
@@ -108,11 +109,7 @@ public class KafkaDemo {
 
                 //手动等待一段时间 模拟数据处理时间
                 if (count > 0 && dealMs > 0) {
-                    try {
-                        Thread.sleep(dealMs);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    ThreadUtil.sleep(dealMs);
                 }
 
                 //若非自动提交 则手动提交
