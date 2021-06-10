@@ -1,11 +1,18 @@
 package com.djt.utils;
 
 import com.djt.datastructure.tree.AbsBinNode;
+import guru.nidi.graphviz.engine.Format;
+import guru.nidi.graphviz.engine.Graphviz;
+import guru.nidi.graphviz.model.Factory;
+import guru.nidi.graphviz.model.MutableGraph;
+import guru.nidi.graphviz.model.MutableNode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -263,6 +270,39 @@ public class BinaryTreeUtils {
                 charsArr[i][j] = c;
             }
         }
+    }
+
+    public static <K extends Comparable<K>, V> void printTree(AbsBinNode<K, V> node) {
+        if (node == null) {
+            return;
+        }
+
+        MutableGraph treeGraph = Factory.mutGraph("BinaryTree").setDirected(true);
+        treeGraph.add(genGraphNode(node));
+        try {
+            Graphviz.fromGraph(treeGraph).width(1000).render(Format.PNG)
+                    .toFile(new File("src/main/graphviz/BinaryTree.png"));
+        } catch (IOException e) {
+            throw new RuntimeException("生成二叉树Graph失败！", e);
+        }
+    }
+
+    public static <K extends Comparable<K>, V> MutableNode genGraphNode(AbsBinNode<K, V> node) {
+        if (node == null) {
+            return null;
+        }
+
+        MutableNode curNode = Factory.mutNode(node.getValue().toString());
+        MutableNode leftNode = genGraphNode(node.getLeft());
+        if (null != leftNode) {
+            curNode.addLink(leftNode);
+        }
+        MutableNode rightNode = genGraphNode(node.getRight());
+        if (null != rightNode) {
+            curNode.addLink(rightNode);
+        }
+
+        return curNode;
     }
 
 }

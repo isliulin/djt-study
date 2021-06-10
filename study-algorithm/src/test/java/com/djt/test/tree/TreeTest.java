@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.djt.datastructure.tree.binarytree.BinarySearchNode;
 import com.djt.datastructure.tree.binarytree.BinarySearchTree;
 import com.djt.utils.BinaryTreeUtils;
+import com.djt.utils.RandomUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,21 +33,26 @@ public class TreeTest {
      */
     public List<Integer> getNodeList() {
         List<Integer> nodeList = new ArrayList<>();
-        nodeList.add(30);
-        nodeList.add(15);
-        nodeList.add(7);
-        nodeList.add(5);
-        nodeList.add(10);
-        nodeList.add(20);
-        nodeList.add(18);
-        nodeList.add(25);
-        nodeList.add(45);
-        nodeList.add(40);
-        nodeList.add(35);
-        nodeList.add(42);
-        nodeList.add(55);
-        nodeList.add(50);
-        nodeList.add(60);
+        //nodeList.add(30);
+        //nodeList.add(15);
+        //nodeList.add(7);
+        //nodeList.add(5);
+        //nodeList.add(10);
+        //nodeList.add(20);
+        //nodeList.add(18);
+        //nodeList.add(25);
+        //nodeList.add(45);
+        //nodeList.add(40);
+        //nodeList.add(35);
+        //nodeList.add(42);
+        //nodeList.add(55);
+        //nodeList.add(50);
+        //nodeList.add(60);
+
+        int nodeNum = RandomUtils.getRandomNumber(1, 30);
+        for (int i = 0; i < nodeNum; i++) {
+            nodeList.add(RandomUtils.getRandomNumber(0, 100));
+        }
         return nodeList;
     }
 
@@ -171,6 +177,11 @@ public class TreeTest {
     @Test
     public void testLevelCollect() {
         BinaryTreeUtils.levelCollect(binarySearchTree.getRoot());
+    }
+
+    @Test
+    public void testPrintTree() {
+        BinaryTreeUtils.printTree(binarySearchTree.getRoot());
     }
 
 }
