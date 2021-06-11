@@ -267,5 +267,12 @@ public class StringTest {
         System.out.println(str.replace("${aaa}", "666"));
     }
 
+    @Test
+    public void testChar() {
+        for (char i = 0; i < 256; i++) {
+            System.out.println((int) i + ":" + i);
+        }
+    }
+
 
 }

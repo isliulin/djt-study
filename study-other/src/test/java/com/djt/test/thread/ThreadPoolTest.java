@@ -99,7 +99,7 @@ public class ThreadPoolTest {
 
         executor.shutdown();
         //10秒之后结束程序
-        ThreadUtil.sleep(10000);
+        ThreadUtil.sleep(100000);
         done.set(true);
         ThreadUtil.sleep(1000);
 

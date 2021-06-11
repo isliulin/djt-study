@@ -26,9 +26,9 @@ class ScalaTest {
 
     @Test
     def testOption(): Unit = {
+        println(Option(null).getOrElse("10"))
         println(Option("").getOrElse("10"))
         println(StringUtils.trimToNull(""))
         println(Option(StringUtils.trimToNull("")).getOrElse("10"))
     }
-
 }

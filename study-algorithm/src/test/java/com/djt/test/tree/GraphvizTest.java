@@ -36,8 +36,13 @@ public class GraphvizTest {
 
     @Test
     public void testGraphviz2() throws IOException {
-        MutableGraph g = mutGraph("example1").setDirected(true).add(
-                mutNode("a").add(Color.RED).addLink(mutNode("b")));
+        MutableNode nodeA = mutNode("a");
+        MutableNode nodeB = mutNode("b");
+        //nodeA.attrs(Label.Justification.LEFT);
+        nodeA.add(Color.RED).addLink(nodeB);
+
+        MutableGraph g = mutGraph("example1").setDirected(true);
+        g.add(nodeA);
 
         Graphviz.fromGraph(g).width(200).render(Format.PNG).toFile(new File("src/main/graphviz/ex2.png"));
     }
