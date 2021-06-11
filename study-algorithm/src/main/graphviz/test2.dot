@@ -1,0 +1,16 @@
+digraph g {
+  A->B;
+  A->C;
+  B->D;
+  B->E;
+  C->F;
+  C->G;
+  A[shape=circle, label="A"];
+  B[shape=circle, label="B"];
+  C[shape=circle, label="C"];
+  D[shape=circle, label="D"];
+  E[shape=circle, label="E"];
+  F[shape=circle, label="F"];
+  G[shape=circle, label="G"];
+  NULL[style=invis];
+}

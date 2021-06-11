@@ -1,0 +1,5 @@
+#将dot文件转为png图片
+dot -Tpng test.dot -o test.png
+
+#将dot文件经过处理再转为png图片 暂时无法使用 可能是脚本问题
+dot test2.dot | gvpr -c -f binarytree.gvpr | neato -n -Tpng -o test2.png
