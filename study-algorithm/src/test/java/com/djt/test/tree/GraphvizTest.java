@@ -45,6 +45,7 @@ public class GraphvizTest {
         g.add(nodeA);
 
         Graphviz.fromGraph(g).width(200).render(Format.PNG).toFile(new File("src/main/graphviz/ex2.png"));
+        Graphviz.fromGraph(g).width(200).render(Format.DOT).toFile(new File("src/main/graphviz/ex2.dot"));
     }
 
     @Test

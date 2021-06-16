@@ -1,0 +1,121 @@
+graph tree {
+    n1 [label = "1"];
+    n2 [label = "2"];
+    n1 -- n2;
+    n1_1 [label = "1_1", width = .1, style = dashed];
+    n1 -- n1_1 [style = dashed];
+    n1_2 [label = "1_2", width = .1, style = dashed];
+    n1 -- n1_2 [style = dashed];
+    n1_3 [label = "1_3", width = .1, style = dashed];
+    n1 -- n1_3 [style = dashed];
+    n1_4 [label = "1_4", width = .1, style = dashed];
+    n1 -- n1_4 [style = dashed];
+    n1_5 [label = "1_5", width = .1, style = dashed];
+    n1 -- n1_5 [style = dashed];
+    n1_6 [label = "1_6", width = .1, style = dashed];
+    n1 -- n1_6 [style = dashed];
+    n3 [label = "3"];
+    n1 -- n3;
+
+    n4 [label = "4"];
+    n2 -- n4;
+    n2_1 [label = "2_1", width = .1, style = dashed]
+    n2 -- n2_1 [style = dashed];
+    n2_2 [label = "2_2", width = .1, style = dashed]
+    n2 -- n2_2 [style = dashed];
+    n2_3 [label = "2_3", width = .1, style = dashed]
+    n2 -- n2_3 [style = dashed];
+    n2_4 [label = "2_4", width = .1, style = dashed]
+    n2 -- n2_4 [style = dashed];
+    n5 [label = "5"];
+    n2 -- n5;
+
+    n6 [label = "6"];
+    n3 -- n6;
+    n3_1 [label = "3_1", width = .1, style = dashed]
+    n3 -- n3_1 [style = dashed];
+    n3_2 [label = "3_2", width = .1, style = dashed]
+    n3 -- n3_2 [style = dashed];
+    n3_3 [label = "3_3", width = .1, style = dashed]
+    n3 -- n3_3 [style = dashed];
+    n3_4 [label = "3_4", width = .1, style = dashed]
+    n3 -- n3_4 [style = dashed];
+    n7 [label = "7"];
+    n3 -- n7;
+
+    n8 [label = "8"];
+    n4 -- n8;
+    n4_1 [label = "4_1", width = .1, style = dashed]
+    n4 -- n4_1 [style = dashed];
+    n4_2 [label = "4_2", width = .1, style = dashed]
+    n4 -- n4_2 [style = dashed];
+    n9 [label = "9"];
+    n4 -- n9;
+
+    n10 [label = "10"];
+    n5 -- n10;
+    n5_1 [label = "5_1", width = .1, style = dashed]
+    n5 -- n5_1 [style = dashed];
+    n5_2 [label = "5_2", width = .1, style = dashed]
+    n5 -- n5_2 [style = dashed];
+    n11 [label = "11"];
+    n5 -- n11;
+
+    n12 [label = "12"];
+    n6 -- n12;
+    n6_1 [label = "6_1", width = .1, style = dashed]
+    n6 -- n6_1 [style = dashed];
+    n6_2 [label = "6_2", width = .1, style = dashed]
+    n6 -- n6_2 [style = dashed];
+    n13 [label = "13"];
+    n6 -- n13;
+
+    n14 [label = "14"];
+    n7 -- n14;
+    n7_1 [label = "7_1", width = .1, style = dashed]
+    n7 -- n7_1 [style = dashed];
+    n7_2 [label = "7_2", width = .1, style = dashed]
+    n7 -- n7_2 [style = dashed];
+    n15 [label = "15"];
+    n7 -- n15;
+
+    n16 [label = "16"];
+    n8 -- n16;
+    n17 [label = "17"];
+    n8 -- n17;
+
+    n18 [label = "18"];
+    n9 -- n18
+    n19 [label = "19"];
+    n9 -- n19
+
+    n20 [label = "20"];
+    n10 -- n20
+    n21 [label = "21"];
+    n10 -- n21
+
+    n22 [label = "22"];
+    n11 -- n22
+    n23 [label = "23"];
+    n11 -- n23
+
+    n24 [label = "24"];
+    n12 -- n24
+    n25 [label = "25"];
+    n12 -- n25
+
+    n26 [label = "26"];
+    n13 -- n26
+    n27 [label = "27"];
+    n13 -- n27
+
+    n28 [label = "28"];
+    n14 -- n28
+    n29 [label = "29"];
+    n14 -- n29
+
+    n30 [label = "30"];
+    n15 -- n30;
+    n31 [label = "31"];
+    n15 -- n31;
+}
