@@ -44,7 +44,7 @@ public class PasswordUtils {
             AES aes = SecureUtil.aes(key.getEncoded());
             return aes.encryptHex(password);
         } catch (Exception e) {
-            throw new RuntimeException("加密失败！");
+            throw new RuntimeException("加密失败！", e);
         }
     }
 
@@ -71,7 +71,7 @@ public class PasswordUtils {
             AES aes = SecureUtil.aes(key.getEncoded());
             return aes.decryptStr(password);
         } catch (Exception e) {
-            throw new RuntimeException("解密失败！");
+            throw new RuntimeException("解密失败！", e);
         }
     }
 
