@@ -1,6 +1,7 @@
 package com.djt.test.dao;
 
 import cn.hutool.db.sql.SqlExecutor;
+import com.alibaba.druid.util.JdbcUtils;
 import com.djt.dao.impl.MySqlDao;
 import com.djt.test.bean.TestDbUtilsBean;
 import com.djt.test.bean.TestHuToolBean;
@@ -13,6 +14,7 @@ import org.junit.Test;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author 　djt317@qq.com
@@ -100,5 +102,18 @@ public class MySqlDaoTest extends DaoTest {
         }
     }
 
+    @Test
+    public void testJdbcUtils() throws SQLException {
+        String sql = "select\n" +
+                "t1.*\n" +
+                "from etl_db.t_ogg_kafka_config t1\n" +
+                "left join etl_db.t_rl_project_table_config t2 on t1.table_id =t2.table_id \n" +
+                "left join etl_db.t_rl_project_info_config t3 on t2.task_id = t3.task_id\n" +
+                "where t3.project_name ='xdata-realtime-stream'";
+        List<Map<String, Object>> result = JdbcUtils.executeQuery(dao.getDataSource(), sql);
+        for (Map<String, Object> map : result) {
+            System.out.println(map);
+        }
+    }
 
 }

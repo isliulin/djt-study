@@ -2,6 +2,7 @@ package com.djt.dao;
 
 import cn.hutool.db.Db;
 import cn.hutool.db.DbUtil;
+import cn.hutool.db.Entity;
 import cn.hutool.db.sql.SqlExecutor;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.util.JdbcUtils;
@@ -88,6 +89,18 @@ public abstract class AbstractDao {
      */
     public List<Map<String, Object>> query(String sql, Object... params) throws SQLException {
         return queryRunner.query(sql, new MapListHandler(), params);
+    }
+
+    /**
+     * 查询
+     *
+     * @param sql    查询sql
+     * @param params 参数列表
+     * @return 结果列表
+     * @throws SQLException e
+     */
+    public List<Entity> query2(String sql, Object... params) throws SQLException {
+        return db.query(sql, params);
     }
 
     /**

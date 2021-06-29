@@ -274,5 +274,12 @@ public class StringTest {
         }
     }
 
+    @Test
+    public void testSubstr() {
+        String str = "123";
+        System.out.println(StringUtils.substring(str, -1));
+        System.out.println("123".substring(-1));
+    }
+
 
 }

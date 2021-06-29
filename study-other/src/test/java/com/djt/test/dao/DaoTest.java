@@ -30,7 +30,6 @@ public abstract class DaoTest {
     public void before() {
         config = PropertiesUtils.loadProperties("/config.properties");
         System.out.println("=======初始化开始=======");
-        System.out.println(config.toString());
         initDao();
         if (dao == null) {
             throw new IllegalArgumentException("dao不能为空，请初始化！");
