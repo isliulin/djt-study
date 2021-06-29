@@ -1,5 +1,6 @@
 package com.djt.dao.impl;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import com.djt.dao.AbstractDao;
 import com.djt.utils.PasswordUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,7 @@ public class MySqlDao extends AbstractDao {
     }
 
     @Override
-    protected void initDataSource() {
+    protected void initDataSource(DruidDataSource dataSource) {
         try {
             dataSource.setUrl(config.getProperty("mysql.druid.Url"));
             dataSource.setUsername(config.getProperty("mysql.druid.Username"));

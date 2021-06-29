@@ -1,6 +1,7 @@
 package com.djt.dao.impl;
 
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.druid.pool.DruidDataSource;
 import com.djt.dao.AbstractDao;
 import com.djt.utils.DjtConstant;
 import com.djt.utils.PasswordUtils;
@@ -41,7 +42,7 @@ public class OracleDao extends AbstractDao {
     }
 
     @Override
-    protected void initDataSource() {
+    protected void initDataSource(DruidDataSource dataSource) {
         try {
             dataSource.setUrl(config.getProperty("oracle.druid.Url"));
             dataSource.setUsername(config.getProperty("oracle.druid.Username"));

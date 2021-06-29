@@ -41,7 +41,7 @@ public abstract class AbstractDao {
     /**
      * 数据源
      */
-    protected final DruidDataSource dataSource = new DruidDataSource();
+    private final DruidDataSource dataSource = new DruidDataSource();
 
     /**
      * 数据库操作工具
@@ -55,15 +55,17 @@ public abstract class AbstractDao {
 
     protected AbstractDao(Properties config) {
         this.config = config;
-        initDataSource();
+        initDataSource(dataSource);
         queryRunner = new QueryRunner(dataSource);
         db = DbUtil.use(dataSource);
     }
 
     /**
      * 初始化数据源
+     *
+     * @param dataSource 数据源
      */
-    protected abstract void initDataSource();
+    protected abstract void initDataSource(DruidDataSource dataSource);
 
     public DruidDataSource getDataSource() {
         return dataSource;
