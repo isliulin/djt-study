@@ -38,7 +38,7 @@ public class HiveDao extends AbstractDao {
     }
 
     @Override
-    protected void initDataSource(DruidDataSource dataSource) {
+    protected void initDataSource(DruidDataSource dataSource, Properties config) {
         try {
             dataSource.setUrl(config.getProperty("hive.druid.Url"));
             dataSource.setUsername(config.getProperty("hive.druid.Username"));

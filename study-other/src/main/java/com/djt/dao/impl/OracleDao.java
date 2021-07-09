@@ -42,13 +42,13 @@ public class OracleDao extends AbstractDao {
     }
 
     @Override
-    protected void initDataSource(DruidDataSource dataSource) {
+    protected void initDataSource(DruidDataSource dataSource, Properties config) {
         try {
             dataSource.setUrl(config.getProperty("oracle.druid.Url"));
             dataSource.setUsername(config.getProperty("oracle.druid.Username"));
             dataSource.setPassword(PasswordUtils.decrypt(config.getProperty("oracle.druid.Password")));
-            dataSource.setInitialSize(Integer.parseInt(config.getProperty("oracle.druid.InitialSize", "3")));
-            dataSource.setMaxActive(Integer.parseInt(config.getProperty("oracle.druid.MaxActive", "3")));
+            dataSource.setInitialSize(Integer.parseInt(config.getProperty("oracle.druid.InitialSize", "1")));
+            dataSource.setMaxActive(Integer.parseInt(config.getProperty("oracle.druid.MaxActive", "1")));
             dataSource.setMinIdle(Integer.parseInt(config.getProperty("oracle.druid.MinIdle", "1")));
             dataSource.setMaxWait(Long.parseLong(config.getProperty("oracle.druid.MaxWait", "100")));
             dataSource.setKeepAlive(Boolean.parseBoolean(config.getProperty("oracle.druid.KeepAlive", "true")));

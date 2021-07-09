@@ -1,17 +1,21 @@
 package com.djt.test.kafka;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.setting.dialect.PropsUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.djt.kafka.KafkaDemo;
 import com.djt.utils.DjtConstant;
+import com.djt.utils.RandomUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.Producer;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
 /**
@@ -35,31 +39,27 @@ public class KafkaTest {
 
     @Test
     public void testProduce() {
-        String topic = "dc_etl_baseinfo";
-        String jsonStr = "{\n" +
-                "  \"table\": \"BASE_DATA_USER.T_DICT\",\n" +
-                "  \"op_type\": \"I\",\n" +
-                "  \"op_ts\": \"2021-06-07 11:38:25.000000\",\n" +
-                "  \"current_ts\": \"2021-06-07T19:38:29.242000\",\n" +
-                "  \"pos\": \"00000001590007717741\",\n" +
-                "  \"after\": {\n" +
-                "    \"ID\": \"119670987\",\n" +
-                "    \"VALUE\": \"1\",\n" +
-                "    \"VALUE_NAME\": \"VALUE_NAME\",\n" +
-                "    \"LABEL\": \"LABEL\",\n" +
-                "    \"TYPE\": \"TYPE\",\n" +
-                "    \"TYPE_NAME\": \"TYPE_NAME\",\n" +
-                "    \"PROJECT\": \"PROJECT\",\n" +
-                "    \"REMARK\": \"REMARK\",\n" +
-                "    \"SORT\": \"SORT\",\n" +
-                "    \"PARENT_ID\": \"PARENT_ID\",\n" +
-                "    \"CREATE_TIME\": \"2021-06-06 11:38:25.000000\",\n" +
-                "    \"UPDATE_TIME\": \"2021-06-06 11:38:25.000000\",\n" +
-                "    \"DEL_FLAG\": \"DEL_FLAG\"\n" +
-                "  }\n" +
-                "}";
+        String topic = "dc_etl_account";
+        int size = 100;
         Producer<String, String> producer = KafkaDemo.createProducer(props);
-        KafkaDemo.sendMessage(producer, topic, "0", jsonStr);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DatePattern.PURE_DATETIME_PATTERN);
+        for (int i = 0; i < size; i++) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("table", "CHARGE_USER.T_ACTIVITY_RECORD");
+            jsonObject.put("op_type", "I");
+            jsonObject.put("op_ts", LocalDateTimeUtil.format(LocalDateTime.now(), DatePattern.NORM_DATETIME_FORMATTER));
+            jsonObject.put("current_ts", LocalDateTimeUtil.format(LocalDateTime.now(), DatePattern.NORM_DATETIME_FORMATTER));
+            jsonObject.put("pos", System.currentTimeMillis());
+            JSONObject data = new JSONObject();
+            //String id = String.valueOf(System.currentTimeMillis());
+            String id = String.valueOf(i);
+            data.put("ID", id);
+            data.put("ACTIVITY_ID", "11772299");
+            data.put("AMOUNT", RandomUtils.getRandomNumber(0, 100));
+            data.put("TRANS_TIME", RandomUtils.getRandomDate("20200101", "20210630", formatter));
+            jsonObject.put("after", data);
+            KafkaDemo.sendMessage(producer, topic, id, jsonObject.toJSONString());
+        }
         producer.flush();
     }
 

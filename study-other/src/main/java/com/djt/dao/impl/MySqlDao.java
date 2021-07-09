@@ -38,13 +38,13 @@ public class MySqlDao extends AbstractDao {
     }
 
     @Override
-    protected void initDataSource(DruidDataSource dataSource) {
+    protected void initDataSource(DruidDataSource dataSource, Properties config) {
         try {
             dataSource.setUrl(config.getProperty("mysql.druid.Url"));
             dataSource.setUsername(config.getProperty("mysql.druid.Username"));
             dataSource.setPassword(PasswordUtils.decrypt(config.getProperty("mysql.druid.Password")));
-            dataSource.setInitialSize(Integer.parseInt(config.getProperty("mysql.druid.InitialSize", "3")));
-            dataSource.setMaxActive(Integer.parseInt(config.getProperty("mysql.druid.MaxActive", "3")));
+            dataSource.setInitialSize(Integer.parseInt(config.getProperty("mysql.druid.InitialSize", "1")));
+            dataSource.setMaxActive(Integer.parseInt(config.getProperty("mysql.druid.MaxActive", "1")));
             dataSource.setMinIdle(Integer.parseInt(config.getProperty("mysql.druid.MinIdle", "1")));
             dataSource.setMaxWait(Long.parseLong(config.getProperty("mysql.druid.MaxWait", "100")));
             dataSource.setKeepAlive(Boolean.parseBoolean(config.getProperty("mysql.druid.KeepAlive", "true")));

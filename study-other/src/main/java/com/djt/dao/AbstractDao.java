@@ -34,11 +34,6 @@ import java.util.Properties;
 public abstract class AbstractDao {
 
     /**
-     * 配置
-     */
-    protected Properties config;
-
-    /**
      * 数据源
      */
     private final DruidDataSource dataSource = new DruidDataSource();
@@ -54,8 +49,7 @@ public abstract class AbstractDao {
     protected Db db;
 
     protected AbstractDao(Properties config) {
-        this.config = config;
-        initDataSource(dataSource);
+        initDataSource(dataSource, config);
         queryRunner = new QueryRunner(dataSource);
         db = DbUtil.use(dataSource);
     }
@@ -64,8 +58,9 @@ public abstract class AbstractDao {
      * 初始化数据源
      *
      * @param dataSource 数据源
+     * @param config     配置
      */
-    protected abstract void initDataSource(DruidDataSource dataSource);
+    protected abstract void initDataSource(DruidDataSource dataSource, Properties config);
 
     public DruidDataSource getDataSource() {
         return dataSource;
