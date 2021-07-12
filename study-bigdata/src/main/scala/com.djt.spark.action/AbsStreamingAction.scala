@@ -47,6 +47,7 @@ abstract class AbsStreamingAction(config: Properties) extends AbsSparkAction(con
         } catch {
             case e: Exception =>
                 LOG.error("系统异常！", e)
+                throw new RuntimeException(e)
         } finally {
             streamingContext.stop()
             LOG.info("任务结束...共耗时：{} 秒", (System.currentTimeMillis() - start) / 1000)
@@ -159,7 +160,7 @@ abstract class AbsStreamingAction(config: Properties) extends AbsSparkAction(con
      *
      * @return
      */
-    def createDirectStream(): InputDStream[ConsumerRecord[String, String]] = {
+    def createKafkaDirectStream(): InputDStream[ConsumerRecord[String, String]] = {
         val topics = config.getProperty(ConfigConstant.Kafka.KAFKA_CONSUMER_TOPICS)
         Validate.notBlank(topics, s"${ConfigConstant.Kafka.KAFKA_CONSUMER_TOPICS} can not be null!")
         val topicList = topics.split(",").map(_.trim)

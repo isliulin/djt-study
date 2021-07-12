@@ -22,7 +22,7 @@ class KafkaStreamingAction(config: Properties) extends AbsStreamingAction(config
      * @param streamingContext sc
      */
     override def executeAction(streamingContext: StreamingContext): Unit = {
-        val directStream = createDirectStream()
+        val directStream = createKafkaDirectStream()
         directStream.foreachRDD((rdd, batch) => {
             val startTime = System.currentTimeMillis()
             //转换批次号
