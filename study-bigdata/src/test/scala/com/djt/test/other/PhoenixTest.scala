@@ -2,7 +2,7 @@ package com.djt.test.other
 
 import com.djt.test.dto.CaseClass.TestCase
 import com.djt.test.spark.action.AbsActionTest
-import com.djt.utils.ParamConstant
+import com.djt.utils.ConfigConstant
 import org.apache.phoenix.spark._
 import org.apache.spark.SparkConf
 import org.junit.{Before, Test}
@@ -18,7 +18,7 @@ class PhoenixTest extends AbsActionTest {
     @Before
     override def before(): Unit = {
         super.before()
-        zkUrl = config.getProperty(ParamConstant.PHOENIX_ZK_URL)
+        zkUrl = config.getProperty(ConfigConstant.Phoenix.PHOENIX_ZK_URL)
     }
 
     override def setSparkConf(sparkConf: SparkConf): Unit = {

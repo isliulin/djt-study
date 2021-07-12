@@ -2,7 +2,7 @@ package com.djt.test.other
 
 import com.djt.test.dto.CaseClass.TermInfo
 import com.djt.test.spark.action.AbsActionTest
-import com.djt.utils.ParamConstant
+import com.djt.utils.ConfigConstant
 import org.apache.kudu.client.{KuduClient, KuduPredicate, KuduScanner, SessionConfiguration}
 import org.apache.kudu.spark.kudu.KuduContext
 import org.junit.{After, Before, Test}
@@ -24,7 +24,7 @@ class KuduTest extends AbsActionTest {
     @Before
     override def before(): Unit = {
         super.before()
-        kuduMaster = config.getProperty(ParamConstant.KUDU_MASTER)
+        kuduMaster = config.getProperty(ConfigConstant.Kudu.KUDU_MASTER)
         kuduContext = new KuduContext(kuduMaster, getSparkSession.sparkContext)
         kuduClient = new KuduClient.KuduClientBuilder(kuduMaster).build()
     }

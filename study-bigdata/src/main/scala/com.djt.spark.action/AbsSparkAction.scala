@@ -1,6 +1,6 @@
 package com.djt.spark.action
 
-import com.djt.utils.ParamConstant
+import com.djt.utils.ConfigConstant
 import org.apache.commons.lang3.Validate
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
@@ -76,9 +76,9 @@ abstract class AbsSparkAction(config: Properties) extends Serializable {
      * @return sc
      */
     private def getSparkConf: SparkConf = {
-        val sparkMaster = config.getProperty(ParamConstant.SPARK_MASTER)
-        Validate.notNull(sparkMaster, ParamConstant.SPARK_MASTER + " can not be null!")
-        val sparkAppName = config.getProperty(ParamConstant.SPARK_APP_NAME, this.getClass.getSimpleName)
+        val sparkMaster = config.getProperty(ConfigConstant.Spark.SPARK_MASTER)
+        Validate.notNull(sparkMaster, ConfigConstant.Spark.SPARK_MASTER + " can not be null!")
+        val sparkAppName = config.getProperty(ConfigConstant.Spark.SPARK_APP_NAME, this.getClass.getSimpleName)
         val sparkConf = new SparkConf()
         sparkConf.setMaster(sparkMaster)
         sparkConf.setAppName(sparkAppName)

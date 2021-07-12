@@ -31,4 +31,16 @@ class ScalaTest {
         println(StringUtils.trimToNull(""))
         println(Option(StringUtils.trimToNull("")).getOrElse("10"))
     }
+
+    @Test
+    def testMap(): Unit = {
+        val map = Map("a" -> "1", "b" -> "2")
+        println(map.getOrElse("a", "666"))
+        println(map.getOrElse("c", "666"))
+        println(map.getOrElse("c", null))
+        println(map.getOrElse("b", null))
+        println(map.get("d").get)
+    }
+
+
 }

@@ -1,7 +1,7 @@
 package com.djt.spark.action.impl
 
 import com.djt.spark.action.AbsStreamingAction
-import com.djt.utils.{DataParseUtils, ParamConstant}
+import com.djt.utils.{ConfigConstant, DataParseUtils}
 import org.apache.spark.streaming.{StateSpec, StreamingContext}
 
 import java.util.Properties
@@ -23,7 +23,7 @@ class TradeStatStreamingAction(config: Properties) extends AbsStreamingAction(co
      */
     override def executeAction(streamingContext: StreamingContext): Unit = {
         val sc = streamingContext.sparkContext
-        sc.setLogLevel(config.getProperty(ParamConstant.SPARK_LOG_LEVEL, "ERROR"))
+        sc.setLogLevel(config.getProperty(ConfigConstant.Spark.SPARK_LOG_LEVEL, "ERROR"))
         streamingContext.checkpoint("/user/spark/chekpoint/test-djt-stream2")
 
         //用来初始化的rdd

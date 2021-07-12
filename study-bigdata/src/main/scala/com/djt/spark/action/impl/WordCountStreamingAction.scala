@@ -1,7 +1,7 @@
 package com.djt.spark.action.impl
 
 import com.djt.spark.action.AbsStreamingAction
-import com.djt.utils.ParamConstant
+import com.djt.utils.ConfigConstant
 import org.apache.commons.lang3.StringUtils
 import org.apache.spark.streaming.{Minutes, StateSpec, StreamingContext}
 
@@ -22,7 +22,7 @@ class WordCountStreamingAction(config: Properties) extends AbsStreamingAction(co
      * @param streamingContext sc
      */
     override def executeAction(streamingContext: StreamingContext): Unit = {
-        streamingContext.sparkContext.setLogLevel(config.getProperty(ParamConstant.SPARK_LOG_LEVEL, "ERROR"))
+        streamingContext.sparkContext.setLogLevel(config.getProperty(ConfigConstant.Spark.SPARK_LOG_LEVEL, "ERROR"))
         streamingContext.checkpoint("/user/spark/chekpoint/test-djt-stream2")
 
         val dStream = getSocketTextStream(streamingContext).flatMap(str => {

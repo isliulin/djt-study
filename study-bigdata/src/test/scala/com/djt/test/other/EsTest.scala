@@ -1,7 +1,7 @@
 package com.djt.test.other
 
 import com.djt.test.spark.action.AbsActionTest
-import com.djt.utils.{ParamConstant, RandomUtils}
+import com.djt.utils.{ConfigConstant, RandomUtils}
 import org.apache.commons.lang3.Validate
 import org.apache.http.HttpHost
 import org.apache.http.client.config.RequestConfig
@@ -71,7 +71,7 @@ class EsTest extends AbsActionTest {
 
     override def setSparkConf(sparkConf: SparkConf): Unit = {
         super.setSparkConf(sparkConf)
-        sparkConf.set("es.nodes", config.getProperty(ParamConstant.ES_HOST))
+        sparkConf.set("es.nodes", config.getProperty(ConfigConstant.Es.ES_HOST))
         sparkConf.set("es.mapping.date.rich", "false")
         //sparkConf.set("es.port", "")
     }
