@@ -278,7 +278,10 @@ public class StringTest {
     public void testSubstr() {
         String str = "123";
         System.out.println(StringUtils.substring(str, -1));
-        System.out.println("123".substring(-1));
+        //System.out.println("123".substring(-1));
+        System.out.println(StringUtils.substringBetween("test_${yyyyMMdd}", "${", "}"));
+        System.out.println(StringUtils.replace("test_${yyyyMMdd}", "${yyyyMMdd}", "20210706"));
+        System.out.println(StringUtils.contains("test_${yyyyMMdd}","${*}"));
     }
 
 

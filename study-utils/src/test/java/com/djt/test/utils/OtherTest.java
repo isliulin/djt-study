@@ -4,6 +4,8 @@ import com.djt.utils.DjtConstant;
 import org.junit.Test;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,5 +37,18 @@ public class OtherTest {
         System.out.println("排序前：" + list);
         Collections.sort(list);
         System.out.println("排序后：" + list);
+    }
+
+    @Test
+    public void test3() {
+        YearMonth ym = YearMonth.parse("202107", DjtConstant.YM);
+        System.out.println(ym.format(DjtConstant.YM));
+
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("MMdd");
+        LocalDate date = LocalDate.parse("20210706", DjtConstant.YMD);
+        System.out.println(date.format(DjtConstant.YM));
+        System.out.println(date.format(DjtConstant.YMD));
+        System.out.println(date.format(formatter1));
+
     }
 }

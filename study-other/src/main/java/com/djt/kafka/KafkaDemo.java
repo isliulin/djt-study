@@ -111,12 +111,12 @@ public class KafkaDemo {
      * @param topics      消费主题列表
      */
     public static void startConsumer(Properties props, long pollMs, long dealMs, boolean isPrintData, String... topics) {
-        ExecutorService pool = Executors.newSingleThreadExecutor();
         Consumer<String, String> consumer = createConsumer(props);
-        boolean isAutoCommit = Boolean.parseBoolean(props.getProperty("kafka.enable.auto.commit", "true"));
+        boolean isAutoCommit = Boolean.parseBoolean(props.getProperty(ConfigConstants.Kafka.KAFKA_ENABLE_AUTO_COMMIT_CONFIG, "true"));
         List<String> topicList = Arrays.asList(topics);
         consumer.subscribe(topicList);
         log.info("启动消费者，消费主题=>{}", topicList);
+        ExecutorService pool = Executors.newSingleThreadExecutor();
         pool.execute(() -> {
             while (true) {
                 ConsumerRecords<String, String> records = consumer.poll(pollMs);

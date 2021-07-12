@@ -31,8 +31,8 @@ class KafkaStreamingAction(config: Properties) extends AbsStreamingAction(config
             //获取offset
             val offsetRanges: Array[OffsetRange] = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
             if (!rdd.isEmpty()) {
-                offsetRanges.foreach(offset => {
-                    LOG.warn(offset.toString())
+                offsetRanges.foreach(offsetRange => {
+                    LOG.warn(offsetRange.toString())
                 })
             }
 
