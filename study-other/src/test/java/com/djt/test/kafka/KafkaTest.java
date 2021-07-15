@@ -92,19 +92,16 @@ public class KafkaTest {
 
     @Test
     public void testKafkaProducer() {
-        String topic = "TEST_DJT";
-        //String topic = "SPARK_ETL_DJT_1";
+        String topic = "FLINK_TEST_DJT";
         Producer<String, String> producer = KafkaDemo.createProducer(props);
-        for (int i = 0; i < 10000; i++) {
-            //int topicNo = (i % 3) + 1;
-            //topic = "SPARK_ETL_DJT_" + topicNo;
+        for (int i = 0; i < 10; i++) {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("F1", i);
             jsonObject.put("F2", i);
             jsonObject.put("F3", i);
             String msgStr = JSONObject.toJSONString(jsonObject, SerializerFeature.WRITE_MAP_NULL_FEATURES);
             KafkaDemo.sendMessage(producer, topic, String.valueOf(i), msgStr);
-            ThreadUtil.sleep(1000);
+            //ThreadUtil.sleep(500);
         }
         producer.flush();
     }
