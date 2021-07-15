@@ -1,7 +1,6 @@
 package com.djt.flink.job;
 
-import cn.hutool.setting.dialect.Props;
-import com.djt.flink.utils.ConfigConstants;
+import cn.hutool.setting.Setting;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,18 +10,24 @@ import org.junit.Test;
  */
 public class FlinkJobTest {
 
-    Props props = new Props();
+    private final Setting setting = new Setting("config.properties");
 
     @Before
     public void before() {
-        props.setProperty(ConfigConstants.Socket.FLINK_SOCKET_STREAM_HOST, "172.20.20.183");
-        props.setProperty(ConfigConstants.Socket.FLINK_SOCKET_STREAM_PORT, "9191");
-        props.setProperty(ConfigConstants.Socket.FLINK_SOCKET_STREAM_DELIMITER, "\n");
+        //setting.put(ConfigConstants.Socket.FLINK_SOCKET_STREAM_HOST, "172.20.20.183");
+        //setting.put(ConfigConstants.Socket.FLINK_SOCKET_STREAM_PORT, "9191");
+        //setting.put(ConfigConstants.Socket.FLINK_SOCKET_STREAM_DELIMITER, "\n");
     }
 
     @Test
     public void testSocketStreamFlinkJob() {
-        AbsFlinkJob job = new SocketStreamFlinkJob("SocketStreamFlinkJob", props);
+        AbsFlinkJob job = new SocketStreamFlinkJob("SocketStreamFlinkJob", setting);
+        job.run();
+    }
+
+    @Test
+    public void testKafkaStreamFlinkJob() {
+        AbsFlinkJob job = new KafkaStreamFlinkJob("KafkaStreamFlinkJob", setting);
         job.run();
     }
 
