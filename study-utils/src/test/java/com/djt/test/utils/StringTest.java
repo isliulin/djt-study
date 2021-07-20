@@ -7,6 +7,7 @@ import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONValidator;
 import com.djt.utils.ParamUtils;
+import com.google.common.base.Joiner;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.junit.Test;
@@ -235,7 +236,7 @@ public class StringTest {
 
     @Test
     public void testHash() {
-        int size = 10000;
+        int size = 10;
         Set<Integer> set = new HashSet<>();
         for (int i = 1; i <= size; i++) {
             int hash = HashUtil.oneByOneHash(String.valueOf(i));
@@ -243,6 +244,8 @@ public class StringTest {
             set.add(hash);
         }
         System.out.println(set.size());
+        String join = Joiner.on(",").join(set);
+        System.out.println(join);
     }
 
     @Test
@@ -281,7 +284,16 @@ public class StringTest {
         //System.out.println("123".substring(-1));
         System.out.println(StringUtils.substringBetween("test_${yyyyMMdd}", "${", "}"));
         System.out.println(StringUtils.replace("test_${yyyyMMdd}", "${yyyyMMdd}", "20210706"));
-        System.out.println(StringUtils.contains("test_${yyyyMMdd}","${*}"));
+        System.out.println(StringUtils.contains("test_${yyyyMMdd}", "${*}"));
+    }
+
+    @Test
+    public void testJoin() {
+        List<String> list = new ArrayList<>();
+        list.add("A");
+        list.add("B");
+        list.add("C");
+        System.out.println(StringUtils.join(list, ","));
     }
 
 
