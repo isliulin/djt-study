@@ -2,6 +2,7 @@ package com.djt.test.kafka;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.setting.dialect.PropsUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -93,15 +94,16 @@ public class KafkaTest {
     public void testKafkaProducer() {
         String topic = "FLINK_TEST_DJT";
         Producer<String, String> producer = KafkaDemo.createProducer(props);
-        LocalDateTime time = LocalDateTime.now();
-        for (int i = 0; i < 10; i++) {
+        String timeStr = "2021-07-01 00:00:05";
+        LocalDateTime time = LocalDateTime.parse(timeStr, DatePattern.NORM_DATETIME_FORMATTER);
+        for (int i = 0; i < 1; i++) {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("F1", i);
-            jsonObject.put("F2", "测试-" + i);
-            jsonObject.put("F3", time.plusSeconds(1).format(DjtConstant.YMDHMS_FORMAT));
+            jsonObject.put("F1", "key-1");
+            jsonObject.put("F2", 1);
+            jsonObject.put("F3", time.plusSeconds(i).format(DjtConstant.YMDHMS_FORMAT));
             String msgStr = JSONObject.toJSONString(jsonObject, SerializerFeature.WRITE_MAP_NULL_FEATURES);
             KafkaDemo.sendMessage(producer, topic, String.valueOf(i), msgStr);
-            //ThreadUtil.sleep(500);
+            ThreadUtil.sleep(1000);
         }
         producer.flush();
     }
