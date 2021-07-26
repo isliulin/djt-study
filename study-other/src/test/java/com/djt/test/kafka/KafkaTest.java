@@ -17,6 +17,7 @@ import org.junit.Test;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
+import java.util.Random;
 
 /**
  * @author 　djt317@qq.com
@@ -94,16 +95,18 @@ public class KafkaTest {
     public void testKafkaProducer() {
         String topic = "FLINK_TEST_DJT";
         Producer<String, String> producer = KafkaDemo.createProducer(props);
-        String timeStr = "2021-07-01 00:00:05";
+        String timeStr = "2021-07-01 00:00:00";
         LocalDateTime time = LocalDateTime.parse(timeStr, DatePattern.NORM_DATETIME_FORMATTER);
-        for (int i = 0; i < 1; i++) {
+        String[] names = {"刘一", "陈二", "张三", "李四", "王五", "赵六", "孙七", "周八", "吴九", "郑十"};
+        Random random = new Random();
+        for (int i = 0; i < Integer.MAX_VALUE; i++) {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("F1", "key-1");
+            jsonObject.put("F1", names[random.nextInt(names.length)]);
             jsonObject.put("F2", 1);
             jsonObject.put("F3", time.plusSeconds(i).format(DjtConstant.YMDHMS_FORMAT));
             String msgStr = JSONObject.toJSONString(jsonObject, SerializerFeature.WRITE_MAP_NULL_FEATURES);
             KafkaDemo.sendMessage(producer, topic, String.valueOf(i), msgStr);
-            ThreadUtil.sleep(1000);
+            ThreadUtil.sleep(100);
         }
         producer.flush();
     }

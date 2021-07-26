@@ -4,6 +4,10 @@ import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+
 /**
  * 配置参数名常量
  *
@@ -12,6 +16,22 @@ import org.apache.kafka.clients.producer.ProducerConfig;
  */
 public interface ConfigConstants {
 
+    /**
+     * 通用常量
+     */
+    interface Common {
+
+        /**
+         * default time-zone
+         */
+        ZoneId ZONE_ID = ZoneId.systemDefault();
+
+        /**
+         * default zone-offset
+         */
+        ZoneOffset ZONE_OFFSET = OffsetDateTime.now().getOffset();
+
+    }
 
     /**
      * Kafka 配置

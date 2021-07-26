@@ -18,7 +18,7 @@ abstract public class AbsFlinkJob {
     /**
      * 任务名
      */
-    private final String jobName;
+    protected final String jobName;
 
     /**
      * 任务配置
@@ -28,7 +28,7 @@ abstract public class AbsFlinkJob {
     /**
      * Flink运行环境
      */
-    protected StreamExecutionEnvironment exeEnv = StreamExecutionEnvironment.getExecutionEnvironment();
+    private final StreamExecutionEnvironment exeEnv = StreamExecutionEnvironment.getExecutionEnvironment();
 
 
     public AbsFlinkJob(String jobName, Setting setting) {
@@ -43,8 +43,7 @@ abstract public class AbsFlinkJob {
     public void run() {
         try {
             executeBefore();
-            executeAction();
-            exeEnv.execute(jobName);
+            doRun(exeEnv);
         } catch (Exception e) {
             log.error("任务运行异常: {}", e.getMessage());
             throw new RuntimeException(e);
@@ -54,13 +53,13 @@ abstract public class AbsFlinkJob {
     /**
      * 任务执行前的动作
      */
-    protected void executeBefore() {
+    protected void executeBefore() throws Exception {
     }
 
     /**
      * 任务主体
      */
-    abstract protected void executeAction();
+    abstract protected void doRun(StreamExecutionEnvironment exeEnv) throws Exception;
 
     /**
      * 获取kafka相关配置

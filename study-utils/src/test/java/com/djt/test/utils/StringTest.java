@@ -58,9 +58,14 @@ public class StringTest {
     }
 
     @Test
+    public void testJson3() {
+    }
+
+    @Test
     public void testMap() {
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("A", null);
+        System.out.println(dataMap);
         System.out.println(dataMap.get("A"));
         System.out.println(dataMap.getOrDefault("A", "").toString());
     }

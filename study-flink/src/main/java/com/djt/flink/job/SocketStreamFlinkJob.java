@@ -8,6 +8,7 @@ import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 
@@ -25,7 +26,7 @@ public class SocketStreamFlinkJob extends AbsFlinkJob {
     }
 
     @Override
-    public void executeAction() {
+    public void doRun(StreamExecutionEnvironment exeEnv) throws Exception {
         String host = setting.get("socket", ConfigConstants.Socket.FLINK_SOCKET_STREAM_HOST);
         int port = Integer.parseInt(setting.get("socket", ConfigConstants.Socket.FLINK_SOCKET_STREAM_PORT));
         String delimiter = setting.get("socket", ConfigConstants.Socket.FLINK_SOCKET_STREAM_DELIMITER);
@@ -40,5 +41,7 @@ public class SocketStreamFlinkJob extends AbsFlinkJob {
         })
         .keyBy(tuple2 -> tuple2.getField(0)).window(SlidingProcessingTimeWindows.of(Time.seconds(5), Time.seconds(1))).sum("f1");
         wordCount.print();
+
+        exeEnv.execute(jobName);
     }
 }
