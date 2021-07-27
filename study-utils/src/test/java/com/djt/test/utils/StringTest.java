@@ -301,5 +301,13 @@ public class StringTest {
         System.out.println(StringUtils.join(list, ","));
     }
 
+    @Test
+    public void testCharAt() {
+        String str = "abcd";
+        int flag = (int) str.charAt(0) % 10;
+        System.out.println((int) str.charAt(0));
+        System.out.println(flag);
+    }
+
 
 }

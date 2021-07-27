@@ -85,6 +85,22 @@ public class SecureUtilTest {
         String str = "123456";
         String md5 = DigestUtils.md5Hex(str);
         System.out.println(md5);
+
+        str = "123456";
+        md5 = DigestUtils.md5Hex(str);
+        System.out.println(md5);
+
+        str = "20210727张三";
+        md5 = DigestUtils.md5Hex(str);
+        System.out.println(md5);
+
+        str = "20210727李四";
+        md5 = DigestUtils.md5Hex(str);
+        System.out.println(md5);
+
+        str = "20210727王五";
+        md5 = DigestUtils.md5Hex(str);
+        System.out.println(md5);
     }
 
 

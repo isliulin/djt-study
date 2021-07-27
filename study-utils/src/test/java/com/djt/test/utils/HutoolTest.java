@@ -2,12 +2,18 @@ package com.djt.test.utils;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.annotation.JSONField;
+import com.djt.test.bean.PayOrder;
 import org.junit.Test;
 
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author 　djt317@qq.com
@@ -48,5 +54,16 @@ public class HutoolTest {
         System.out.println(ZoneOffset.systemDefault());
     }
 
+    @Test
+    public void testReflectUti() {
+        List<String> fieldNames = new ArrayList<>();
+        Field[] fields = ReflectUtil.getFields(PayOrder.class);
+        for (Field field : fields) {
+            JSONField jsonField = field.getAnnotation(JSONField.class);
+            String fieldName = jsonField.name();
+            fieldNames.add(fieldName);
+        }
+        System.out.println(fieldNames);
+    }
 
 }

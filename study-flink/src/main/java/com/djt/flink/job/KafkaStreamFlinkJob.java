@@ -5,6 +5,7 @@ import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.setting.Setting;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.djt.flink.entity.MyTumblingEventTimeWindows;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.eventtime.*;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
@@ -14,7 +15,6 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
-import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
@@ -69,7 +69,7 @@ public class KafkaStreamFlinkJob extends AbsFlinkJob {
                                 LocalDateTimeUtil.toEpochMilli(LocalDateTimeUtil.parse(event.f2, DatePattern.NORM_DATETIME_FORMATTER))))
                 .keyBy(event -> event.f0)
                 //窗口
-                .window(TumblingEventTimeWindows.of(Time.seconds(5)))
+                .window(MyTumblingEventTimeWindows.of(Time.seconds(5)))
                 //允许延迟时间
                 .allowedLateness(Time.seconds(5))
                 //数据处理
