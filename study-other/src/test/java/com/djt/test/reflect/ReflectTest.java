@@ -1,6 +1,10 @@
 package com.djt.test.reflect;
 
+import cn.hutool.core.util.ClassUtil;
+import com.djt.test.dao.DaoTest;
 import org.junit.Test;
+
+import java.util.Set;
 
 /**
  * 反射与泛型-测试类
@@ -23,5 +27,13 @@ public class ReflectTest {
         Home<Student> home = new Home<>(student);
         System.out.println(home);
         home.getType();
+    }
+
+    @Test
+    public void testClassUtil() {
+        Set<Class<?>> classSet = ClassUtil.scanPackageBySuper("com.djt.test.dao", DaoTest.class);
+        for (Class<?> clazz : classSet) {
+            System.out.println(clazz.getName());
+        }
     }
 }

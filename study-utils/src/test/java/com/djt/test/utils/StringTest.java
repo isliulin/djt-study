@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.HashUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONValidator;
 import com.djt.utils.ParamUtils;
@@ -59,6 +60,19 @@ public class StringTest {
 
     @Test
     public void testJson3() {
+        String jsonStr = "{\n" +
+                "  \"f1\": \"1\",\n" +
+                "  \"f2\": 666,\n" +
+                "  \"f3\": [\"A\",\"b\",\"c\"]\n" +
+                "}";
+        JSONObject jsonObject = JSON.parseObject(jsonStr);
+        System.out.println(jsonObject.getString("f1"));
+        System.out.println(jsonObject.getString("f2"));
+        System.out.println(jsonObject.getString("f3"));
+        System.out.println(jsonObject.getJSONArray("f1"));
+        System.out.println(jsonObject.get("f1").getClass().getName());
+        System.out.println(jsonObject.get("f3").getClass().getName());
+
     }
 
     @Test

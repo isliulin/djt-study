@@ -2,6 +2,7 @@ package com.djt.test.utils;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.annotation.JSONField;
@@ -64,6 +65,13 @@ public class HutoolTest {
             fieldNames.add(fieldName);
         }
         System.out.println(fieldNames);
+    }
+
+    @Test
+    public void testUUID() {
+        UUID uuid = UUID.randomUUID();
+        System.out.println(uuid.toString(false));
+        System.out.println(uuid.toString(true));
     }
 
 }
