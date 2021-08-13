@@ -97,12 +97,9 @@ public class KafkaTest {
         Producer<String, String> producer = KafkaDemo.createProducer(props);
         String timeStr = "2021-07-01 00:00:00";
         LocalDateTime time = LocalDateTime.parse(timeStr, DatePattern.NORM_DATETIME_FORMATTER);
-        String[] names = {"刘一", "陈二", "张三", "李四", "王五", "赵六", "孙七", "周八", "吴九", "郑十"};
-        Random random = new Random();
-        for (int i = 0; i < Integer.MAX_VALUE; i++) {
+        for (int i = 0; i < 1; i++) {
             JSONObject jsonObject = new JSONObject();
-            String name = names[random.nextInt(names.length)];
-            jsonObject.put("F1", "张三");
+            jsonObject.put("F1", "刘德华");
             jsonObject.put("F2", 1);
             jsonObject.put("F3", time.plusSeconds(i).format(DjtConstant.YMDHMS_FORMAT));
             String msgStr = JSONObject.toJSONString(jsonObject, SerializerFeature.WRITE_MAP_NULL_FEATURES);
@@ -113,10 +110,10 @@ public class KafkaTest {
     }
 
     @Test
-    public void testKafkaProducer2() throws InterruptedException {
-        String topic = "FLINK_TEST_DJT";
+    public void testKafkaProducerFlink() {
+        String topic = "RISK_ANALYSIS_EVENT";
         Producer<String, String> producer = KafkaDemo.createProducer(props);
-        String timeStr = "2021-07-01 00:00:00";
+        String timeStr = "2021-07-01 12:34:56";
         LocalDateTime startTime = LocalDateTime.parse(timeStr, DatePattern.NORM_DATETIME_FORMATTER);
         String[] merNoArr = {"M0001", "M0002", "M0003", "M0004", "M0005", "M0006", "M0007", "M0008", "M0009", "M0010"};
         String[] nameArr = {"刘一", "陈二", "张三", "李四", "王五", "赵六", "孙七", "周八", "吴九", "郑十"};
@@ -125,22 +122,26 @@ public class KafkaTest {
         for (int i = 0; i < Integer.MAX_VALUE; i++) {
             LocalDateTime thisTime = startTime.plusMinutes(i);
             int merIndex = random.nextInt(merNoArr.length);
+            String merNo = merNoArr[merIndex];
+            String merName = nameArr[merIndex];
+            String retCode = retCodeArr[random.nextInt(retCodeArr.length)];
 
+            long timestamp = System.currentTimeMillis();
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("type", "03");
             jsonObject.put("subject", "test");
-            jsonObject.put("timestamp", System.currentTimeMillis());
-            jsonObject.put("event_id", "1");
+            jsonObject.put("timestamp", timestamp);
+            jsonObject.put("event_id", timestamp);
 
             JSONObject event = new JSONObject();
             event.put("ORDER_ID", System.currentTimeMillis());
             event.put("ORI_ORDER_ID", "");
             event.put("BUSI_TYPE", "1001");
             event.put("OUT_ORDER_ID", "");
-            event.put("MERCH_NO", merNoArr[merIndex]);
+            event.put("MERCH_NO", merNo);
             event.put("TERM_NO", "456789");
             event.put("TERM_SN", "888888");
-            event.put("PRINT_MERCH_NAME", nameArr[merIndex]);
+            event.put("PRINT_MERCH_NAME", merName);
             event.put("AGENT_ID", "50263545");
             event.put("SOURCES", "pos+/posp_api");
             event.put("TRANS_TIME", thisTime.format(DjtConstant.YMDHMS_FORMAT));
@@ -154,7 +155,7 @@ public class KafkaTest {
             event.put("FEE", "1");
             event.put("FEE_TYPE", "01");
             event.put("PAY_TOKEN", "379140010000021");
-            event.put("RET_CODE", retCodeArr[random.nextInt(retCodeArr.length)]);
+            event.put("RET_CODE", retCode);
             event.put("RET_MSG", "测试");
             event.put("AUTH_CODE", "132456");
             event.put("REMARK", "备注" + i);
@@ -162,9 +163,10 @@ public class KafkaTest {
             event.put("UPDATE_TIME", thisTime.format(DjtConstant.YMDHMS_FORMAT));
 
             jsonObject.put("event", event);
+            System.out.println("======" + jsonObject.toJSONString());
             String msgStr = JSONObject.toJSONString(jsonObject, SerializerFeature.WRITE_MAP_NULL_FEATURES);
             KafkaDemo.sendMessage(producer, topic, String.valueOf(i), msgStr);
-            Thread.sleep(300);
+            ThreadUtil.sleep(100);
         }
         producer.flush();
     }
