@@ -158,7 +158,7 @@ class HBaseTest extends AbsActionTest {
 
     @Test
     def testBathPut2(): Unit = {
-        val tableName = "TEST.T_TEST_DJT"
+        val tableName = "TEST:T_TEST_DJT"
         val table = conn.getTable(TableName.valueOf(tableName))
         val cf = Bytes.toBytes("0")
         val put = new Put(Bytes.toBytes("444"))

@@ -99,7 +99,7 @@ public class KafkaTest {
         LocalDateTime time = LocalDateTime.parse(timeStr, DatePattern.NORM_DATETIME_FORMATTER);
         for (int i = 0; i < 1; i++) {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("F1", "刘德华");
+            jsonObject.put("F1", "666");
             jsonObject.put("F2", 1);
             jsonObject.put("F3", time.plusSeconds(i).format(DjtConstant.YMDHMS_FORMAT));
             String msgStr = JSONObject.toJSONString(jsonObject, SerializerFeature.WRITE_MAP_NULL_FEATURES);
