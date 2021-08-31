@@ -1,5 +1,6 @@
 package com.djt.utils;
 
+import cn.hutool.core.lang.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
@@ -8,6 +9,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Random;
+
+import static com.djt.utils.DjtConstant.SUR_NAME_ARR;
 
 /**
  * 随机数工具类
@@ -17,6 +21,7 @@ import java.time.format.DateTimeFormatter;
  */
 public class RandomUtils {
 
+    public static final Random RANDOM = new Random();
 
     /**
      * 生成指定长度的数字字符串 末尾补0
@@ -87,27 +92,43 @@ public class RandomUtils {
     /**
      * 生成随机姓名
      *
-     * @param sex 性别 1-男 2-女
+     * @return name
+     */
+    public static String getRandomName() {
+        return getRandomName((byte) (RANDOM.nextInt(2)));
+    }
+
+    /**
+     * 生成随机姓名
+     *
+     * @param sex 性别 0-男 1-女
      * @return name
      */
     public static String getRandomName(byte sex) {
-        Validate.isTrue(sex == 1 || sex == 2, "性别不合法！");
+        Validate.isTrue(sex == 0 || sex == 1, "性别不合法！");
         //随机取个姓
-        int surNameIdx = getRandomNumber(0, DjtConstant.SUR_NAME_ARR.length - 1);
-        String surName = DjtConstant.SUR_NAME_ARR[surNameIdx];
+        String surName = SUR_NAME_ARR[RANDOM.nextInt(SUR_NAME_ARR.length)];
         //根据性别取名字列表
-        String[] nameArr = sex == 1 ? DjtConstant.NAME_MALE_ARR : DjtConstant.NAME_FEMALE_ARR;
+        String[] nameArr = sex == 0 ? DjtConstant.NAME_MALE_ARR : DjtConstant.NAME_FEMALE_ARR;
         //随机名字长度 1-2
         int nameLen = getRandomNumber(1, 2);
-        String char1 = nameArr[getRandomNumber(0, nameArr.length - 1)];
+        String char1 = nameArr[RANDOM.nextInt(nameArr.length)];
         String char2 = "";
         if (nameLen > 1) {
-            char2 = nameArr[getRandomNumber(0, nameArr.length - 1)];
+            char2 = nameArr[RANDOM.nextInt(nameArr.length)];
         }
         String name = char1 + char2;
         //姓+名
         return surName + name;
     }
 
+    /**
+     * 生成UUID
+     *
+     * @return String
+     */
+    public static String getUuid() {
+        return UUID.randomUUID().toString(true);
+    }
 
 }

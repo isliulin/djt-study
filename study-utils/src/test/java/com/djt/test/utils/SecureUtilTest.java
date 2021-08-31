@@ -11,6 +11,7 @@ import cn.hutool.crypto.symmetric.DES;
 import cn.hutool.crypto.symmetric.SymmetricAlgorithm;
 import com.djt.utils.PasswordUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.Test;
 
@@ -101,6 +102,13 @@ public class SecureUtilTest {
         str = "20210727王五";
         md5 = DigestUtils.md5Hex(str);
         System.out.println(md5);
+
+        md5 = StringUtils.newStringUtf8(DigestUtils.md5("123456"));
+        System.out.println(md5);
+
+        md5 = SecureUtil.md5("123456");
+        System.out.println(md5);
+
     }
 
 

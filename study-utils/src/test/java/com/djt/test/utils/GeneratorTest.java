@@ -1,5 +1,6 @@
 package com.djt.test.utils;
 
+import cn.binarywang.tools.generator.ChineseMobileNumberGenerator;
 import cn.binarywang.tools.generator.ChineseNameGenerator;
 import cn.binarywang.tools.generator.bank.BankCardNumberGenerator;
 import cn.binarywang.tools.generator.bank.BankCardTypeEnum;
@@ -64,6 +65,14 @@ public class GeneratorTest {
         for (int i = 0; i < 10; i++) {
             String bankCardNo = BankCardNumberGenerator.generate(BankNameEnum.ICBC, BankCardTypeEnum.CREDIT);
             System.err.println(bankCardNo);
+        }
+    }
+
+    @Test
+    public void testChineseMobileNumberGenerator() {
+        for (int i = 0; i < 10; i++) {
+            String no = ChineseMobileNumberGenerator.getInstance().generate();
+            System.err.println(no);
         }
     }
 
