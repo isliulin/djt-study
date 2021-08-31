@@ -1,0 +1,45 @@
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.1.0 http://maven.apache.org/xsd/assembly-2.1.0.xsd">
+    <id>release</id>
+    <formats>
+        <format>jar</format>
+    </formats>
+    <!--第一层是否是基础目录-->
+    <includeBaseDirectory>false</includeBaseDirectory>
+
+    <dependencySets>
+
+        <dependencySet>
+            <!--是否添加自身jar包-->
+            <useProjectArtifact>true</useProjectArtifact>
+            <!--三方包输出路径-->
+            <outputDirectory>.</outputDirectory>
+            <!--是否将三方包解压成class文件-->
+            <unpack>true</unpack>
+            <!--可被打包的jar包作用范围-->
+            <scope>runtime</scope>
+        </dependencySet>
+
+    </dependencySets>
+
+    <fileSets>
+
+        <fileSet>
+            <directory>${project.build.outputDirectory}</directory>
+            <outputDirectory>.</outputDirectory>
+            <includes>
+                <include>log4j2.xml</include>
+                <include>config.properties</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>
+            <directory>${project.build.outputDirectory}/META-INF</directory>
+            <outputDirectory>./META-INF</outputDirectory>
+            <includes>
+                <include>app.properties</include>
+            </includes>
+        </fileSet>
+
+    </fileSets>
+</assembly>
