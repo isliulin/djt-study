@@ -3,13 +3,16 @@ package com.djt.test.utils;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.UUID;
+import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.system.HostInfo;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.djt.test.bean.PayOrder;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
+import java.net.InetSocketAddress;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -73,5 +76,24 @@ public class HutoolTest {
         System.out.println(uuid.toString(false));
         System.out.println(uuid.toString(true));
     }
+
+    @Test
+    public void testHostInfo() {
+        HostInfo hostInfo = new HostInfo();
+        System.out.println(hostInfo.toString());
+    }
+
+    @Test
+    public void testNetUtil() {
+        System.out.println(NetUtil.getIpByHost("www.baidu.com"));
+        System.out.println(NetUtil.getLocalHostName());
+        System.out.println(NetUtil.getLocalhostStr());
+        System.out.println(NetUtil.isUsableLocalPort(8080));
+        System.out.println(NetUtil.getLocalMacAddress());
+        System.out.println(NetUtil.localIpv4s());
+        System.out.println(NetUtil.ping("www.baidu.com"));
+        System.out.println(NetUtil.isOpen(new InetSocketAddress("172.20.20.183", 2181), 1000));
+    }
+
 
 }
