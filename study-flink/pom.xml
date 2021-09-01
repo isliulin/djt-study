@@ -81,7 +81,6 @@
             <version>${flink.version}</version>
         </dependency>
 
-        <!--Table相关接口引入这一个包即可-->
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-table-planner-blink_${scala.binary.version}</artifactId>
@@ -91,15 +90,22 @@
 
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-sql-parser</artifactId>
+            <artifactId>flink-cep_${scala.binary.version}</artifactId>
             <version>${flink.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>guava</artifactId>
-                    <groupId>com.google.guava</groupId>
-                </exclusion>
-            </exclusions>
+            <scope>provided</scope>
         </dependency>
+
+        <!--<dependency>-->
+        <!--    <groupId>org.apache.flink</groupId>-->
+        <!--    <artifactId>flink-sql-parser</artifactId>-->
+        <!--    <version>${flink.version}</version>-->
+        <!--    <exclusions>-->
+        <!--        <exclusion>-->
+        <!--            <artifactId>guava</artifactId>-->
+        <!--            <groupId>com.google.guava</groupId>-->
+        <!--        </exclusion>-->
+        <!--    </exclusions>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>org.apache.flink</groupId>
@@ -237,7 +243,7 @@
                         <configuration>
                             <encoding>UTF-8</encoding>
                             <addOutputDirectory>false</addOutputDirectory>
-                            <sourceDirectory>src/main/java</sourceDirectory>
+                            <!--<sourceDirectory>src/main/java</sourceDirectory>-->
                         </configuration>
                     </execution>
                 </executions>
