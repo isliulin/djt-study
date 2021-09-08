@@ -3,6 +3,9 @@ package com.djt.utils;
 import cn.hutool.setting.dialect.Props;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.flink.api.common.restartstrategy.RestartStrategies;
+import org.apache.flink.api.common.time.Time;
+import org.apache.flink.configuration.RestartStrategyOptions;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.ExecutionCheckpointingOptions;
@@ -38,11 +41,6 @@ public interface ConfigConstants {
      * 是否输出日志
      */
     String FLINK_PRINT_LOG = "flink.print.log";
-
-    /**
-     * 规则接口URL
-     */
-    String HTTP_RULE_URL = "http.rule.url";
 
     /**
      * 事件消息 消费topic
@@ -112,15 +110,6 @@ public interface ConfigConstants {
      */
     static boolean flinkPrintLog() {
         return Boolean.parseBoolean(getConfig(FLINK_PRINT_LOG, "false"));
-    }
-
-    /**
-     * 获取 HTTP_RULE_URL
-     *
-     * @return String
-     */
-    static String httpRuleUrl() {
-        return getConfig(HTTP_RULE_URL);
     }
 
     /**
@@ -282,6 +271,28 @@ public interface ConfigConstants {
                 CheckpointConfig.ExternalizedCheckpointCleanup.valueOf(
                         getConfig(ExecutionCheckpointingOptions.EXTERNALIZED_CHECKPOINT.key(), "RETAIN_ON_CANCELLATION")));
         return configuration;
+    }
+
+    /**
+     * 获取 RestartStrategyConfiguration
+     *
+     * @return Configuration
+     */
+    static RestartStrategies.RestartStrategyConfiguration getRestartStrategyConfiguration() {
+        org.apache.flink.configuration.Configuration configuration = new org.apache.flink.configuration.Configuration();
+        configuration.set(RestartStrategyOptions.RESTART_STRATEGY,
+                getConfig(RestartStrategyOptions.RESTART_STRATEGY.key(), "failure-rate"));
+        configuration.set(RestartStrategyOptions.RESTART_STRATEGY_FAILURE_RATE_MAX_FAILURES_PER_INTERVAL,
+                Integer.parseInt(getConfig(
+                        RestartStrategyOptions.RESTART_STRATEGY_FAILURE_RATE_MAX_FAILURES_PER_INTERVAL.key(), "3")));
+        configuration.set(RestartStrategyOptions.RESTART_STRATEGY_FAILURE_RATE_FAILURE_RATE_INTERVAL,
+                Duration.ofMillis(Long.parseLong(getConfig(
+                        RestartStrategyOptions.RESTART_STRATEGY_FAILURE_RATE_FAILURE_RATE_INTERVAL.key(), "300000"))));
+        configuration.set(RestartStrategyOptions.RESTART_STRATEGY_FAILURE_RATE_DELAY,
+                Duration.ofMillis(Long.parseLong(getConfig(
+                        RestartStrategyOptions.RESTART_STRATEGY_FAILURE_RATE_DELAY.key(), "10000"))));
+        return RestartStrategies.fromConfiguration(configuration)
+                .orElse(RestartStrategies.failureRateRestart(3, Time.minutes(5), Time.seconds(10)));
     }
 
     /**
