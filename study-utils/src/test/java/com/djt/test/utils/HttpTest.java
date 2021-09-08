@@ -1,6 +1,7 @@
 package com.djt.test.utils;
 
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.http.client.config.RequestConfig;
@@ -20,6 +21,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author 　djt317@qq.com
@@ -36,8 +39,15 @@ public class HttpTest {
 
     @Test
     public void testHttpUtil() {
-        String content = HttpUtil.get("https://www.baidu.com");
-        System.out.println(content);
+        //https://www.baidu.com/s?wd=hutool
+        String url = "https://www.baidu.com/s";
+        Map<String, Object> params = new HashMap<>();
+        params.put("wd", "hutool");
+        HttpRequest httpRequest = HttpRequest.get(url).form(params);
+        httpRequest.body("wd=hutool");
+        System.out.println("发送请求=>\n" + httpRequest);
+        String content = HttpUtil.get(url, params);
+        System.out.println("请求响应=>" + httpRequest.execute().body());
     }
 
     @Test

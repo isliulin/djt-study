@@ -8,7 +8,9 @@
     <Properties>
         <!-- 配置日志文件输出目录及文件名 -->
         <Property name="LOG_HOME">./logs</Property>
-        <Property name="FILE_NAME">${artifactId}</Property>
+        <Property name="FILE_NAME">${project.artifactId}</Property>
+        <property name="LOG_PATTERN">[%d{yyyy-MM-dd HH:mm:ss.SSS}] %processId %-5p [%c{36}:%L] [%t] - %msg%xEx%n
+        </property>
     </Properties>
 
     <Appenders>
@@ -17,29 +19,37 @@
             <!-- 只输出level及以上级别的信息(onMatch),其他的不输出(onMismatch) -->
             <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
             <!-- 输出日志的格式 -->
-            <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}] %-5level [%class{36}] [%t] - %msg%xEx%n"/>
+            <PatternLayout>
+                <MarkerPatternSelector defaultPattern="${LOG_PATTERN}">
+                    <PatternMatch key="sink" pattern="%msg%xEx%n"/>
+                </MarkerPatternSelector>
+            </PatternLayout>
         </Console>
         <!-- 一般日志文件格式 输出INFO及以上级别的日志 -->
-        <RollingRandomAccessFile name="Info"
+        <RollingRandomAccessFile name="InfoFile"
                                  fileName="${LOG_HOME}/${FILE_NAME}.log"
                                  filePattern="${LOG_HOME}/${FILE_NAME}_%d{yyyy-MM-dd}.log.gz">
             <Filters>
                 <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
             </Filters>
-            <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}] %-5level [%class{36}] [%t] - %msg%xEx%n"/>
+            <PatternLayout>
+                <MarkerPatternSelector defaultPattern="${LOG_PATTERN}">
+                    <PatternMatch key="sink" pattern="%msg%xEx%n"/>
+                </MarkerPatternSelector>
+            </PatternLayout>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
             </Policies>
             <DefaultRolloverStrategy max="20"/>
         </RollingRandomAccessFile>
         <!-- 错误日志文件格式 输出WARN及以上级别的日志 -->
-        <RollingRandomAccessFile name="Error"
+        <RollingRandomAccessFile name="ErrorFile"
                                  fileName="${LOG_HOME}/${FILE_NAME}_ERROR.log"
                                  filePattern="${LOG_HOME}/${FILE_NAME}_ERROR_%d{yyyy-MM-dd}.log.gz">
             <Filters>
                 <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
             </Filters>
-            <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}] %-5level [%class{36}] [%t] - %msg%xEx%n"/>
+            <PatternLayout pattern="${LOG_PATTERN}"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
             </Policies>
@@ -47,7 +57,7 @@
         </RollingRandomAccessFile>
         <!-- 配置异步写日志 -->
         <Async name="Async">
-            <AppenderRef ref="Info"/>
+            <AppenderRef ref="InfoFile"/>
         </Async>
     </Appenders>
 
@@ -56,12 +66,10 @@
         <!-- 配置日志的根节点 -->
         <root level="INFO">
             <appender-ref ref="Console"/>
-            <appender-ref ref="Info"/>
-            <appender-ref ref="Error"/>
+            <appender-ref ref="InfoFile"/>
+            <appender-ref ref="ErrorFile"/>
         </root>
         <!-- 第三方日志系统 -->
-        <logger level="info" name="org.springframework.core"/>
-        <logger level="info" name="org.springframework.beans"/>
-        <logger level="info" name="org.springframework.context"/>
+        <logger level="info" name="org.springframework"/>
     </Loggers>
 </Configuration>
