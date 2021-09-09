@@ -32,11 +32,16 @@ abstract public class BaseStreamJob {
     public BaseStreamJob(String jobName, StreamExecutionEnvironment streamEnv) {
         this.jobName = jobName;
         this.streamEnv = streamEnv;
+        //默认并行度
         streamEnv.setParallelism(ConfigConstants.flinkEnvParallelism());
+        //Watermark生成时间间隔
         streamEnv.getConfig().setAutoWatermarkInterval(ConfigConstants.flinkWatermarkInterval());
+        //Checkpoint相关
         streamEnv.setStateBackend(new FsStateBackend(ConfigConstants.flinkCheckpointPath()));
         CheckpointConfig checkpointConfig = streamEnv.getCheckpointConfig();
         checkpointConfig.configure(ConfigConstants.getCheckpointConfig());
+        //重启策略
+        streamEnv.setRestartStrategy(ConfigConstants.getRestartStrategyConfiguration());
     }
 
     /**
