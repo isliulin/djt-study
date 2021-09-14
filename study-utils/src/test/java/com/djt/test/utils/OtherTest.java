@@ -1,11 +1,6 @@
 package com.djt.test.utils;
 
 import com.djt.utils.DjtConstant;
-import lombok.extern.log4j.Log4j2;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
 import org.junit.Test;
 
 import java.time.LocalDate;
@@ -19,7 +14,6 @@ import java.util.List;
  * @author 　djt317@qq.com
  * @since 　 2021-04-07
  */
-@Log4j2
 public class OtherTest {
 
     @Test
@@ -57,12 +51,5 @@ public class OtherTest {
         System.out.println(date.format(formatter1));
     }
 
-    @Test
-    public void testLog() {
-        Logger log = LogManager.getLogger(OtherTest.class);
-        log.info("666");
-        System.out.println(MarkerManager.exists("sink"));
-        Marker marker = MarkerManager.getMarker("sink");
-        log.info(marker, "666");
-    }
+
 }

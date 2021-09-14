@@ -21,7 +21,7 @@
             <!-- 输出日志的格式 -->
             <PatternLayout>
                 <MarkerPatternSelector defaultPattern="${LOG_PATTERN}">
-                    <PatternMatch key="sink" pattern="%msg%xEx%n"/>
+                    <PatternMatch key="sink" pattern="%msg%xEx"/>
                 </MarkerPatternSelector>
             </PatternLayout>
         </Console>
@@ -34,7 +34,7 @@
             </Filters>
             <PatternLayout>
                 <MarkerPatternSelector defaultPattern="${LOG_PATTERN}">
-                    <PatternMatch key="sink" pattern="%msg%xEx%n"/>
+                    <PatternMatch key="sink" pattern="%msg%xEx"/>
                 </MarkerPatternSelector>
             </PatternLayout>
             <Policies>
