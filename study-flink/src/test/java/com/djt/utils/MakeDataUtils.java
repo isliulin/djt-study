@@ -75,7 +75,7 @@ public class MakeDataUtils {
         for (int i = 0; i < Integer.MAX_VALUE; i++) {
             MyEvent event = makeOneMyEvent(i);
             KafkaUtils.sendMessage(producer, topic, event.getId(), JSON.toJSONString(event));
-            ThreadUtil.sleep(100);
+            ThreadUtil.sleep(1000);
         }
     }
 

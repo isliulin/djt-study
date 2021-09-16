@@ -619,6 +619,9 @@ public abstract class MyFlinkKafkaConsumerBase<T> extends RichParallelSourceFunc
                     }
 
                     for (KafkaTopicPartition seedPartition : allPartitions) {
+                        if (!specificStartupOffsets.containsKey(seedPartition)) {
+                            continue;
+                        }
                         Long specificOffset = specificStartupOffsets.get(seedPartition);
                         if (specificOffset != null) {
                             // since the specified offsets represent the next record to read, we
