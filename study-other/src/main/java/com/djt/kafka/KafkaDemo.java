@@ -3,15 +3,16 @@ package com.djt.kafka;
 import cn.hutool.core.thread.ThreadUtil;
 import com.djt.utils.ConfigConstants;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.Validate;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.PartitionInfo;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.time.Duration;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -101,6 +102,34 @@ public class KafkaDemo {
         log.info("生产数据=>topic:{} key:{} value:{}", topic, key, value);
     }
 
+    public static volatile boolean isRunning = true;
+
+    /**
+     * 启动消费者线程
+     *
+     * @param pollMs      拉取时间
+     * @param isPrintData 是否打印数据
+     */
+    public static void startConsumer(Consumer<String, String> consumer, long pollMs, boolean isPrintData) {
+        ExecutorService pool = Executors.newSingleThreadExecutor();
+        pool.execute(() -> {
+            while (isRunning) {
+                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(pollMs));
+                if (isPrintData) {
+                    for (ConsumerRecord<String, String> record : records) {
+                        log.info("消费数据=>topic:{} partition:{} offset:{} key:{} value:{}",
+                                record.topic(), record.partition(), record.offset(), record.key(), record.value());
+                    }
+                }
+                consumer.commitSync();
+            }
+        });
+        pool.shutdown();
+        while (!pool.isTerminated()) {
+            ThreadUtil.sleep(1);
+        }
+    }
+
     /**
      * 启动消费者线程
      *
@@ -118,7 +147,7 @@ public class KafkaDemo {
         log.info("启动消费者，消费主题=>{}", topicList);
         ExecutorService pool = Executors.newSingleThreadExecutor();
         pool.execute(() -> {
-            while (true) {
+            while (isRunning) {
                 ConsumerRecords<String, String> records = consumer.poll(pollMs);
                 int count = records.count();
                 log.info("收到消息条数:{}", count);
@@ -141,7 +170,25 @@ public class KafkaDemo {
         });
         pool.shutdown();
         while (!pool.isTerminated()) {
+            ThreadUtil.sleep(1);
         }
+    }
+
+    /**
+     * 获取topic分区
+     *
+     * @param topic topic
+     * @return List<Integer>
+     */
+    public static List<Integer> getPartitionList(KafkaProducer<?, ?> producer, String topic) {
+        Validate.notEmpty(topic);
+        List<Integer> pts = new ArrayList<>();
+        List<PartitionInfo> partitionInfoList = producer.partitionsFor(topic);
+        for (PartitionInfo partitionInfo : partitionInfoList) {
+            pts.add(partitionInfo.partition());
+        }
+        Collections.sort(pts);
+        return pts;
     }
 
 }

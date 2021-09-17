@@ -3,6 +3,7 @@ package com.djt.test.kafka;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.setting.dialect.PropsUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -10,12 +11,17 @@ import com.djt.kafka.KafkaDemo;
 import com.djt.utils.DjtConstant;
 import com.djt.utils.RandomUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.common.PartitionInfo;
+import org.apache.kafka.common.TopicPartition;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 
@@ -31,11 +37,6 @@ public class KafkaTest {
     @Before
     public void before() {
         props = PropsUtil.get("config.properties");
-    }
-
-    @Test
-    public void nothing() {
-
     }
 
     @Test
@@ -88,7 +89,6 @@ public class KafkaTest {
             KafkaDemo.sendMessage(producer, topic, String.valueOf(i), msgStr);
         }
         producer.flush();
-
     }
 
     @Test
@@ -181,5 +181,22 @@ public class KafkaTest {
         KafkaDemo.startConsumer(props, 1000, 0, true, topic);
     }
 
+    @Test
+    public void testConsumer() {
+        String topic = "FLINK_TEST_DJT";
+        Consumer<String, String> consumer = KafkaDemo.createConsumer(props);
+        TopicPartition tp = new TopicPartition(topic, 0);
+        consumer.assign(Collections.singletonList(tp));
+        KafkaDemo.startConsumer(consumer, 1000, true);
+    }
+
+    @Test
+    public void testProducer() {
+        Producer<String, String> producer = KafkaDemo.createProducer(props);
+        List<PartitionInfo> partitionInfoList = producer.partitionsFor("FLINK_TEST_DJT");
+        for (PartitionInfo pt : partitionInfoList) {
+            System.out.println(StrUtil.format("topic:{} partition:{}", pt.topic(), pt.partition()));
+        }
+    }
 
 }
