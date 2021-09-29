@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 自定义窗口函数
+ * 自定义 WindowFunction
  *
  * @author 　djt317@qq.com
  * @since 　 2021-07-27

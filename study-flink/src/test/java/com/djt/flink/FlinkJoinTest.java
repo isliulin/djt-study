@@ -5,6 +5,7 @@ import cn.hutool.core.thread.ThreadUtil;
 import com.alibaba.fastjson.JSON;
 import com.djt.event.MyEvent;
 import com.djt.event.MySchema;
+import com.djt.function.*;
 import com.djt.utils.ConfigConstants;
 import com.djt.utils.KafkaUtils;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -12,6 +13,7 @@ import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.RichJoinFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
@@ -33,8 +35,8 @@ public class FlinkJoinTest extends FlinkBaseTest {
 
     @Test
     public void testJoin() throws Exception {
-        DataStream<MyEvent> kafkaSource1 = getKafkaSource("flink-test-1", "group-flink-test-1");
-        DataStream<MyEvent> kafkaSource2 = getKafkaSource("flink-test-2", "group-flink-test-2");
+        DataStream<MyEvent> kafkaSource1 = getKafkaSourceWithWm("flink-test-1", "group-flink-test-1");
+        DataStream<MyEvent> kafkaSource2 = getKafkaSourceWithWm("flink-test-2", "group-flink-test-2");
         DataStream<Tuple2<MyEvent, MyEvent>> joinStream = kafkaSource1.join(kafkaSource2)
                 .where(MyEvent::getId)
                 .equalTo(MyEvent::getId)
@@ -45,6 +47,36 @@ public class FlinkJoinTest extends FlinkBaseTest {
 
         streamEnv.execute("testJoin");
     }
+
+    @Test
+    public void testJoinByState() throws Exception {
+        DataStream<MyEvent> kafkaSource1 = getKafkaSourceWithWm("flink-test-1", "group-flink-test-1");
+        DataStream<MyEvent> kafkaSource2 = getKafkaSourceWithWm("flink-test-2", "group-flink-test-2");
+
+        kafkaSource1.union(kafkaSource2)
+                .keyBy(MyEvent::getId)
+                .process(new MyKeyedProcessFunction())
+                .print();
+
+        streamEnv.execute("testJoinByState");
+    }
+
+    @Test
+    public void testJoinByAgg() throws Exception {
+        DataStream<MyEvent> kafkaSource1 = getKafkaSource("flink-test-1", "group-flink-test-1");
+        DataStream<MyEvent> kafkaSource2 = getKafkaSource("flink-test-2", "group-flink-test-2");
+
+        DataStream<MyEvent> stream = getKafkaSourceWithWm(kafkaSource1.union(kafkaSource2));
+        stream.keyBy(MyEvent::getId)
+                .window(TumblingEventTimeWindows.of(Time.seconds(5)))
+                .trigger(MyEventTimeTrigger.create())
+                .evictor(new MyEvictor())
+                .aggregate(new MyAggregateFunction(), new MyAggWindowFunction())
+                .print();
+
+        streamEnv.execute("testJoinByAgg");
+    }
+
 
     @Test
     public void makeSomeMyEvent() {
@@ -58,7 +90,7 @@ public class FlinkJoinTest extends FlinkBaseTest {
         //String topic2 = "flink-test-2";
         Producer<String, String> producer = KafkaUtils.createProducer(ConfigConstants.getKafkaProducerProps());
         LocalDateTime startTime = LocalDateTime.parse("2021-01-01 00:00:00", DatePattern.NORM_DATETIME_FORMATTER);
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 10; i++) {
             MyEvent event = new MyEvent();
             event.setId(String.valueOf(i));
             event.setName("张三_" + i);
@@ -76,10 +108,10 @@ public class FlinkJoinTest extends FlinkBaseTest {
         String topic1 = "flink-test-2";
         Producer<String, String> producer = KafkaUtils.createProducer(ConfigConstants.getKafkaProducerProps());
         LocalDateTime startTime = LocalDateTime.parse("2021-01-01 00:00:00", DatePattern.NORM_DATETIME_FORMATTER);
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 10; i++) {
             MyEvent event = new MyEvent();
             event.setId(String.valueOf(i));
-            event.setName("李四_" + i);
+            event.setName("王五_" + i);
             event.setNum(100L);
             event.setTime(startTime.plusSeconds(i).format(DatePattern.NORM_DATETIME_FORMATTER));
             KafkaUtils.sendMessage(producer, topic1, event.getId(), JSON.toJSONString(event));
@@ -97,16 +129,24 @@ public class FlinkJoinTest extends FlinkBaseTest {
         };
     }
 
-    public DataStream<MyEvent> getKafkaSource(String topic, String groupId) {
-        Properties kafkaProps = ConfigConstants.getKafkaConsumerProps();
-        kafkaProps.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-        FlinkKafkaConsumer<MyEvent> kafkaConsumer = new FlinkKafkaConsumer<>(topic, new MySchema(), kafkaProps);
-        return streamEnv.addSource(kafkaConsumer)
-                .setParallelism(3)
+    public DataStream<MyEvent> getKafkaSourceWithWm(String topic, String groupId) {
+        return getKafkaSourceWithWm(getKafkaSource(topic, groupId));
+    }
+
+    public DataStream<MyEvent> getKafkaSourceWithWm(DataStream<MyEvent> streamSource) {
+        return streamSource
                 .assignTimestampsAndWatermarks(WatermarkStrategy
                         .<MyEvent>forBoundedOutOfOrderness(Duration.ofSeconds(5))
                         .withTimestampAssigner((event, timestamp) -> event.getEventTime())
                         .withIdleness(Duration.ofMinutes(1)));
+    }
+
+    public DataStreamSource<MyEvent> getKafkaSource(String topic, String groupId) {
+        Properties kafkaProps = ConfigConstants.getKafkaConsumerProps();
+        kafkaProps.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        FlinkKafkaConsumer<MyEvent> kafkaConsumer = new FlinkKafkaConsumer<>(topic, new MySchema(), kafkaProps);
+        return streamEnv.addSource(kafkaConsumer)
+                .setParallelism(3);
     }
 
 }

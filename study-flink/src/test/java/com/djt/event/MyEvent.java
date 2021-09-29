@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 测试事件对象
@@ -33,5 +35,7 @@ public class MyEvent implements Serializable {
         return null == time ? 0L :
                 LocalDateTimeUtil.toEpochMilli(LocalDateTimeUtil.parse(time, DatePattern.NORM_DATETIME_FORMATTER));
     }
+
+    private Set<String> nameSet = new HashSet<>();
 
 }

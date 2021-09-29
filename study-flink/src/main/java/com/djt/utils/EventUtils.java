@@ -1,8 +1,11 @@
 package com.djt.utils;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.table.api.ApiExpression;
 
 import java.lang.reflect.Field;
@@ -40,5 +43,10 @@ public class EventUtils {
             expressionList.add(expression);
         }
         return expressionList.toArray(new ApiExpression[0]);
+    }
+
+    public static String getTimeWindowStr(TimeWindow window) {
+        return "win_start=" + LocalDateTimeUtil.of(window.getStart()).format(DatePattern.NORM_DATETIME_FORMATTER) +
+                " ,win_end=" + LocalDateTimeUtil.of(window.getEnd()).format(DatePattern.NORM_DATETIME_FORMATTER);
     }
 }
