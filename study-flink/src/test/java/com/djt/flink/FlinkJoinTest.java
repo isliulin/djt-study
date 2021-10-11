@@ -4,26 +4,19 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.thread.ThreadUtil;
 import com.alibaba.fastjson.JSON;
 import com.djt.event.MyEvent;
-import com.djt.event.MySchema;
 import com.djt.function.*;
 import com.djt.utils.ConfigConstants;
 import com.djt.utils.KafkaUtils;
-import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.RichJoinFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.Producer;
 import org.junit.Test;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Properties;
 
 /**
  * join 测试类
@@ -90,15 +83,15 @@ public class FlinkJoinTest extends FlinkBaseTest {
         //String topic2 = "flink-test-2";
         Producer<String, String> producer = KafkaUtils.createProducer(ConfigConstants.getKafkaProducerProps());
         LocalDateTime startTime = LocalDateTime.parse("2021-01-01 00:00:00", DatePattern.NORM_DATETIME_FORMATTER);
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
             MyEvent event = new MyEvent();
-            event.setId(String.valueOf(i));
-            event.setName("张三_" + i);
+            event.setId(String.valueOf(1));
+            event.setName("李四" + i);
             event.setNum(100L);
             event.setTime(startTime.plusSeconds(i).format(DatePattern.NORM_DATETIME_FORMATTER));
             KafkaUtils.sendMessage(producer, topic1, event.getId(), JSON.toJSONString(event));
             //KafkaUtils.sendMessage(producer, topic2, event.getId(), JSON.toJSONString(event));
-            ThreadUtil.sleep(10);
+            //ThreadUtil.sleep(1000);
         }
         producer.flush();
     }
@@ -129,24 +122,5 @@ public class FlinkJoinTest extends FlinkBaseTest {
         };
     }
 
-    public DataStream<MyEvent> getKafkaSourceWithWm(String topic, String groupId) {
-        return getKafkaSourceWithWm(getKafkaSource(topic, groupId));
-    }
-
-    public DataStream<MyEvent> getKafkaSourceWithWm(DataStream<MyEvent> streamSource) {
-        return streamSource
-                .assignTimestampsAndWatermarks(WatermarkStrategy
-                        .<MyEvent>forBoundedOutOfOrderness(Duration.ofSeconds(5))
-                        .withTimestampAssigner((event, timestamp) -> event.getEventTime())
-                        .withIdleness(Duration.ofMinutes(1)));
-    }
-
-    public DataStreamSource<MyEvent> getKafkaSource(String topic, String groupId) {
-        Properties kafkaProps = ConfigConstants.getKafkaConsumerProps();
-        kafkaProps.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-        FlinkKafkaConsumer<MyEvent> kafkaConsumer = new FlinkKafkaConsumer<>(topic, new MySchema(), kafkaProps);
-        return streamEnv.addSource(kafkaConsumer)
-                .setParallelism(3);
-    }
 
 }

@@ -41,7 +41,7 @@ public class FlinkCheckpointTest extends FlinkBaseTest {
         checkpointConfig.enableExternalizedCheckpoints(RETAIN_ON_CANCELLATION);
         checkpointConfig.setTolerableCheckpointFailureNumber(0);
 
-        DataStream<MyEvent> kafkaSource = getKafkaSource();
+        DataStream<MyEvent> kafkaSource = getKafkaSourceWithWm();
         kafkaSource.keyBy(MyEvent::getId)
                 .window(TumblingEventTimeWindows.of(Time.seconds(5)))
                 .allowedLateness(Time.seconds(0))

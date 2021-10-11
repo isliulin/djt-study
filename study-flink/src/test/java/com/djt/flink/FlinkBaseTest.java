@@ -9,10 +9,12 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.RestOptions;
 import org.apache.flink.runtime.state.filesystem.FsStateBackend;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.connectors.kafka.internals.KafkaTopicPartition;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,22 +50,40 @@ public class FlinkBaseTest {
      *
      * @return DataStream
      */
-    public DataStream<MyEvent> getKafkaSource() {
+    public DataStream<MyEvent> getKafkaSourceWithWm() {
         Properties kafkaProps = ConfigConstants.getKafkaConsumerProps();
+        String groupId = kafkaProps.getProperty(ConsumerConfig.GROUP_ID_CONFIG);
         String topic = ConfigConstants.topicEvent();
-        FlinkKafkaConsumer<MyEvent> kafkaConsumer = new FlinkKafkaConsumer<>(topic, new MySchema(), kafkaProps);
-        return streamEnv.addSource(kafkaConsumer)
-                .setParallelism(ConfigConstants.flinkSourceKafkaParallelism())
+        return getKafkaSourceWithWm(topic, groupId);
+    }
+
+
+    public DataStream<MyEvent> getKafkaSourceWithWm(String topic, String groupId) {
+        return getKafkaSourceWithWm(getKafkaSource(topic, groupId));
+    }
+
+    public static long outOrdTime = 5;
+
+    public DataStream<MyEvent> getKafkaSourceWithWm(DataStream<MyEvent> streamSource) {
+        return streamSource
                 .assignTimestampsAndWatermarks(WatermarkStrategy
-                        .<MyEvent>forBoundedOutOfOrderness(Duration.ofSeconds(5))
+                        .<MyEvent>forBoundedOutOfOrderness(Duration.ofSeconds(outOrdTime))
                         .withTimestampAssigner((event, timestamp) -> event.getEventTime())
                         .withIdleness(Duration.ofMinutes(1)));
+    }
+
+    public DataStreamSource<MyEvent> getKafkaSource(String topic, String groupId) {
+        Properties kafkaProps = ConfigConstants.getKafkaConsumerProps();
+        kafkaProps.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        FlinkKafkaConsumer<MyEvent> kafkaConsumer = new FlinkKafkaConsumer<>(topic, new MySchema(), kafkaProps);
+        return streamEnv.addSource(kafkaConsumer)
+                .setParallelism(3);
     }
 
 
     @Test
     public void testKafkaSource() throws Exception {
-        DataStream<MyEvent> kafkaSource = getKafkaSource();
+        DataStream<MyEvent> kafkaSource = getKafkaSourceWithWm();
         kafkaSource.print();
         streamEnv.execute("testKafkaSource");
     }

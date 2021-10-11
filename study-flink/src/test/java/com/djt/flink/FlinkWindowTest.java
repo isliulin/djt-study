@@ -2,16 +2,12 @@ package com.djt.flink;
 
 import com.djt.event.MyEvent;
 import com.djt.function.EveryEventTimeTrigger;
+import com.djt.function.MyKeyedProcessFunction;
 import com.djt.function.MyWindowFunction;
-import org.apache.flink.api.java.aggregation.AggregationFunctionFactory;
 import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
-import org.apache.flink.table.planner.plan.utils.AggFunctionFactory;
-import org.apache.flink.util.Collector;
 import org.junit.Test;
 
 import java.time.temporal.ChronoField;
@@ -24,7 +20,7 @@ public class FlinkWindowTest extends FlinkBaseTest {
 
     @Test
     public void testTumblingEventTimeWindows() throws Exception {
-        DataStream<MyEvent> kafkaSource = getKafkaSource();
+        DataStream<MyEvent> kafkaSource = getKafkaSourceWithWm();
         kafkaSource.keyBy(MyEvent::getId)
                 .window(TumblingEventTimeWindows.of(Time.seconds(5)))
                 .allowedLateness(Time.seconds(5))
@@ -35,7 +31,7 @@ public class FlinkWindowTest extends FlinkBaseTest {
 
     @Test
     public void testSlidingEventTimeWindows() throws Exception {
-        DataStream<MyEvent> kafkaSource = getKafkaSource();
+        DataStream<MyEvent> kafkaSource = getKafkaSourceWithWm();
         int start = 23;
         int end = 6;
         int size = getWindowSizeHour(start, end);
@@ -76,7 +72,14 @@ public class FlinkWindowTest extends FlinkBaseTest {
     }
 
     @Test
-    public void testAggFunctionFactory() {
+    public void testKeyedProcessFunction() throws Exception {
+        FlinkBaseTest.outOrdTime = 1;
+        DataStream<MyEvent> kafkaSource = getKafkaSourceWithWm();
+
+        kafkaSource.keyBy(MyEvent::getId)
+                .process(new MyKeyedProcessFunction());
+
+        streamEnv.execute("testKeyedProcessFunction");
     }
 
 }

@@ -52,7 +52,7 @@ public class MakeDataUtils {
         event.setId("666");
         event.setName("张三");
         event.setNum(100L);
-        event.setTime("2021-01-01 00:00:00");
+        event.setTime("2022-01-01 00:00:00");
 
         String topic = PROPS.getProperty("topic.event", null);
         Producer<String, String> producer = KafkaUtils.createProducer(ConfigConstants.getKafkaProducerProps());

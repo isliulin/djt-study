@@ -22,7 +22,7 @@ public class FlinkSinkTest extends FlinkBaseTest {
 
     @Test
     public void testHBaseSink() throws Exception {
-        DataStream<MyEvent> kafkaSource = getKafkaSource();
+        DataStream<MyEvent> kafkaSource = getKafkaSourceWithWm();
         Configuration configuration = ConfigConstants.getHbaseConfiguration();
         SingleOutputStreamOperator<HBaseData> hbaseDataStream = kafkaSource.map(event -> {
             JSONObject data = JSON.parseObject(JSON.toJSONString(event));

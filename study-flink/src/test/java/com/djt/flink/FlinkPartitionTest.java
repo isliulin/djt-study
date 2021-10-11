@@ -16,7 +16,7 @@ public class FlinkPartitionTest extends FlinkBaseTest {
 
     @Test
     public void testPartition() throws Exception {
-        DataStream<MyEvent> kafkaSource = getKafkaSource();
+        DataStream<MyEvent> kafkaSource = getKafkaSourceWithWm();
         kafkaSource.partitionCustom(new MyPartition(), MyEvent::getId).print().setParallelism(7);
 
         streamEnv.execute("testPartition");
@@ -24,7 +24,7 @@ public class FlinkPartitionTest extends FlinkBaseTest {
 
     @Test
     public void testPartition2() throws Exception {
-        DataStream<MyEvent> kafkaSource = getKafkaSource();
+        DataStream<MyEvent> kafkaSource = getKafkaSourceWithWm();
         kafkaSource.partitionCustom(new IdPartitioner(), (KeySelector<MyEvent, Integer>) value -> 7).print().setParallelism(5);
 
         streamEnv.execute("testPartition2");

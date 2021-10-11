@@ -38,7 +38,7 @@ public class FlinkTableSqlTest extends FlinkBaseTest {
 
     @Test
     public void testTableApi1() throws Exception {
-        DataStream<MyEvent> kafkaSource = getKafkaSource();
+        DataStream<MyEvent> kafkaSource = getKafkaSourceWithWm();
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(streamEnv);
         tableEnv.createTemporaryView("t_test_djt", kafkaSource, EventUtils.getExpressions(MyEvent.class));
         Table table = tableEnv.from("t_test_djt")
@@ -50,7 +50,7 @@ public class FlinkTableSqlTest extends FlinkBaseTest {
 
     @Test
     public void testTableApi2() throws Exception {
-        DataStream<MyEvent> kafkaSource = getKafkaSource();
+        DataStream<MyEvent> kafkaSource = getKafkaSourceWithWm();
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(streamEnv);
         Table table = tableEnv.fromDataStream(kafkaSource, EventUtils.getExpressions(MyEvent.class));
         Table windowedTable = table.window(Tumble.over(lit(5).second()).on($("event_time")).as("window"))
@@ -68,7 +68,7 @@ public class FlinkTableSqlTest extends FlinkBaseTest {
 
     @Test
     public void testSqlApi1() throws Exception {
-        DataStream<MyEvent> kafkaSource = getKafkaSource();
+        DataStream<MyEvent> kafkaSource = getKafkaSourceWithWm();
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(streamEnv);
 
         tableEnv.createTemporaryView("t_test_djt", kafkaSource, EventUtils.getExpressions(MyEvent.class));
@@ -87,7 +87,7 @@ public class FlinkTableSqlTest extends FlinkBaseTest {
 
     @Test
     public void testSqlApi2() throws Exception {
-        DataStream<MyEvent> kafkaSource = getKafkaSource();
+        DataStream<MyEvent> kafkaSource = getKafkaSourceWithWm();
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(streamEnv);
         tableEnv.createTemporaryView("t_test_djt", kafkaSource, EventUtils.getExpressions(MyEvent.class));
         //注意:窗口的默认时区为 UTC + 0
@@ -109,7 +109,7 @@ public class FlinkTableSqlTest extends FlinkBaseTest {
 
     @Test
     public void testSqlApi3() throws Exception {
-        DataStream<MyEvent> kafkaSource = getKafkaSource();
+        DataStream<MyEvent> kafkaSource = getKafkaSourceWithWm();
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(streamEnv);
         //每条数据都触发计算
         tableEnv.getConfig().getConfiguration().setBoolean("table.exec.emit.early-fire.enabled", true);
