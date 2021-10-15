@@ -4,6 +4,7 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.net.NetUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.system.HostInfo;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -93,6 +95,21 @@ public class HutoolTest {
         System.out.println(NetUtil.localIpv4s());
         System.out.println(NetUtil.ping("www.baidu.com"));
         System.out.println(NetUtil.isOpen(new InetSocketAddress("172.20.20.183", 2181), 1000));
+    }
+
+    @Test
+    public void testStrUtil2() {
+        String str = "a, b ,c  ,  d,";
+        System.out.println(Arrays.toString(StrUtil.splitToArray(str, ",")));
+        System.out.println(Arrays.toString(StrUtil.splitTrim(str, ",").toArray(new String[0])));
+    }
+
+    @Test
+    public void testArrayUtil() {
+        String[] a = {"a", "b", "c"};
+        String[] b = {"c", "d", "e", "f"};
+        System.out.println(ArrayUtil.containsAny(a, b));
+        System.out.println(ArrayUtil.containsAny(b, a));
     }
 
 
