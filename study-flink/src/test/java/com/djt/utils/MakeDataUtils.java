@@ -65,7 +65,7 @@ public class MakeDataUtils {
         String topic = PROPS.getProperty("topic.event", null);
         Consumer<String, String> consumer = KafkaUtils.createConsumer(ConfigConstants.getKafkaConsumerProps());
         consumer.subscribe(Collections.singletonList(topic));
-        KafkaUtils.startConsumer(consumer, 1000, true);
+        KafkaUtils.startConsumer(topic, 1000, true, ConfigConstants.getKafkaConsumerProps());
     }
 
     @Test

@@ -323,5 +323,13 @@ public class StringTest {
         System.out.println(flag);
     }
 
+    @Test
+    public void testContain() {
+        System.out.println(StringUtils.containsIgnoreCase("张三李四王五", "李四"));
+        System.out.println(StringUtils.containsAny("张三李四王五", "李四", "王五"));
+        System.out.println(StringUtils.equalsAny("张三", "李四", "王五"));
+        System.out.println(StringUtils.equalsAnyIgnoreCase("张三", "李四", "张三"));
+    }
+
 
 }
