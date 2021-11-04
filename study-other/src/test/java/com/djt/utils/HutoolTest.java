@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import javax.sql.DataSource;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -44,4 +45,6 @@ public class HutoolTest {
         String sql = StrUtil.format("ALTER TABLE {} ADD PARTITION P{} VALUES ({})", "xdata.t_test", "20210101", "20210101");
         System.out.println(sql);
     }
+
+
 }
