@@ -11,6 +11,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.kafka.clients.producer.Producer;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Properties;
 import java.util.Random;
 
@@ -68,7 +69,7 @@ public class MakeDataUtils {
 
     static {
         //生成商户信息
-        int merchNum = 10000;
+        int merchNum = 500000;
         MER_NO_ARR = new String[merchNum];
         NAME_ARR = new String[merchNum];
         for (int i = 0; i < merchNum; i++) {
@@ -97,8 +98,8 @@ public class MakeDataUtils {
      * @param offset 时间偏移量
      * @return Event
      */
-    public static JSONObject makePayOrderEvent(long offset) {
-        LocalDateTime thisTime = TIME_START.plusMinutes(offset);
+    public static JSONObject makePayOrderEvent(long offset, int interval) {
+        LocalDateTime thisTime = TIME_START.plus(offset * interval, ChronoUnit.MILLIS);
         int merIndex = RANDOM.nextInt(MER_NO_ARR.length);
         String merNo = MER_NO_ARR[merIndex];
         String merName = NAME_ARR[merIndex];
@@ -149,13 +150,15 @@ public class MakeDataUtils {
      * @param size       条数
      * @param sleep      休眠时间
      * @param startTime  起始时间
+     * @param interval   数据之间时间间隔
      * @param properties 配置
      */
-    public static void makeDataToKafka(String topic, long size, long sleep, LocalDateTime startTime, Properties properties) {
+    public static void makeDataToKafka(String topic, long size, long sleep,
+                                       LocalDateTime startTime, int interval, Properties properties) {
         Producer<String, String> producer = KafkaUtils.createProducer(properties);
         TIME_START = startTime;
         for (long i = 0; i < size; i++) {
-            JSONObject event = makePayOrderEvent(i);
+            JSONObject event = makePayOrderEvent(i, interval);
             KafkaUtils.sendMessage(producer, topic, event.getString("event_id"), JSON.toJSONString(event));
             ThreadUtil.sleep(sleep);
         }

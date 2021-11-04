@@ -22,7 +22,8 @@ public class MakeData extends AbsTools {
         long sleepMs = PROPS.getLong("kafka.send.sleep");
         LocalDateTime startTime = LocalDateTime.parse(PROPS.getStr("start.time", "1970-01-01 00:00:00"),
                 DatePattern.NORM_DATETIME_FORMATTER);
+        int interval = PROPS.getInt("event.time.interval", 10);
         Properties properties = KafkaUtils.getProducerProps(PROPS.toProperties());
-        MakeDataUtils.makeDataToKafka(topic, Integer.MAX_VALUE, sleepMs, startTime, properties);
+        MakeDataUtils.makeDataToKafka(topic, Integer.MAX_VALUE, sleepMs, startTime, interval, properties);
     }
 }

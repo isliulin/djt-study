@@ -1,5 +1,7 @@
 package com.djt.test.utils;
 
+import cn.hutool.core.lang.Tuple;
+import cn.hutool.core.util.StrUtil;
 import com.djt.utils.DjtConstant;
 import org.junit.Test;
 
@@ -9,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author 　djt317@qq.com
@@ -51,5 +54,23 @@ public class OtherTest {
         System.out.println(date.format(formatter1));
     }
 
+    @Test
+    public void test4() {
+        List<Integer> list = new ArrayList<>();
+        for (int i = 1; i <= 101; i++) {
+            list.add(i);
+        }
 
+        int batchSize = 9;
+        int batchNo = 0;
+        List<Integer> tmpList = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            tmpList.add(list.get(i));
+            if (tmpList.size() >= batchSize || i == list.size() - 1) {
+                ++batchNo;
+                System.out.println(StrUtil.format("批次：{} 数据：{}", batchNo, tmpList));
+                tmpList.clear();
+            }
+        }
+    }
 }

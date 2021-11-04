@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * Kafka工具类 用于造数据
@@ -69,13 +70,16 @@ public class KafkaUtils {
         Producer<String, String> consumerTmp = KafkaUtils.createProducer(getConsumerProps(properties));
         int pts = consumerTmp.partitionsFor(topic).size();
         consumerTmp.close();
-        ExecutorService pool = ThreadUtil.newExecutor(pts, pts, pts * 2);
+        ExecutorService pool = ThreadUtil.newExecutor(pts + 1, pts + 1, pts * 2);
+        LongAdder counter = new LongAdder();
         for (int i = 0; i < pts; i++) {
             pool.execute(() -> {
                 Consumer<String, String> consumer = KafkaUtils.createConsumer(getConsumerProps(properties));
                 consumer.subscribe(Collections.singletonList(topic));
                 while (isRunning) {
                     ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(pollMs));
+                    int rs = records.count();
+                    counter.add(rs);
                     if (isPrintData) {
                         for (ConsumerRecord<String, String> record : records) {
                             log.info("消费数据=>topic:{} offset:{} key:{} value:{}",
@@ -87,6 +91,21 @@ public class KafkaUtils {
                 consumer.close();
             });
         }
+        //启动一个线程 每隔5秒打印消费总数
+        pool.execute(() -> {
+            long lastTime = System.currentTimeMillis();
+            long lastNums = 0;
+            while (isRunning) {
+                long now = System.currentTimeMillis();
+                long nums = counter.longValue();
+                if (now - lastTime >= 5000 && nums > lastNums) {
+                    lastNums = nums;
+                    lastTime = now;
+                    log.info("已消费数据量:{}", nums);
+                }
+                ThreadUtil.sleep(1000);
+            }
+        });
 
         pool.shutdown();
         while (!pool.isTerminated()) {

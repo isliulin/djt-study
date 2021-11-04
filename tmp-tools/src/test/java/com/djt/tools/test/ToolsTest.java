@@ -1,6 +1,7 @@
 package com.djt.tools.test;
 
 import com.djt.tools.AbsTools;
+import com.djt.tools.impl.ConsumeData;
 import com.djt.tools.impl.HdfsTools;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,6 +28,12 @@ public class ToolsTest {
     @Test
     public void testHdfsTools() {
         AbsTools tools = new HdfsTools();
+        tools.execute(null);
+    }
+
+    @Test
+    public void testConsumeData() {
+        AbsTools tools = new ConsumeData();
         tools.execute(null);
     }
 
