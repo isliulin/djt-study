@@ -3,6 +3,7 @@ package com.djt.tools.test;
 import com.djt.tools.AbsTools;
 import com.djt.tools.impl.ConsumeData;
 import com.djt.tools.impl.HdfsTools;
+import com.djt.tools.impl.OrcParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.After;
@@ -37,4 +38,9 @@ public class ToolsTest {
         tools.execute(null);
     }
 
+    @Test
+    public void testOrcParser() {
+        AbsTools tools = new OrcParser();
+        tools.execute(null);
+    }
 }
