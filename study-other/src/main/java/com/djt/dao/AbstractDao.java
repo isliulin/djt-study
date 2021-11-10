@@ -129,12 +129,13 @@ public abstract class AbstractDao {
     /**
      * 执行SQL
      *
-     * @param sql 待执行的SQL
+     * @param sql    待执行的SQL
+     * @param params 参数列表
      * @throws SQLException e
      */
-    public void executeSql(String sql) throws SQLException {
+    public void executeSql(String sql, Object... params) throws SQLException {
         Validate.notBlank(sql, "SQL不能为空！");
-        db.execute(sql);
+        db.execute(sql, params);
     }
 
     /**
@@ -162,6 +163,35 @@ public abstract class AbstractDao {
      */
     public void close(ResultSet resultSet) {
         JdbcUtils.close(resultSet);
+    }
+
+    /**
+     * 批量执行SQL
+     *
+     * @param sqls      sql列表
+     * @param batchSize 批次大小
+     */
+    public void executeBatch(List<String> sqls, int batchSize) {
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            int batchCount = 0;
+            List<String> sqlList = new ArrayList<>();
+            for (int i = 0; i < sqls.size(); i++) {
+                sqlList.add(sqls.get(i));
+                boolean isExecute = (i > 0 && i % batchSize == 0) || i == sqls.size() - 1;
+                if (isExecute) {
+                    SqlExecutor.executeBatch(conn, sqlList);
+                    sqlList.clear();
+                    log.info("第 {} 批执行成功.", (++batchCount));
+                }
+            }
+            log.info("写入总条数：{}", sqls.size());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            close(conn);
+        }
     }
 
     /**

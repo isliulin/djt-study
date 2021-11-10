@@ -48,7 +48,8 @@ public class RiskRuleService extends AbstractService {
             for (Map<String, Object> resultMap : resultMapList) {
                 System.out.println("=======================================");
                 System.out.println(StrUtil.format("rule_id={} product={} param={} rule_desc={}",
-                        resultMap.get("RULE_ID"),resultMap.get("PRODUCT"),resultMap.get("PARAM"), resultMap.get("RULE_DESC")));
+                        resultMap.get("RULE_ID"), resultMap.get("PRODUCT"),
+                        resultMap.get("PARAM"), resultMap.get("RULE_DESC")));
                 JSONObject paramJson = JSON.parseObject(resultMap.getOrDefault("PARAM", "{}").toString());
                 List<String> fieldList = getParams(paramJson);
                 for (String field : fieldList) {
@@ -63,10 +64,49 @@ public class RiskRuleService extends AbstractService {
                 }
             }
 
-        } catch (SQLException throwables) {
-            throw new RuntimeException("查询失败：", throwables);
+        } catch (SQLException e) {
+            throw new RuntimeException("SQL执行失败：", e);
         }
         return ruleCodeSet;
+    }
+
+    public void updateOutputKey() {
+        String sqlSelect = "select * from riskctrl_user.t_nr_statistics_rule";
+        String sqlUpdate = "update riskctrl_user.t_nr_statistics_rule set param=?,output_key=? where rule_id=?";
+        try {
+            List<Map<String, Object>> resultMapList = dao.query(sqlSelect);
+            for (Map<String, Object> resultMap : resultMapList) {
+                String ruleId = resultMap.get("RULE_ID").toString();
+                JSONObject paramJson = JSON.parseObject(resultMap.getOrDefault("PARAM", "{}").toString());
+                String outputKey = "outputKey";
+                if (paramJson.containsKey(outputKey)) {
+                    String outputKeyValue = paramJson.getString(outputKey);
+                    paramJson.remove(outputKey);
+                    dao.executeSql(sqlUpdate, paramJson.toJSONString(), outputKeyValue, ruleId);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("SQL执行失败：", e);
+        }
+    }
+
+    public void removeOutputKey() {
+        String sqlSelect = "select * from riskctrl_user.t_rc_base_rule where rule_type='02'";
+        String sqlUpdate = "update riskctrl_user.t_rc_base_rule set DEFAULT_PARAMS=? where rule_type='02' and rule_code=?";
+        try {
+            List<Map<String, Object>> resultMapList = dao.query(sqlSelect);
+            for (Map<String, Object> resultMap : resultMapList) {
+                String ruleCode = resultMap.get("RULE_CODE").toString();
+                JSONObject paramJson = JSON.parseObject(resultMap.getOrDefault("DEFAULT_PARAMS", "{}").toString());
+                String outputKey = "outputKey";
+                if (paramJson.containsKey(outputKey)) {
+                    paramJson.remove(outputKey);
+                    dao.executeSql(sqlUpdate, paramJson.toJSONString(), ruleCode);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("SQL执行失败：", e);
+        }
     }
 
     private List<String> getParams(JSONObject paramJson) {

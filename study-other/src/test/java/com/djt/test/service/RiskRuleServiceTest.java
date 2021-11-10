@@ -19,4 +19,10 @@ public class RiskRuleServiceTest {
         System.out.println(ruleCodeSet);
     }
 
+    @Test
+    public void testUpdateOutputKey() {
+        //riskRuleService.updateOutputKey();
+        riskRuleService.removeOutputKey();
+    }
+
 }
