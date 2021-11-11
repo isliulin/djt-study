@@ -10,6 +10,7 @@ import org.apache.flink.configuration.RestOptions;
 import org.apache.flink.runtime.state.filesystem.FsStateBackend;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
+import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
@@ -50,7 +51,7 @@ public class FlinkBaseTest {
      *
      * @return DataStream
      */
-    public DataStream<MyEvent> getKafkaSourceWithWm() {
+    public SingleOutputStreamOperator<MyEvent> getKafkaSourceWithWm() {
         Properties kafkaProps = ConfigConstants.getKafkaConsumerProps();
         String groupId = kafkaProps.getProperty(ConsumerConfig.GROUP_ID_CONFIG);
         String topic = ConfigConstants.topicEvent();
@@ -58,13 +59,13 @@ public class FlinkBaseTest {
     }
 
 
-    public DataStream<MyEvent> getKafkaSourceWithWm(String topic, String groupId) {
+    public SingleOutputStreamOperator<MyEvent> getKafkaSourceWithWm(String topic, String groupId) {
         return getKafkaSourceWithWm(getKafkaSource(topic, groupId));
     }
 
     public static long outOrdTime = 5;
 
-    public DataStream<MyEvent> getKafkaSourceWithWm(DataStream<MyEvent> streamSource) {
+    public SingleOutputStreamOperator<MyEvent> getKafkaSourceWithWm(DataStream<MyEvent> streamSource) {
         return streamSource
                 .assignTimestampsAndWatermarks(WatermarkStrategy
                         .<MyEvent>forBoundedOutOfOrderness(Duration.ofSeconds(outOrdTime))
@@ -83,7 +84,7 @@ public class FlinkBaseTest {
 
     @Test
     public void testKafkaSource() throws Exception {
-        DataStream<MyEvent> kafkaSource = getKafkaSourceWithWm();
+        SingleOutputStreamOperator<MyEvent> kafkaSource = getKafkaSourceWithWm();
         kafkaSource.print();
         streamEnv.execute("testKafkaSource");
     }

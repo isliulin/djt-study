@@ -11,6 +11,7 @@ import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.RichJoinFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.kafka.clients.producer.Producer;
@@ -28,8 +29,8 @@ public class FlinkJoinTest extends FlinkBaseTest {
 
     @Test
     public void testJoin() throws Exception {
-        DataStream<MyEvent> kafkaSource1 = getKafkaSourceWithWm("flink-test-1", "group-flink-test-1");
-        DataStream<MyEvent> kafkaSource2 = getKafkaSourceWithWm("flink-test-2", "group-flink-test-2");
+        SingleOutputStreamOperator<MyEvent> kafkaSource1 = getKafkaSourceWithWm("flink-test-1", "group-flink-test-1");
+        SingleOutputStreamOperator<MyEvent> kafkaSource2 = getKafkaSourceWithWm("flink-test-2", "group-flink-test-2");
         DataStream<Tuple2<MyEvent, MyEvent>> joinStream = kafkaSource1.join(kafkaSource2)
                 .where(MyEvent::getId)
                 .equalTo(MyEvent::getId)
@@ -43,8 +44,8 @@ public class FlinkJoinTest extends FlinkBaseTest {
 
     @Test
     public void testJoinByState() throws Exception {
-        DataStream<MyEvent> kafkaSource1 = getKafkaSourceWithWm("flink-test-1", "group-flink-test-1");
-        DataStream<MyEvent> kafkaSource2 = getKafkaSourceWithWm("flink-test-2", "group-flink-test-2");
+        SingleOutputStreamOperator<MyEvent> kafkaSource1 = getKafkaSourceWithWm("flink-test-1", "group-flink-test-1");
+        SingleOutputStreamOperator<MyEvent> kafkaSource2 = getKafkaSourceWithWm("flink-test-2", "group-flink-test-2");
 
         kafkaSource1.union(kafkaSource2)
                 .keyBy(MyEvent::getId)
@@ -59,7 +60,7 @@ public class FlinkJoinTest extends FlinkBaseTest {
         DataStream<MyEvent> kafkaSource1 = getKafkaSource("flink-test-1", "group-flink-test-1");
         DataStream<MyEvent> kafkaSource2 = getKafkaSource("flink-test-2", "group-flink-test-2");
 
-        DataStream<MyEvent> stream = getKafkaSourceWithWm(kafkaSource1.union(kafkaSource2));
+        SingleOutputStreamOperator<MyEvent> stream = getKafkaSourceWithWm(kafkaSource1.union(kafkaSource2));
         stream.keyBy(MyEvent::getId)
                 .window(TumblingEventTimeWindows.of(Time.seconds(5)))
                 .trigger(MyEventTimeTrigger.create())

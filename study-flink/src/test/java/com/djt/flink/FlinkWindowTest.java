@@ -5,6 +5,7 @@ import com.djt.function.EveryEventTimeTrigger;
 import com.djt.function.MyKeyedProcessFunction;
 import com.djt.function.MyWindowFunction;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
@@ -20,7 +21,7 @@ public class FlinkWindowTest extends FlinkBaseTest {
 
     @Test
     public void testTumblingEventTimeWindows() throws Exception {
-        DataStream<MyEvent> kafkaSource = getKafkaSourceWithWm();
+        SingleOutputStreamOperator<MyEvent> kafkaSource = getKafkaSourceWithWm();
         kafkaSource.keyBy(MyEvent::getId)
                 .window(TumblingEventTimeWindows.of(Time.seconds(5)))
                 .allowedLateness(Time.seconds(5))
@@ -31,7 +32,7 @@ public class FlinkWindowTest extends FlinkBaseTest {
 
     @Test
     public void testSlidingEventTimeWindows() throws Exception {
-        DataStream<MyEvent> kafkaSource = getKafkaSourceWithWm();
+        SingleOutputStreamOperator<MyEvent> kafkaSource = getKafkaSourceWithWm();
         int start = 23;
         int end = 6;
         int size = getWindowSizeHour(start, end);
@@ -74,12 +75,30 @@ public class FlinkWindowTest extends FlinkBaseTest {
     @Test
     public void testKeyedProcessFunction() throws Exception {
         FlinkBaseTest.outOrdTime = 1;
-        DataStream<MyEvent> kafkaSource = getKafkaSourceWithWm();
+        SingleOutputStreamOperator<MyEvent> kafkaSource = getKafkaSourceWithWm();
 
         kafkaSource.keyBy(MyEvent::getId)
                 .process(new MyKeyedProcessFunction());
 
         streamEnv.execute("testKeyedProcessFunction");
     }
+
+    @Test
+    public void testTumblingEventTimeWindows2() throws Exception {
+        SingleOutputStreamOperator<MyEvent> kafkaSource = getKafkaSourceWithWm();
+
+        kafkaSource.keyBy(MyEvent::getId)
+                .window(TumblingEventTimeWindows.of(Time.days(1), Time.hours(16)))
+                .trigger(EveryEventTimeTrigger.create())
+                .apply(new MyWindowFunction());
+
+        kafkaSource.keyBy(MyEvent::getId)
+                .window(TumblingEventTimeWindows.of(Time.days(1), Time.hours(4)))
+                .trigger(EveryEventTimeTrigger.create())
+                .apply(new MyWindowFunction());
+
+        streamEnv.execute("testKeyedProcessFunction");
+    }
+
 
 }

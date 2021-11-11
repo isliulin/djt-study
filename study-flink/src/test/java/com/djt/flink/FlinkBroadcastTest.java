@@ -35,7 +35,7 @@ public class FlinkBroadcastTest extends FlinkBaseTest {
     @Test
     public void testBroadcast() throws Exception {
         streamEnv.getConfig().setAutoWatermarkInterval(1000);
-        DataStream<MyEvent> kafkaSource = getKafkaSourceWithWm();
+        SingleOutputStreamOperator<MyEvent> kafkaSource = getKafkaSourceWithWm();
         DataStreamSource<Map<String, Long>> riskRuleSource = streamEnv.addSource(new RiskRuleSourceFunction());
         MapStateDescriptor<String, Map<String, Long>> riskRuleMsd = new MapStateDescriptor<>(
                 "riskRuleBdt",

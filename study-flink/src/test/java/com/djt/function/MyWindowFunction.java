@@ -5,7 +5,8 @@ import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.StrUtil;
 import com.djt.event.MyEvent;
 import lombok.extern.log4j.Log4j2;
-import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.streaming.api.functions.windowing.RichWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 
@@ -19,7 +20,11 @@ import java.util.List;
  * @since 　 2021-07-27
  */
 @Log4j2
-public class MyWindowFunction implements WindowFunction<MyEvent, MyEvent, String, TimeWindow> {
+public class MyWindowFunction extends RichWindowFunction<MyEvent, MyEvent, String, TimeWindow> {
+
+    @Override
+    public void open(Configuration parameters) {
+    }
 
     @Override
     public void apply(String s, TimeWindow window, Iterable<MyEvent> input, Collector<MyEvent> out) {

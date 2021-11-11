@@ -30,7 +30,7 @@ public class EveryEventTimeTrigger extends Trigger<Object, TimeWindow> {
 
     @Override
     public TriggerResult onEventTime(long time, TimeWindow window, TriggerContext ctx) {
-        return time == window.maxTimestamp() ? TriggerResult.FIRE : TriggerResult.CONTINUE;
+        return TriggerResult.CONTINUE;
     }
 
     @Override

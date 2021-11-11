@@ -8,6 +8,7 @@ import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.runtime.state.filesystem.FsStateBackend;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.functions.windowing.RichWindowFunction;
 import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
@@ -41,7 +42,7 @@ public class FlinkCheckpointTest extends FlinkBaseTest {
         checkpointConfig.enableExternalizedCheckpoints(RETAIN_ON_CANCELLATION);
         checkpointConfig.setTolerableCheckpointFailureNumber(0);
 
-        DataStream<MyEvent> kafkaSource = getKafkaSourceWithWm();
+        SingleOutputStreamOperator<MyEvent> kafkaSource = getKafkaSourceWithWm();
         kafkaSource.keyBy(MyEvent::getId)
                 .window(TumblingEventTimeWindows.of(Time.seconds(5)))
                 .allowedLateness(Time.seconds(0))
