@@ -119,7 +119,9 @@ public class MakeDataUtils {
         int merIndex = RANDOM.nextInt(MER_NO_ARR.length);
         String merNo = MER_NO_ARR[merIndex];
         String merName = NAME_ARR[merIndex];
-        String cardNo = CARD_NO_ARR[RANDOM.nextInt(CARD_NO_ARR.length)];
+
+        int cardIndex = merIndex + RANDOM.nextInt(5);
+        String cardNo = CARD_NO_ARR[cardIndex];
 
         JSONObject eventJson = new JSONObject();
         eventJson.put("type", "02");
