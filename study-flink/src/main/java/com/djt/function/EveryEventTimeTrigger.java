@@ -58,7 +58,7 @@ public class EveryEventTimeTrigger extends Trigger<Object, TimeWindow> {
 
     @Override
     public String toString() {
-        return "RiskEventTimeTrigger()";
+        return "EveryEventTimeTrigger()";
     }
 
     public static EveryEventTimeTrigger create() {

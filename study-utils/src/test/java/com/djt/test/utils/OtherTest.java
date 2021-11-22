@@ -1,17 +1,18 @@
 package com.djt.test.utils;
 
-import cn.hutool.core.lang.Tuple;
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.util.StrUtil;
 import com.djt.utils.DjtConstant;
 import org.junit.Test;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author 　djt317@qq.com
@@ -70,6 +71,20 @@ public class OtherTest {
                 ++batchNo;
                 System.out.println(StrUtil.format("批次：{} 数据：{}", batchNo, tmpList));
                 tmpList.clear();
+            }
+        }
+    }
+
+    @Test
+    public void test5() {
+        LocalDateTime start = LocalDateTime.parse("1970-01-01 00:00:00", DatePattern.NORM_DATETIME_FORMATTER);
+        LocalDateTime end = LocalDateTime.parse("1970-01-02 00:00:00", DatePattern.NORM_DATETIME_FORMATTER);
+        for (int i = 0; i < Integer.MAX_VALUE; i++) {
+            LocalDateTime now = start.plus(i * 21L, ChronoUnit.MILLIS);
+            if (now.isAfter(end)) {
+                System.out.println(StrUtil.format("计时结束:{} date_time:{}",
+                        i, now.format(DatePattern.NORM_DATETIME_FORMATTER)));
+                break;
             }
         }
     }

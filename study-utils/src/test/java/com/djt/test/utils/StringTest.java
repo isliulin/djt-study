@@ -332,4 +332,10 @@ public class StringTest {
     }
 
 
+    @Test
+    public void testSub() {
+        System.out.println(StringUtils.substringAfter("2021-11-08 11:11:11", " "));
+        System.out.println("2021-11-11 " + StringUtils.substringAfter("2021-11-08 11:11:11", " "));
+    }
+
 }

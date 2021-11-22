@@ -2,13 +2,14 @@ package com.djt.flink;
 
 import com.djt.event.MyEvent;
 import com.djt.function.EveryEventTimeTrigger;
+import com.djt.function.MyEventTimeTrigger;
 import com.djt.function.MyKeyedProcessFunction;
 import com.djt.function.MyWindowFunction;
-import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.flink.streaming.api.windowing.triggers.PurgingTrigger;
 import org.junit.Test;
 
 import java.time.temporal.ChronoField;
@@ -96,6 +97,19 @@ public class FlinkWindowTest extends FlinkBaseTest {
                 .window(TumblingEventTimeWindows.of(Time.days(1), Time.hours(4)))
                 .trigger(EveryEventTimeTrigger.create())
                 .apply(new MyWindowFunction());
+
+        streamEnv.execute("testKeyedProcessFunction");
+    }
+
+    @Test
+    public void testTumblingEventTimeWindows3() throws Exception {
+        SingleOutputStreamOperator<MyEvent> kafkaSource = getKafkaSourceWithWm();
+
+        kafkaSource.keyBy(MyEvent::getId)
+                .window(TumblingEventTimeWindows.of(Time.seconds(5)))
+                .trigger(PurgingTrigger.of(MyEventTimeTrigger.create()))
+                .apply(new MyWindowFunction());
+
 
         streamEnv.execute("testKeyedProcessFunction");
     }

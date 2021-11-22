@@ -50,9 +50,9 @@ public class MakeDataUtils {
     public void makeOneMyEventToKafka() {
         MyEvent event = new MyEvent();
         event.setId("666");
-        event.setName("张三");
+        event.setName("李四");
         event.setNum(100L);
-        event.setTime("2022-01-01 00:00:00");
+        event.setTime("2022-01-01 00:00:01");
 
         String topic = PROPS.getProperty("topic.event", null);
         Producer<String, String> producer = KafkaUtils.createProducer(ConfigConstants.getKafkaProducerProps());

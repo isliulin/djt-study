@@ -43,6 +43,8 @@ public class KafkaUtils {
         return new KafkaConsumer<>(getConsumerProps(props));
     }
 
+    public static long start = System.currentTimeMillis();
+
     /**
      * 生产数据
      *
@@ -53,7 +55,12 @@ public class KafkaUtils {
      */
     public static void sendMessage(Producer<String, String> producer, String topic, String key, String value) {
         producer.send(new ProducerRecord<>(topic, key, value));
-        log.info("生产数据=>topic:{} key:{} value:{}", topic, key, value);
+        long now = System.currentTimeMillis();
+        long interval = 5000;
+        if (now - start >= interval) {
+            start = now;
+            log.info("生产数据=>topic:{} key:{} value:{}", topic, key, value);
+        }
     }
 
     public static volatile boolean isRunning = true;
