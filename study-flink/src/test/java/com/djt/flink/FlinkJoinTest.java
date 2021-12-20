@@ -71,6 +71,14 @@ public class FlinkJoinTest extends FlinkBaseTest {
         streamEnv.execute("testJoinByAgg");
     }
 
+    @Test
+    public void testCoGroup() throws Exception {
+        DataStream<MyEvent> kafkaSource1 = getKafkaSource("flink-test-1", "group-flink-test-1");
+        DataStream<MyEvent> kafkaSource2 = getKafkaSource("flink-test-2", "group-flink-test-2");
+
+        streamEnv.execute("testCoGroup");
+    }
+
 
     @Test
     public void makeSomeMyEvent() {

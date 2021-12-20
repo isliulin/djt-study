@@ -1,5 +1,6 @@
 package com.djt.test.utils;
 
+import cn.hutool.core.io.FileUtil;
 import com.google.common.collect.HashMultimap;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -7,6 +8,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,5 +72,11 @@ public class FileUtilsTest {
         }
     }
 
+    @Test
+    public void testFile2() {
+        String filePath = "C:\\Users\\duanjiatao\\Desktop\\cici.txt";
+        String content = FileUtil.readString(filePath, StandardCharsets.UTF_8);
+        System.out.println(content);
+    }
 
 }

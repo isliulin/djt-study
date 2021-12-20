@@ -107,4 +107,13 @@ public class HttpTest {
         }
     }
 
+    @Test
+    public void testHttpUtil2() {
+        String url = "http://172.20.6.6:26354/monitorException";
+        String body = "{\"service_model\": \"XD\", \"exe_service\": \"azkaban\", \"err_msg\": \"测试-DJT-777\", \"alarm_level\": \"3\"}";
+        String rep = HttpUtil.post(url, body);
+        cn.hutool.json.JSONObject json = new cn.hutool.json.JSONObject(rep,false);
+        System.out.println(json);
+    }
+
 }

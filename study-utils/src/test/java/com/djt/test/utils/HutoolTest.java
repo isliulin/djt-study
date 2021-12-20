@@ -7,6 +7,7 @@ import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
 import cn.hutool.system.HostInfo;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.djt.test.bean.PayOrder;
@@ -110,6 +111,16 @@ public class HutoolTest {
         String[] b = {"c", "d", "e", "f"};
         System.out.println(ArrayUtil.containsAny(a, b));
         System.out.println(ArrayUtil.containsAny(b, a));
+    }
+
+    @Test
+    public void testJson() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.set("A","1");
+        jsonObject.set("B","2");
+        jsonObject.set("C","3");
+        System.out.println(jsonObject.toString());
+        System.out.println(jsonObject.toJSONString(2));
     }
 
 

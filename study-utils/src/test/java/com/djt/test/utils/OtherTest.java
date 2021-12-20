@@ -2,7 +2,9 @@ package com.djt.test.utils;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpUtil;
 import com.djt.utils.DjtConstant;
+import com.sun.deploy.net.HttpUtils;
 import org.junit.Test;
 
 import java.time.LocalDate;
@@ -87,5 +89,22 @@ public class OtherTest {
                 break;
             }
         }
+    }
+
+    @Test
+    public void test6() {
+        LocalDateTime start = LocalDateTime.parse("1970-01-01 00:00:00", DatePattern.NORM_DATETIME_FORMATTER);
+        LocalDateTime end = LocalDateTime.parse("1970-01-01 00:00:00", DatePattern.NORM_DATETIME_FORMATTER);
+        System.out.println(start.isBefore(end));
+    }
+
+    @Test
+    public void test7() {
+        System.out.println(null instanceof String);
+    }
+
+    @Test
+    public void test8() {
+
     }
 }

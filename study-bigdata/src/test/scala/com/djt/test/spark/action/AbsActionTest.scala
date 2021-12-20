@@ -48,6 +48,7 @@ abstract class AbsActionTest extends Serializable {
             println(s"$key : ${config.getProperty(key.toString)}")
         })
         LOG.info("=======初始化完成...=======")
+        println("=============================================================")
     }
 
     protected def setConfig(config: Properties): Unit = {}

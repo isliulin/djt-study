@@ -3,10 +3,7 @@ package com.djt.event;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import com.alibaba.fastjson.annotation.JSONField;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -21,7 +18,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MyEvent extends BaseEvent {
+public class MyEvent extends BaseEvent implements Comparable<MyEvent> {
 
     @JSONField(name = "id")
     private String id;
@@ -40,4 +37,14 @@ public class MyEvent extends BaseEvent {
 
     private Set<String> nameSet = new HashSet<>();
 
+    @Override
+    public int compareTo(@NonNull MyEvent o) {
+        if (this.getEventTime() > o.getEventTime()) {
+            return 0;
+        } else if (this.getEventTime() < o.getEventTime()) {
+            return -1;
+        } else {
+            return 0;
+        }
+    }
 }

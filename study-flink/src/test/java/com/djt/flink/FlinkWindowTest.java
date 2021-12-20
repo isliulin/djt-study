@@ -114,5 +114,19 @@ public class FlinkWindowTest extends FlinkBaseTest {
         streamEnv.execute("testKeyedProcessFunction");
     }
 
+    @Test
+    public void testTumblingEventTimeWindows4() throws Exception {
+        outOrdTime = 2;
+        SingleOutputStreamOperator<MyEvent> kafkaSource = getKafkaSourceWithWm();
+
+        kafkaSource.keyBy(MyEvent::getId)
+                .window(TumblingEventTimeWindows.of(Time.seconds(5)))
+                .apply(new MyWindowFunction())
+                .print();
+
+
+        streamEnv.execute("testKeyedProcessFunction");
+    }
+
 
 }

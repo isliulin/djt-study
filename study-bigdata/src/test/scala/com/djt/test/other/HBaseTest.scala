@@ -2,15 +2,16 @@ package com.djt.test.other
 
 import com.djt.test.spark.action.AbsActionTest
 import com.djt.utils.{DjtConstant, RandomUtils}
+import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.hbase._
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.filter.{CompareFilter, MultiRowRangeFilter}
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable
 import org.apache.hadoop.hbase.mapreduce.TableInputFormat
 import org.apache.hadoop.hbase.protobuf.ProtobufUtil
 import org.apache.hadoop.hbase.util.{Base64, Bytes}
-import org.apache.hadoop.hbase.{HBaseConfiguration, HConstants, TableName}
 import org.junit.{After, Before, Test}
 
 import scala.collection.mutable.ListBuffer
@@ -27,7 +28,7 @@ class HBaseTest extends AbsActionTest {
     @Before
     override def before(): Unit = {
         super.before()
-        hbaseConf.set(HConstants.ZOOKEEPER_QUORUM, "xdata-uat03.jlpay.io,cdh-dev01.jlpay.io,cdh-dev02.jlpay.io")
+        hbaseConf.set(HConstants.ZOOKEEPER_QUORUM, "cdh-dev01.jlpay.io,cdh-dev02.jlpay.io,cdh-dev03.jlpay.io")
         hbaseConf.set(HConstants.CLIENT_PORT_STR, "2181")
         conn = ConnectionFactory.createConnection(hbaseConf)
     }
@@ -58,6 +59,28 @@ class HBaseTest extends AbsActionTest {
         println(exists(table, row) + ":" + getFieldValue(table, cf, row, field))
 
         table.close()
+    }
+
+    @Test
+    def testPut2(): Unit = {
+        val tableName = "RC:STAT_RESULT"
+        val table = conn.getTable(TableName.valueOf(tableName))
+        val cf = Bytes.toBytes("cf")
+        val row = Bytes.toBytes(DigestUtils.md5Hex("84944037011A00O"))
+        val field = Bytes.toBytes("merchValidTradeDays")
+        val field2 = Bytes.toBytes("merchLast30DaysSumMax")
+
+        val put = new Put(row)
+        put.addColumn(cf, field, Bytes.toBytes("10"))
+        put.addColumn(cf, field2, Bytes.toBytes("10000000"))
+        table.put(put)
+        println(Bytes.toString(row) + ":" + Bytes.toString(field) + "=" + getFieldValue(table, cf, row, field))
+        table.close()
+
+        val get = new Get(row)
+        val result = table.get(get)
+        val value2 = result.getValue(cf, field)
+        Bytes.toString(value2)
     }
 
     @Test
@@ -126,9 +149,16 @@ class HBaseTest extends AbsActionTest {
         val resultScanner = table.getScanner(scan)
         val iter = resultScanner.iterator()
         while (iter.hasNext) {
+            val sb = new StringBuilder
             val result = iter.next()
-            val rowString = Bytes.toString(result.getRow)
-            println(rowString)
+            val rowkey = Bytes.toString(result.getRow)
+            sb.append(rowkey).append("=>")
+            result.rawCells().foreach(cell => {
+                val q = Bytes.toString(CellUtil.cloneQualifier(cell))
+                val v = Bytes.toLong(CellUtil.cloneValue(cell))
+                sb.append(q).append("=").append(v).append(" ")
+            })
+            println(sb)
         }
         table.close()
     }
@@ -158,6 +188,7 @@ class HBaseTest extends AbsActionTest {
 
     @Test
     def testBathPut2(): Unit = {
+        //create 'RC:EVENT_FLOW',{ NAME => 'event', DATA_BLOCK_ENCODING => 'PREFIX_TREE', REPLICATION_SCOPE => '0'}
         val tableName = "TEST:T_TEST_DJT"
         val table = conn.getTable(TableName.valueOf(tableName))
         val cf = Bytes.toBytes("cf")
@@ -165,6 +196,19 @@ class HBaseTest extends AbsActionTest {
         put.addColumn(cf, Bytes.toBytes("F2"), Bytes.toBytes("444"))
         put.addColumn(cf, Bytes.toBytes("F3"), Bytes.toBytes("444"))
         table.put(put)
+    }
+
+    @Test
+    def testIncrement(): Unit = {
+        val tableName = "TEST:T_TEST_DJT"
+        val table = conn.getTable(TableName.valueOf(tableName))
+        val cf = Bytes.toBytes("cf")
+        val ql = Bytes.toBytes("test1")
+        val inc = new Increment(Bytes.toBytes("123456"))
+        inc.addColumn(cf, ql, 1L)
+        table.increment(inc)
+        table.close()
+        testScan2()
     }
 
 
