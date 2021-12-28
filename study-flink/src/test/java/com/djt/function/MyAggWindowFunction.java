@@ -25,7 +25,6 @@ public class MyAggWindowFunction implements WindowFunction<Set<String>, Tuple2<S
             System.out.println(StrUtil.format("满足条件===>{}:", s));
             out.collect(Tuple2.of(s, nameSet));
         }
-
     }
 
 }

@@ -15,12 +15,7 @@ public class MyEventTimeTrigger extends Trigger<Object, TimeWindow> {
     private MyEventTimeTrigger() {}
 
     @Override
-    public TriggerResult onElement(
-            Object element, long timestamp, TimeWindow window, TriggerContext ctx) {
-
-        if (ctx.getCurrentWatermark() < window.maxTimestamp()) {
-            ctx.registerEventTimeTimer(window.maxTimestamp());
-        }
+    public TriggerResult onElement(Object element, long timestamp, TimeWindow window, TriggerContext ctx) {
         return TriggerResult.FIRE;
     }
 
@@ -36,25 +31,11 @@ public class MyEventTimeTrigger extends Trigger<Object, TimeWindow> {
 
     @Override
     public void clear(TimeWindow window, TriggerContext ctx) {
-        ctx.deleteEventTimeTimer(window.maxTimestamp());
-    }
-
-    @Override
-    public boolean canMerge() {
-        return true;
-    }
-
-    @Override
-    public void onMerge(TimeWindow window, OnMergeContext ctx) {
-        long windowMaxTimestamp = window.maxTimestamp();
-        if (windowMaxTimestamp > ctx.getCurrentWatermark()) {
-            ctx.registerEventTimeTimer(windowMaxTimestamp);
-        }
     }
 
     @Override
     public String toString() {
-        return "RiskEventTimeTrigger()";
+        return "MyEventTimeTrigger()";
     }
 
     public static MyEventTimeTrigger create() {

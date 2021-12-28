@@ -47,17 +47,22 @@ public class MakeDataUtils {
      * 发送一条数据
      */
     @Test
-    public void makeOneMyEventToKafka() {
-        MyEvent event = new MyEvent();
-        event.setId("666");
-        event.setName("李四");
-        event.setNum(100L);
-        event.setTime("2022-01-01 00:00:01");
-
+    public void makeSomeMyEventToKafka() {
         String topic = PROPS.getProperty("topic.event", null);
         Producer<String, String> producer = KafkaUtils.createProducer(ConfigConstants.getKafkaProducerProps());
-        KafkaUtils.sendMessage(producer, topic, event.getId(), JSON.toJSONString(event));
-        producer.flush();
+        LocalDateTime dateTime = LocalDateTime.parse("2022-01-01 00:00:00", DatePattern.NORM_DATETIME_FORMATTER);
+        for (int i = 0; i < 20; i++) {
+            String thisTime = dateTime.plusSeconds(i).format(DatePattern.NORM_DATETIME_FORMATTER);
+            MyEvent event = new MyEvent();
+            event.setId(String.valueOf(RandomUtils.getRandomNumber(0, 100)));
+            event.setName("张三");
+            event.setNum(1L);
+            event.setTime(thisTime);
+
+            KafkaUtils.sendMessage(producer, topic, RandomUtils.getUuid(), JSON.toJSONString(event), false);
+            producer.flush();
+            ThreadUtil.sleep(200);
+        }
     }
 
     @Test

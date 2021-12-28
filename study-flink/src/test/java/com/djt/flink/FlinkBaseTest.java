@@ -7,9 +7,8 @@ import com.djt.utils.ConfigConstants;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.RestOptions;
-import org.apache.flink.runtime.state.filesystem.FsStateBackend;
+import org.apache.flink.contrib.streaming.state.EmbeddedRocksDBStateBackend;
 import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -37,12 +36,17 @@ public class FlinkBaseTest {
     @Before
     public void before() {
         Configuration configuration = new Configuration();
-        configuration.set(RestOptions.PORT, 8082);
+        configuration.set(RestOptions.PORT, 8083);
         streamEnv = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(configuration);
         streamEnv.setParallelism(ConfigConstants.flinkEnvParallelism());
         streamEnv.getConfig().setAutoWatermarkInterval(ConfigConstants.flinkWatermarkInterval());
-        streamEnv.setStateBackend(new FsStateBackend(ConfigConstants.flinkCheckpointPath()));
+
+        //streamEnv.setStateBackend(new FsStateBackend(ConfigConstants.flinkCheckpointPath()));
+        streamEnv.setStateBackend(new EmbeddedRocksDBStateBackend(true));
+
         CheckpointConfig checkpointConfig = streamEnv.getCheckpointConfig();
+        checkpointConfig.enableUnalignedCheckpoints();
+        checkpointConfig.setCheckpointStorage(ConfigConstants.flinkCheckpointPath());
         checkpointConfig.configure(ConfigConstants.getCheckpointConfig());
     }
 
@@ -63,24 +67,32 @@ public class FlinkBaseTest {
         return getKafkaSourceWithWm(getKafkaSource(topic, groupId));
     }
 
-    public static long outOrdTime = 5;
+    public static long outOrdTimeSec = 5;
 
     public SingleOutputStreamOperator<MyEvent> getKafkaSourceWithWm(DataStream<MyEvent> streamSource) {
         return streamSource
                 .assignTimestampsAndWatermarks(WatermarkStrategy
-                        .<MyEvent>forBoundedOutOfOrderness(Duration.ofSeconds(outOrdTime))
-                        .withTimestampAssigner((event, timestamp) -> event.getEventTime())
-                        .withIdleness(Duration.ofMinutes(1)));
+                        .<MyEvent>forBoundedOutOfOrderness(Duration.ofSeconds(outOrdTimeSec))
+                        .withTimestampAssigner((event, timestamp) -> event.getEventTime()))
+                .setParallelism(streamSource.getParallelism())
+                .name("assignTimestampsAndWatermarks");
     }
 
-    public DataStreamSource<MyEvent> getKafkaSource(String topic, String groupId) {
+    public SingleOutputStreamOperator<MyEvent> getKafkaSource() {
+        Properties kafkaProps = ConfigConstants.getKafkaConsumerProps();
+        String topic = ConfigConstants.topicEvent();
+        String groupId = kafkaProps.getProperty(ConsumerConfig.GROUP_ID_CONFIG);
+        return getKafkaSource(topic, groupId);
+    }
+
+    public SingleOutputStreamOperator<MyEvent> getKafkaSource(String topic, String groupId) {
         Properties kafkaProps = ConfigConstants.getKafkaConsumerProps();
         kafkaProps.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         FlinkKafkaConsumer<MyEvent> kafkaConsumer = new FlinkKafkaConsumer<>(topic, new MySchema(), kafkaProps);
         return streamEnv.addSource(kafkaConsumer)
-                .setParallelism(3);
+                .setParallelism(ConfigConstants.flinkSourceKafkaParallelism())
+                .name("kafkaSource");
     }
-
 
     @Test
     public void testKafkaSource() throws Exception {

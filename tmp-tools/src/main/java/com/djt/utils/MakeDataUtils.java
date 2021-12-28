@@ -85,7 +85,7 @@ public class MakeDataUtils {
 
     static {
         //生成商户信息
-        int merchNum = 500000;
+        int merchNum = 100000;
         MER_NO_ARR = new String[merchNum];
         NAME_ARR = new String[merchNum];
         for (int i = 0; i < merchNum; i++) {
@@ -94,7 +94,7 @@ public class MakeDataUtils {
         }
 
         //生成卡信息
-        int cardNum = 1000000;
+        int cardNum = 200000;
         CARD_NO_ARR = new String[cardNum];
         for (int i = 0; i < cardNum; i++) {
             CARD_NO_ARR[i] = BankCardNumberGenerator.getInstance().generate();
@@ -120,7 +120,7 @@ public class MakeDataUtils {
         String merNo = MER_NO_ARR[merIndex];
         String merName = NAME_ARR[merIndex];
 
-        int cardIndex = merIndex + RANDOM.nextInt(5);
+        int cardIndex = merIndex + RANDOM.nextInt(2);
         String cardNo = CARD_NO_ARR[cardIndex];
 
         JSONObject eventJson = new JSONObject();

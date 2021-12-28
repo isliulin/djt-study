@@ -54,11 +54,21 @@ public class KafkaUtils {
      * @param value    消息体
      */
     public static void sendMessage(Producer<String, String> producer, String topic, String key, String value) {
+        sendMessage(producer, topic, key, value, true);
+    }
+
+    /**
+     * 生产数据
+     *
+     * @param producer 生产者
+     * @param topic    主题
+     * @param key      消息标识
+     * @param value    消息体
+     * @param isPrint  是否打印
+     */
+    public static void sendMessage(Producer<String, String> producer, String topic, String key, String value, boolean isPrint) {
         producer.send(new ProducerRecord<>(topic, key, value));
-        long now = System.currentTimeMillis();
-        long interval = 5000;
-        if (now - start >= interval) {
-            start = now;
+        if (isPrint) {
             log.info("生产数据=>topic:{} key:{} value:{}", topic, key, value);
         }
     }

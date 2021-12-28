@@ -1,18 +1,20 @@
 package com.djt.flink;
 
 import com.djt.event.MyEvent;
-import com.djt.function.EveryEventTimeTrigger;
-import com.djt.function.MyEventTimeTrigger;
-import com.djt.function.MyKeyedProcessFunction;
-import com.djt.function.MyWindowFunction;
+import com.djt.function.*;
+import com.djt.utils.ConfigConstants;
+import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.triggers.PurgingTrigger;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import org.junit.Test;
 
 import java.time.temporal.ChronoField;
+import java.util.Properties;
 
 /**
  * @author 　djt317@qq.com
@@ -75,7 +77,7 @@ public class FlinkWindowTest extends FlinkBaseTest {
 
     @Test
     public void testKeyedProcessFunction() throws Exception {
-        FlinkBaseTest.outOrdTime = 1;
+        FlinkBaseTest.outOrdTimeSec = 1;
         SingleOutputStreamOperator<MyEvent> kafkaSource = getKafkaSourceWithWm();
 
         kafkaSource.keyBy(MyEvent::getId)
@@ -116,7 +118,7 @@ public class FlinkWindowTest extends FlinkBaseTest {
 
     @Test
     public void testTumblingEventTimeWindows4() throws Exception {
-        outOrdTime = 2;
+        outOrdTimeSec = 2;
         SingleOutputStreamOperator<MyEvent> kafkaSource = getKafkaSourceWithWm();
 
         kafkaSource.keyBy(MyEvent::getId)
@@ -126,6 +128,37 @@ public class FlinkWindowTest extends FlinkBaseTest {
 
 
         streamEnv.execute("testKeyedProcessFunction");
+    }
+
+    @Test
+    public void testTumblingEventTimeWindows5() throws Exception {
+        SingleOutputStreamOperator<MyEvent> kafkaSource = getKafkaSource();
+        kafkaSource.keyBy(MyEvent::getId)
+                .window(TumblingProcessingTimeWindows.of(Time.seconds(5)))
+                .apply(new MyWindowFunction())
+                .print();
+        streamEnv.execute("testTumblingEventTimeWindows5");
+    }
+
+    @Test
+    public void testWindowAgg() throws Exception {
+        outOrdTimeSec = 60;
+        Properties kafkaProps = ConfigConstants.getKafkaProducerProps();
+        SingleOutputStreamOperator<MyEvent> kafkaSource = getKafkaSourceWithWm();
+        kafkaSource
+                .keyBy(MyEvent::getId)
+                .window(TumblingEventTimeWindows.of(Time.minutes(10)))
+                .trigger(MyEventTimeTrigger.create())
+                .allowedLateness(Time.minutes(1))
+                .aggregate(new MyAggregateFunction2(), new MyAggWindowFunction2())
+                .setParallelism(kafkaSource.getParallelism())
+                .name("aggregate")
+                .addSink(new FlinkKafkaProducer<>("flink-test-1", new SimpleStringSchema(), kafkaProps))
+                .setParallelism(kafkaSource.getParallelism())
+                .name("addSink_Kafka")
+                .uid("addSink_Kafka");
+
+        streamEnv.execute("testWindowAgg");
     }
 
 

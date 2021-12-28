@@ -28,16 +28,16 @@ public class MyWindowFunction extends RichWindowFunction<MyEvent, MyEvent, Strin
 
     @Override
     public void apply(String s, TimeWindow window, Iterable<MyEvent> input, Collector<MyEvent> out) {
+        String winStart = LocalDateTimeUtil.of(window.getStart()).format(DatePattern.NORM_DATETIME_FORMATTER);
+        String winEnd = LocalDateTimeUtil.of(window.getEnd()).format(DatePattern.NORM_DATETIME_FORMATTER);
+
         List<MyEvent> eventList = new ArrayList<>();
         for (MyEvent event : input) {
             eventList.add(event);
             out.collect(event);
         }
 
-        String msg = StrUtil.format("Key:{}, 窗口:[{}--{}], 数据:{}", s,
-                LocalDateTimeUtil.of(window.getStart()).format(DatePattern.NORM_DATETIME_FORMATTER),
-                LocalDateTimeUtil.of(window.getEnd()).format(DatePattern.NORM_DATETIME_FORMATTER),
-                eventList.toString());
+        String msg = StrUtil.format("Key:{}, 窗口:[{}--{}], 数据:{}", s, winStart, winEnd, eventList.toString());
         System.out.println(msg);
     }
 
