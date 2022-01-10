@@ -168,6 +168,19 @@ class SparkActionTest extends AbsActionTest {
         rdd2.takeOrdered(5)(order2).foreach(println(_))
     }
 
+
+    @Test
+    def testSparkSqlKafka(): Unit = {
+        val sql = "select 'a' as key, '888' as value limit 1"
+        val df = getSparkSession.sql(sql)
+        df.write.format("kafka")
+                .option("kafka.bootstrap.servers", "172.20.7.33:9092,172.20.7.34:9092,172.20.7.35:9092")
+                .option("topic", "TEST_topic")
+                .save()
+
+    }
+
+
     /**
      * 自定义分区器
      */

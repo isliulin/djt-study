@@ -15,9 +15,7 @@ import org.junit.Test;
 
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -116,11 +114,19 @@ public class HutoolTest {
     @Test
     public void testJson() {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.set("A","1");
-        jsonObject.set("B","2");
-        jsonObject.set("C","3");
+        jsonObject.set("A", "1");
+        jsonObject.set("B", "2");
+        jsonObject.set("C", "3");
         System.out.println(jsonObject.toString());
         System.out.println(jsonObject.toJSONString(2));
+    }
+
+    @Test
+    public void testDate1() {
+        LocalDate start = LocalDate.parse("20220101", DatePattern.PURE_DATE_FORMATTER);
+        LocalDate end = LocalDate.parse("20220102", DatePattern.PURE_DATE_FORMATTER);
+        Period period = LocalDateTimeUtil.betweenPeriod(start, end);
+        System.out.println(period.getDays());
     }
 
 

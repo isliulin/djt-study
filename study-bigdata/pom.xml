@@ -20,7 +20,7 @@
         <elasticsearch.version>6.7.2</elasticsearch.version>
 
         <hadoop.version>2.6.0-cdh5.11.0</hadoop.version>
-        <spark.version>2.1.0.cloudera2</spark.version>
+        <spark.version>2.2.0.cloudera2</spark.version>
         <hbase.version>1.2.0-cdh5.11.0</hbase.version>
         <hive.version>1.1.0-cdh5.11.0</hive.version>
         <kudu.version>1.10.0-cdh6.3.2</kudu.version>
@@ -165,6 +165,12 @@
             <version>4.14.1-HBase-1.2</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-sql-kafka-0-10_2.11</artifactId>
+            <version>2.2.0</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 
