@@ -76,6 +76,15 @@ public class HutoolTest {
         UUID uuid = UUID.randomUUID();
         System.out.println(uuid.toString(false));
         System.out.println(uuid.toString(true));
+
+
+        for (int i = 0; i < 10; i++) {
+            uuid = UUID.randomUUID();
+            //System.out.println(Math.abs(uuid.hashCode()));
+            //System.out.println(uuid.variant());
+            //System.out.println(uuid.getLeastSignificantBits());
+            System.out.println(Math.abs(uuid.getMostSignificantBits()));
+        }
     }
 
     @Test

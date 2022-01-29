@@ -105,6 +105,6 @@ public class OtherTest {
 
     @Test
     public void test8() {
-
+        System.out.println(Long.MAX_VALUE);
     }
 }

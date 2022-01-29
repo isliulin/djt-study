@@ -11,6 +11,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.djt.tools.AbsTools.PROPS;
+
 /**
  * @author 　djt317@qq.com
  * @since 　 2021-04-09
@@ -41,6 +43,8 @@ public class ToolsTest {
 
     @Test
     public void testConsumeData() {
+        PROPS.setProperty("kafka.topic.event", "RISK_ANALYSIS_EVENT");
+        PROPS.setProperty("group.id", "GROUP_RISK_ANALYSIS_STAT");
         AbsTools tools = new ConsumeData();
         tools.execute(null);
     }

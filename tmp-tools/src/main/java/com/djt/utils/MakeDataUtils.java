@@ -11,6 +11,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
@@ -56,6 +57,11 @@ public class MakeDataUtils {
     public static final String[] PAY_TYPE_ARR = {"wxpay", "alipay", "unionpay", "bankpay"};
 
     /**
+     * 交易状态
+     */
+    public static final String[] STATUS = {"2", "2", "2", "2", "2", "2", "2", "2", "2", "3"};
+
+    /**
      * 商户号
      */
     public static String[] MER_NO_ARR;
@@ -69,7 +75,7 @@ public class MakeDataUtils {
      * 返回码
      */
     public static final String[] RET_CODE_ARR =
-            {"00", "01"};
+            {"00", "00", "00", "00", "00", "00", "00", "00", "01", "VZ"};
 
     /**
      * 手续费类型
@@ -84,8 +90,15 @@ public class MakeDataUtils {
     public static String[] CARD_NO_ARR;
 
     static {
+        updateBaseInfo();
+    }
+
+    /**
+     * 更新基础信息
+     */
+    public static void updateBaseInfo() {
         //生成商户信息
-        int merchNum = 100000;
+        int merchNum = 300000;
         MER_NO_ARR = new String[merchNum];
         NAME_ARR = new String[merchNum];
         for (int i = 0; i < merchNum; i++) {
@@ -94,7 +107,7 @@ public class MakeDataUtils {
         }
 
         //生成卡信息
-        int cardNum = 200000;
+        int cardNum = 500000;
         CARD_NO_ARR = new String[cardNum];
         for (int i = 0; i < cardNum; i++) {
             CARD_NO_ARR[i] = BankCardNumberGenerator.getInstance().generate();
@@ -108,6 +121,8 @@ public class MakeDataUtils {
     public static LocalDateTime TIME_START =
             LocalDateTime.parse("1970-01-01 00:00:00", DatePattern.NORM_DATETIME_FORMATTER);
 
+    private static int dayOld = Integer.parseInt(TIME_START.format(DatePattern.PURE_DATE_FORMATTER));
+
     /**
      * 生成订单流水
      *
@@ -116,11 +131,18 @@ public class MakeDataUtils {
      */
     public static JSONObject makePayOrderEvent(long offset, int interval) {
         LocalDateTime thisTime = TIME_START.plus(offset * interval, ChronoUnit.MILLIS);
+        int dayNew = Integer.parseInt(thisTime.format(DatePattern.PURE_DATE_FORMATTER));
+        if (dayNew > dayOld) {
+            updateBaseInfo();
+            dayOld = dayNew;
+        }
+        String timeStr = thisTime.format(DatePattern.NORM_DATETIME_FORMATTER);
+
         int merIndex = RANDOM.nextInt(MER_NO_ARR.length);
         String merNo = MER_NO_ARR[merIndex];
         String merName = NAME_ARR[merIndex];
 
-        int cardIndex = merIndex + RANDOM.nextInt(2);
+        int cardIndex = merIndex + RANDOM.nextInt(3);
         String cardNo = CARD_NO_ARR[cardIndex];
 
         JSONObject eventJson = new JSONObject();
@@ -129,7 +151,7 @@ public class MakeDataUtils {
         eventJson.put("timestamp", System.currentTimeMillis());
         eventJson.put("event_id", UUID.randomUUID().toString(true));
         JSONObject event = new JSONObject();
-        event.put("order_id", System.currentTimeMillis());
+        event.put("order_id", StringUtils.leftPad(String.valueOf(offset), 20, "0"));
         event.put("ori_order_id", "");
         event.put("busi_type", BUSI_TYPE_ARR[RANDOM.nextInt(BUSI_TYPE_ARR.length)]);
         event.put("out_order_id", "");
@@ -139,10 +161,10 @@ public class MakeDataUtils {
         event.put("print_merch_name", merName);
         event.put("agent_id", "123");
         event.put("sources", "pos+/posp_api");
-        event.put("trans_time", thisTime.format(DatePattern.NORM_DATETIME_FORMATTER));
-        event.put("amount", Math.abs(RANDOM.nextInt(30 * 10000 * 100) * 100));
-        event.put("status", "2");
-        event.put("expire_time", thisTime.plusSeconds(1).format(DatePattern.NORM_DATETIME_FORMATTER));
+        event.put("trans_time", timeStr);
+        event.put("amount", Math.abs(RANDOM.nextInt(100 * 10000 * 100) * 100));
+        event.put("status", STATUS[RANDOM.nextInt(STATUS.length)]);
+        event.put("expire_time", timeStr);
         event.put("trans_type", "SALE");
         event.put("pay_type", PAY_TYPE_ARR[RANDOM.nextInt(PAY_TYPE_ARR.length)]);
         event.put("area_code", "440305");
@@ -154,8 +176,8 @@ public class MakeDataUtils {
         event.put("ret_msg", "测试");
         event.put("auth_code", "132456");
         event.put("remark", "备注" + offset);
-        event.put("create_time", thisTime.format(DatePattern.NORM_DATETIME_FORMATTER));
-        event.put("update_time", thisTime.format(DatePattern.NORM_DATETIME_FORMATTER));
+        event.put("create_time", timeStr);
+        event.put("update_time", timeStr);
 
         eventJson.put("event", event);
         return eventJson;
@@ -177,7 +199,7 @@ public class MakeDataUtils {
         TIME_START = startTime;
         for (long i = 0; i < size; i++) {
             JSONObject event = makePayOrderEvent(i, interval);
-            KafkaUtils.sendMessage(producer, topic, event.getString("event_id"), JSON.toJSONString(event));
+            KafkaUtils.sendMessage(producer, topic, event.getString("event_id"), JSON.toJSONString(event), false);
             ThreadUtil.sleep(sleep);
         }
     }
@@ -248,11 +270,11 @@ public class MakeDataUtils {
         }
         for (OrcStruct struct : resultList) {
             List<String> names = struct.getSchema().getFieldNames();
-            JSONObject eventJson = new JSONObject();
-            eventJson.put("type", "02");
-            eventJson.put("subject", "test");
-            eventJson.put("timestamp", System.currentTimeMillis());
-            eventJson.put("event_id", UUID.randomUUID().toString(true));
+            JSONObject msgJson = new JSONObject();
+            msgJson.put("type", "02");
+            msgJson.put("subject", "test");
+            msgJson.put("timestamp", System.currentTimeMillis());
+            msgJson.put("event_id", UUID.randomUUID().toString(true));
             JSONObject event = new JSONObject();
             String time = TIME_START.plus(++count * interval, ChronoUnit.MILLIS).format(DatePattern.NORM_DATETIME_FORMATTER);
             for (int i = 0; i < names.size(); i++) {
@@ -266,8 +288,8 @@ public class MakeDataUtils {
                 }
                 event.put(name, value);
             }
-            eventJson.put("event", event);
-            KafkaUtils.sendMessage(producer, topic, eventJson.getString("event_id"), JSON.toJSONString(eventJson));
+            msgJson.put("event", event);
+            KafkaUtils.sendMessage(producer, topic, msgJson.getString("event_id"), JSON.toJSONString(msgJson));
             ThreadUtil.sleep(sleep);
         }
     }
