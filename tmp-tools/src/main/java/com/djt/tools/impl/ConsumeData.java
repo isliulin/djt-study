@@ -19,6 +19,7 @@ public class ConsumeData extends AbsTools {
     public void doExecute(String[] args) {
         String topic = PROPS.getProperty("kafka.topic.event", null);
         Properties properties = KafkaUtils.getConsumerProps(PROPS.toProperties());
-        KafkaUtils.startConsumer(topic, 1000, false, properties);
+        boolean consumerLog = PROPS.getBool("kafka.consumer.log.enable", false);
+        KafkaUtils.startConsumer(topic, 1000, consumerLog, properties);
     }
 }

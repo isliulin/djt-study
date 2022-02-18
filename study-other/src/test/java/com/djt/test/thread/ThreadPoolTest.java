@@ -135,5 +135,11 @@ public class ThreadPoolTest {
         }
     }
 
+    @Test
+    public void testScheduler() {
+        ScheduledExecutorService scheduler = ThreadUtil.createScheduledExecutor(1);
+        scheduler.scheduleWithFixedDelay(() ->
+                log.info("当前线程=>{}", Thread.currentThread().getName()), 10, 10, TimeUnit.SECONDS);
+    }
 
 }

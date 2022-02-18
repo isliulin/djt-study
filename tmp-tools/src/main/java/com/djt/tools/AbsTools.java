@@ -32,7 +32,7 @@ public abstract class AbsTools {
         try {
             doExecute(args);
         } catch (Exception e) {
-            LOG.error("程序运行出错：{}", e.getMessage());
+            LOG.error("程序运行出错!", e);
         } finally {
             long stop = System.currentTimeMillis();
             LOG.info("运行完成...耗时：{} s", (stop - start) / 1000);
