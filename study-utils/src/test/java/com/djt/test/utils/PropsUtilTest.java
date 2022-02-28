@@ -38,4 +38,12 @@ public class PropsUtilTest {
         setting.set("f", "6");
         System.out.println(setting.get("f"));
     }
+
+    @Test
+    public void testPropsUtil2() {
+        Props props = Props.getProp("log4j2.xml", StandardCharsets.UTF_8);
+        for (Map.Entry<Object, Object> entry : props.entrySet()) {
+            System.out.println(entry.getKey() + "=" + entry.getValue());
+        }
+    }
 }

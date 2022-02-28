@@ -2,9 +2,7 @@ package com.djt.test.utils;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.http.HttpUtil;
 import com.djt.utils.DjtConstant;
-import com.sun.deploy.net.HttpUtils;
 import org.junit.Test;
 
 import java.time.LocalDate;
