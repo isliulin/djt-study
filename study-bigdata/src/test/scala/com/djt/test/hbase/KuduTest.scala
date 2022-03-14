@@ -1,4 +1,4 @@
-package com.djt.test.other
+package com.djt.test.hbase
 
 import com.djt.test.dto.CaseClass.TermInfo
 import com.djt.test.spark.action.AbsActionTest

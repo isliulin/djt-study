@@ -4,30 +4,21 @@ import cn.binarywang.tools.generator.ChineseMobileNumberGenerator;
 import cn.binarywang.tools.generator.ChineseNameGenerator;
 import cn.binarywang.tools.generator.bank.BankCardNumberGenerator;
 import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.thread.ThreadUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.kafka.clients.producer.Producer;
-import org.apache.orc.OrcFile;
-import org.apache.orc.Reader;
-import org.apache.orc.RecordReader;
-import org.apache.orc.TypeDescription;
-import org.apache.orc.mapred.OrcMapredRecordReader;
-import org.apache.orc.mapred.OrcStruct;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 
@@ -207,92 +198,49 @@ public class MakeDataUtils {
     /**
      * 读取orc文件发送至kafka
      *
-     * @param topic      主题
-     * @param sleep      休眠时间
      * @param filePath   文件路径
-     * @param startTime  起始日期
-     * @param interval   时间间隔
+     * @param starDate   起始日期
+     * @param sleep      休眠时间
+     * @param topic      主题
      * @param properties 配置
+     * @param isPrint    是否打印数据
      */
-    public static void readOrcToKafka(String filePath, LocalDateTime startTime, long interval,
-                                      String topic, long sleep, Properties properties) {
-        TIME_START = startTime;
-        Path path = new Path(filePath);
-        Configuration conf = new Configuration();
-        Reader reader = null;
-        RecordReader rows = null;
+    public static void readFileToKafka(String filePath, LocalDate starDate, long sleep,
+                                       String topic, Properties properties, boolean isPrint) {
+        String dateStr = starDate.format(DatePattern.NORM_DATE_FORMATTER);
+        BufferedReader reader = null;
+        Producer<String, String> producer = null;
         try {
-            reader = OrcFile.createReader(path, OrcFile.readerOptions(conf));
-            rows = reader.rows();
-            TypeDescription schema = reader.getSchema();
-            List<TypeDescription> children = schema.getChildren();
-            int batchSize = 10000;
-            VectorizedRowBatch batch = schema.createRowBatch(batchSize);
-            int numberOfChildren = children.size();
-            List<OrcStruct> resultList = new ArrayList<>();
-            Producer<String, String> producer = KafkaUtils.createProducer(properties);
-            while (rows.nextBatch(batch)) {
-                for (int r = 0; r < batch.size; r++) {
-                    OrcStruct result = new OrcStruct(schema);
-                    for (int i = 0; i < numberOfChildren; ++i) {
-                        result.setFieldValue(i, OrcMapredRecordReader.nextValue(batch.cols[i], 1,
-                                children.get(i), result.getFieldValue(i)));
+            reader = FileUtil.getUtf8Reader(filePath);
+            producer = KafkaUtils.createProducer(properties);
+            String line;
+            while ((line = reader.readLine()) != null) {
+                JSONObject event = JSON.parseObject(line);
+                for (String key : event.keySet()) {
+                    Object value = event.get(key);
+                    value = value == null ? null : value.toString();
+                    if (key.endsWith("_time") && value != null) {
+                        value = dateStr + value.toString().substring(10);
                     }
-                    resultList.add(result);
+                    event.put(key, value);
                 }
-                sendToKafka(resultList, interval, topic, sleep, producer);
-                resultList.clear();
+                String uid = UUID.randomUUID().toString(true);
+                JSONObject msgJson = new JSONObject();
+                msgJson.put("type", "02");
+                msgJson.put("subject", "test");
+                msgJson.put("timestamp", System.currentTimeMillis());
+                msgJson.put("event_id", uid);
+                msgJson.put("event", event);
+                KafkaUtils.sendMessage(producer, topic, uid, msgJson.toJSONString(), isPrint);
+                ThreadUtil.sleep(sleep);
             }
+            producer.flush();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            IoUtil.close(rows);
             IoUtil.close(reader);
-        }
-        log.info("数据生产完成");
-    }
-
-    private static long count = 0L;
-
-    /**
-     * 发送orc数据到kafka
-     *
-     * @param resultList 结果列表
-     * @param interval   时间间隔
-     * @param topic      主题
-     * @param sleep      休眠时间
-     * @param producer   生产者
-     */
-    public static void sendToKafka(List<OrcStruct> resultList, long interval,
-                                   String topic, long sleep, Producer<String, String> producer) {
-        if (CollectionUtils.isEmpty(resultList)) {
-            return;
-        }
-        for (OrcStruct struct : resultList) {
-            List<String> names = struct.getSchema().getFieldNames();
-            JSONObject msgJson = new JSONObject();
-            msgJson.put("type", "02");
-            msgJson.put("subject", "test");
-            msgJson.put("timestamp", System.currentTimeMillis());
-            msgJson.put("event_id", UUID.randomUUID().toString(true));
-            JSONObject event = new JSONObject();
-            String time = TIME_START.plus(++count * interval, ChronoUnit.MILLIS).format(DatePattern.NORM_DATETIME_FORMATTER);
-            for (int i = 0; i < names.size(); i++) {
-                String name = names.get(i);
-                if ("term_sn".equalsIgnoreCase(name)) {
-                    name = "phy_no";
-                }
-                String value = String.valueOf(struct.getFieldValue(i));
-                if (name.endsWith("_time")) {
-                    value = time;
-                }
-                event.put(name, value);
-            }
-            msgJson.put("event", event);
-            KafkaUtils.sendMessage(producer, topic, msgJson.getString("event_id"), JSON.toJSONString(msgJson));
-            ThreadUtil.sleep(sleep);
+            IoUtil.close(producer);
         }
     }
-
 
 }

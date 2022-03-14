@@ -1,4 +1,4 @@
-package com.djt.test.other
+package com.djt.test.hbase
 
 import com.djt.test.spark.action.AbsActionTest
 import com.djt.utils.{DjtConstant, RandomUtils}
@@ -14,6 +14,8 @@ import org.apache.hadoop.hbase.protobuf.ProtobufUtil
 import org.apache.hadoop.hbase.util.{Base64, Bytes}
 import org.junit.{After, Before, Test}
 
+import java.util
+import java.util.{ArrayList, List}
 import scala.collection.mutable.ListBuffer
 
 /**
@@ -210,7 +212,6 @@ class HBaseTest extends AbsActionTest {
         table.close()
         testScan2()
     }
-
 
     def getFieldValue(table: Table, family: Array[Byte], row: Array[Byte], qualifier: Array[Byte]): String = {
         val get = new Get(row)

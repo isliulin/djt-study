@@ -79,12 +79,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.orc</groupId>
-            <artifactId>orc-mapreduce</artifactId>
-            <version>1.7.0</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-high-level-client</artifactId>
             <version>6.7.2</version>
@@ -100,6 +94,18 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
             <version>4.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-serde</artifactId>
+            <version>1.1.0-cdh5.11.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-exec</artifactId>
+            <version>1.1.0-cdh5.11.0</version>
         </dependency>
 
 

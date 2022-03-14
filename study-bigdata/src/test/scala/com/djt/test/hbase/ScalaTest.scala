@@ -1,4 +1,4 @@
-package com.djt.test.other
+package com.djt.test.hbase
 
 import org.apache.commons.lang3.StringUtils
 import org.junit.Test

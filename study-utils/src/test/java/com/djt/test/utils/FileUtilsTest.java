@@ -1,11 +1,16 @@
 package com.djt.test.utils;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.CharsetUtil;
+import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.HashMultimap;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -77,6 +82,30 @@ public class FileUtilsTest {
         String filePath = "C:\\Users\\duanjiatao\\Desktop\\cici.txt";
         String content = FileUtil.readString(filePath, StandardCharsets.UTF_8);
         System.out.println(content);
+    }
+
+    @Test
+    public void testFile3() {
+        String sourcePath = "C:\\Users\\duanjiatao\\Desktop\\tmp\\testData\\order_txt_20220303";
+        String destPath = "C:\\Users\\duanjiatao\\Desktop\\tmp\\testData\\order_txt_20220303_copy";
+        BufferedReader reader = null;
+        BufferedWriter writer = null;
+        try {
+            FileUtil.del(destPath);
+            reader = FileUtil.getUtf8Reader(sourcePath);
+            writer = FileUtil.getWriter(destPath, CharsetUtil.CHARSET_UTF_8, true);
+            long counter = 0;
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(StrUtil.format("第{}行=>{}", ++counter, line));
+                writer.write(line + "\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            IoUtil.close(reader);
+            IoUtil.close(writer);
+        }
     }
 
 }

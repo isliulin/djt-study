@@ -1,6 +1,9 @@
 package com.djt.test.utils;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.SetMultimap;
 import org.junit.Test;
 
 import java.util.HashSet;
@@ -83,5 +86,38 @@ public class CollectionTest {
             }
             System.out.println(item);
         });
+    }
+
+    @Test
+    public void test5() {
+        Set<String> set = new HashSet<>();
+        set.add("a");
+        set.add("b");
+        set.add("c");
+        set.add("d");
+        set.add("e");
+
+        set.forEach(item -> {
+            if ("c".equals(item)) {
+                return;
+            }
+            System.out.println(item);
+        });
+    }
+
+    @Test
+    public void test6() {
+        HashMultimap<String, Integer> multimap = HashMultimap.create();
+        multimap.put("A", 1);
+        multimap.put("A", 2);
+        multimap.put("A", 3);
+        multimap.put("B", 4);
+        multimap.put("B", 5);
+        multimap.put("B", 6);
+        System.out.println(multimap);
+        multimap.get("A").remove(1);
+        System.out.println(multimap);
+
+        SetMultimap<Object, Object> multimap2 = Multimaps.synchronizedSetMultimap(HashMultimap.create());
     }
 }

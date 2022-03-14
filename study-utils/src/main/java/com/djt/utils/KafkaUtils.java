@@ -99,8 +99,8 @@ public class KafkaUtils {
                     counter.add(rs);
                     if (isPrintData) {
                         for (ConsumerRecord<String, String> record : records) {
-                            log.info("消费数据=>topic:{} offset:{} key:{} value:{}",
-                                    record.topic(), record.offset(), record.key(), record.value());
+                            log.info("消费数据=>NO: {} topic:{} offset:{} key:{} value:{}",
+                                    counter.longValue(), record.topic(), record.offset(), record.key(), record.value());
                         }
                     }
                     consumer.commitSync();
@@ -108,25 +108,28 @@ public class KafkaUtils {
                 consumer.close();
             });
         }
-        //启动一个线程 每隔5秒打印消费总数
-        pool.execute(() -> {
-            long lastTime = System.currentTimeMillis();
-            long lastNums = 0;
-            while (isRunning) {
-                long now = System.currentTimeMillis();
-                long nums = counter.longValue();
-                if (now - lastTime >= 5000 && nums > lastNums) {
-                    lastNums = nums;
-                    lastTime = now;
-                    log.info("已消费数据量:{}", nums);
+
+        //如果不打印具体数据 则启动一个线程 每隔5秒打印消费总数
+        if (!isPrintData) {
+            pool.execute(() -> {
+                long lastTime = System.currentTimeMillis();
+                long lastNums = 0;
+                while (isRunning) {
+                    long now = System.currentTimeMillis();
+                    long nums = counter.longValue();
+                    if (now - lastTime >= 5000 && nums > lastNums) {
+                        lastNums = nums;
+                        lastTime = now;
+                        log.info("已消费数据量:{}", nums);
+                    }
+                    ThreadUtil.sleep(1000);
                 }
-                ThreadUtil.sleep(1000);
-            }
-        });
+            });
+        }
 
         pool.shutdown();
         while (!pool.isTerminated()) {
-            ThreadUtil.sleep(1);
+            ThreadUtil.sleep(1000);
         }
     }
 
