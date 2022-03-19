@@ -1,6 +1,8 @@
 package com.djt.test.hbase;
 
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.log4j.Log4j2;
@@ -72,6 +74,37 @@ public class HBaseJavaTest {
             table.put(put);
             queryRow(table, row);
             System.out.println(StrUtil.format("运行耗时: {} ms", System.currentTimeMillis() - start));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            IoUtil.close(table);
+            IoUtil.close(conn);
+        }
+    }
+
+    @Test
+    public void testPutTtl() {
+        String tableName = "TEST:T_TEST_DJT";
+        Table table = null;
+        try {
+            table = conn.getTable(TableName.valueOf(tableName));
+            byte[] cf = Bytes.toBytes("cf");
+            byte[] row = Bytes.toBytes(DigestUtils.md5Hex("123456789"));
+            byte[] field = Bytes.toBytes("f1");
+            Put put = new Put(row);
+
+            put.addColumn(cf, field, ObjectUtil.serialize("666"));
+            put.setTTL(10000L);
+            table.put(put);
+            while (true) {
+                Map<String, Object> resultMap = getResultMap(table, row);
+                System.out.println(resultMap);
+                if (MapUtil.isEmpty(resultMap)) {
+                    break;
+                }
+                ThreadUtil.sleep(1000);
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
