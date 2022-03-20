@@ -1,13 +1,12 @@
 package com.djt.test.utils;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.SetMultimap;
+import org.apache.commons.collections4.set.ListOrderedSet;
 import org.junit.Test;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -117,7 +116,58 @@ public class CollectionTest {
         System.out.println(multimap);
         multimap.get("A").remove(1);
         System.out.println(multimap);
-
-        SetMultimap<Object, Object> multimap2 = Multimaps.synchronizedSetMultimap(HashMultimap.create());
     }
+
+    @Test
+    public void test7() {
+        ListOrderedSet<Integer> list = new ListOrderedSet<>();
+        list.add(7);
+        list.add(5);
+        list.add(8);
+        list.add(3);
+        list.add(9);
+        list.add(2);
+        list.add(0);
+        list.add(4);
+        list.add(6);
+        list.add(1);
+        System.out.println(list);
+    }
+
+    /**
+     * 模拟大文件排序
+     */
+    @Test
+    public void test8() {
+        Random random = new Random();
+        List<List<Integer>> list = new ArrayList<>();
+        for (int i = 0; i < 30; i++) {
+            List<Integer> tmpList = new ArrayList<>();
+            tmpList.add(random.nextInt(100));
+            list.add(tmpList);
+        }
+        System.out.println(StrUtil.format("初始列表=>{}", list));
+
+        while (list.size() > 1) {
+            List<List<Integer>> tmpList = new ArrayList<>();
+            Iterator<List<Integer>> iter = list.iterator();
+            while (iter.hasNext()) {
+                List<Integer> listA = iter.next();
+                iter.remove();
+                List<Integer> listMerged = new ArrayList<>(listA);
+                if (iter.hasNext()) {
+                    List<Integer> listB = iter.next();
+                    listMerged.addAll(listB);
+                    iter.remove();
+                }
+                Collections.sort(listMerged);
+                tmpList.add(listMerged);
+                System.out.println(StrUtil.format("当前排序=>{}", listMerged));
+            }
+            list.addAll(tmpList);
+        }
+        System.out.println(list);
+    }
+
+
 }

@@ -338,4 +338,23 @@ public class StringTest {
         System.out.println("2021-11-11 " + StringUtils.substringAfter("2021-11-08 11:11:11", " "));
     }
 
+    @Test
+    public void testSb() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("666").append(",").append("777").append(",").append("888");
+        System.out.println(sb.toString());
+    }
+
+    @Test
+    public void testWarp() {
+        String str = "\"123\"";
+        System.out.println(StringUtils.unwrap(str, '"'));
+
+        str = "null";
+        System.out.println(StringUtils.unwrap(str, '"'));
+
+        str = "aabbaaccddaa";
+        System.out.println(StringUtils.unwrap(str, "aa"));
+    }
+
 }
