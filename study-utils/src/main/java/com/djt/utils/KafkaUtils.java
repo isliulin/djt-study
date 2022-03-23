@@ -13,6 +13,8 @@ import java.util.Collections;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Kafka工具类 用于造数据
@@ -76,14 +78,29 @@ public class KafkaUtils {
     public static volatile boolean isRunning = true;
 
     /**
-     * 启动消费者
+     * 启动消费者打印数据
      *
      * @param topic       主题
      * @param pollMs      拉取时间
      * @param isPrintData 是否打印数据
-     * @param properties  配置
+     * @param properties  kafka配置
      */
     public static void startConsumer(String topic, long pollMs, boolean isPrintData, Properties properties) {
+        startConsumer(topic, pollMs, isPrintData, properties, null, null);
+    }
+
+    /**
+     * 启动消费者打印数据
+     *
+     * @param topic       主题
+     * @param pollMs      拉取时间
+     * @param isPrintData 是否打印数据
+     * @param properties  kafka配置
+     * @param filterFunc  过滤器
+     * @param mapFunc     映射器
+     */
+    public static void startConsumer(String topic, long pollMs, boolean isPrintData, Properties properties,
+                                     Predicate<String> filterFunc, Function<String, String> mapFunc) {
         Producer<String, String> consumerTmp = KafkaUtils.createProducer(getConsumerProps(properties));
         int pts = consumerTmp.partitionsFor(topic).size();
         consumerTmp.close();
@@ -95,13 +112,20 @@ public class KafkaUtils {
                 consumer.subscribe(Collections.singletonList(topic));
                 while (isRunning) {
                     ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(pollMs));
-                    int rs = records.count();
-                    counter.add(rs);
-                    if (isPrintData) {
-                        for (ConsumerRecord<String, String> record : records) {
-                            log.info("消费数据=>NO: {} topic:{} offset:{} key:{} value:{}",
-                                    counter.longValue(), record.topic(), record.offset(), record.key(), record.value());
+                    for (ConsumerRecord<String, String> record : records) {
+                        counter.increment();
+                        if (!isPrintData) {
+                            continue;
                         }
+                        String msg = record.value();
+                        if (filterFunc != null && !filterFunc.test(msg)) {
+                            continue;
+                        }
+                        if (mapFunc != null) {
+                            msg = mapFunc.apply(msg);
+                        }
+                        log.info("消费数据=>topic:{} offset:{} key:{} value:{}",
+                                record.topic(), record.offset(), record.key(), msg);
                     }
                     consumer.commitSync();
                 }
