@@ -1,10 +1,7 @@
 package com.djt.tools.test;
 
 import com.djt.tools.AbsTools;
-import com.djt.tools.impl.ConsumeData;
-import com.djt.tools.impl.FileToKafka;
-import com.djt.tools.impl.HdfsTools;
-import com.djt.tools.impl.MakeData;
+import com.djt.tools.impl.*;
 import lombok.extern.log4j.Log4j2;
 import org.junit.After;
 import org.junit.Before;
@@ -25,6 +22,12 @@ public class ToolsTest {
 
     @After
     public void after() {
+    }
+
+    @Test
+    public void testHello() {
+        AbsTools tools = new Hello();
+        tools.execute(null);
     }
 
     @Test
@@ -50,6 +53,8 @@ public class ToolsTest {
 
     @Test
     public void testFileToKafka() {
+        PROPS.setProperty("kafka.producer.file.path",
+                "C:\\Users\\duanjiatao\\Desktop\\tmp\\testData\\order_txt_20220303_sorted");
         AbsTools tools = new FileToKafka();
         tools.execute(null);
     }

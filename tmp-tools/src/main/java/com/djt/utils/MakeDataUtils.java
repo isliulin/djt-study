@@ -15,10 +15,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.producer.Producer;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.Random;
 
@@ -213,8 +213,9 @@ public class MakeDataUtils {
         try {
             reader = FileUtil.getUtf8Reader(filePath);
             producer = KafkaUtils.createProducer(properties);
-            String line;
-            while ((line = reader.readLine()) != null) {
+            Iterator<String> iter = reader.lines().iterator();
+            while (iter.hasNext()) {
+                String line = iter.next();
                 JSONObject event = JSON.parseObject(line);
                 for (String key : event.keySet()) {
                     Object value = event.get(key);
@@ -235,7 +236,7 @@ public class MakeDataUtils {
                 ThreadUtil.sleep(sleep);
             }
             producer.flush();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             IoUtil.close(reader);

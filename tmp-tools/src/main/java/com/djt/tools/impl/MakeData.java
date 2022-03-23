@@ -5,7 +5,6 @@ import cn.hutool.core.date.LocalDateTimeUtil;
 import com.djt.tools.AbsTools;
 import com.djt.utils.KafkaUtils;
 import com.djt.utils.MakeDataUtils;
-import lombok.extern.log4j.Log4j2;
 
 import java.time.LocalDateTime;
 import java.util.Properties;
@@ -14,7 +13,6 @@ import java.util.Properties;
  * @author 　djt317@qq.com
  * @since 　 2021-06-25
  */
-@Log4j2
 public class MakeData extends AbsTools {
 
     @Override

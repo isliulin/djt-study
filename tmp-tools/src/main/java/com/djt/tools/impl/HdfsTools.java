@@ -2,6 +2,7 @@ package com.djt.tools.impl;
 
 import com.djt.tools.AbsTools;
 import com.djt.utils.DjtConstant;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -10,8 +11,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.net.URI;
@@ -26,9 +25,8 @@ import java.time.LocalDateTime;
  * @author 　djt317@qq.com
  * @since 　 2021-04-09
  */
+@Log4j2
 public class HdfsTools extends AbsTools {
-
-    private static final Logger log = LogManager.getLogger(HdfsTools.class);
 
     /**
      * 扫描指定路径下的文件 根据条件过滤

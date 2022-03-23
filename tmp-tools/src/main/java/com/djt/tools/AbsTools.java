@@ -1,8 +1,7 @@
 package com.djt.tools;
 
 import cn.hutool.setting.dialect.Props;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import java.nio.charset.StandardCharsets;
 
@@ -12,9 +11,8 @@ import java.nio.charset.StandardCharsets;
  * @author 　djt317@qq.com
  * @since 　 2021-04-09
  */
+@Log4j2
 public abstract class AbsTools {
-
-    private static final Logger LOG = LogManager.getLogger(AbsTools.class);
 
     /**
      * 配置文件路径
@@ -27,18 +25,24 @@ public abstract class AbsTools {
     public static final Props PROPS = Props.getProp(CONFIG_PATH, StandardCharsets.UTF_8);
 
     public void execute(String[] args) {
-        LOG.info("程序开始运行...");
+        log.info("程序开始运行,启动类为:{}", PROPS.getStr("execute.class"));
         long start = System.currentTimeMillis();
         try {
             doExecute(args);
         } catch (Exception e) {
-            LOG.error("程序运行出错!", e);
+            log.error("程序运行出错!", e);
         } finally {
             long stop = System.currentTimeMillis();
-            LOG.info("运行完成...耗时：{} s", (stop - start) / 1000);
+            log.info("运行完成...耗时：{} s", (stop - start) / 1000);
         }
     }
 
+    /**
+     * 任务主体 由子类实现
+     *
+     * @param args 参数类表
+     * @throws Exception e
+     */
     abstract public void doExecute(String[] args) throws Exception;
 
 }

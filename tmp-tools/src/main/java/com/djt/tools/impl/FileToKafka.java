@@ -16,7 +16,7 @@ public class FileToKafka extends AbsTools {
 
     @Override
     public void doExecute(String[] args) {
-        String file = "C:\\Users\\duanjiatao\\Desktop\\tmp\\testData\\order_txt_20220303";
+        String filePath = PROPS.getStr("kafka.producer.file.path");
         String topic = PROPS.getProperty("kafka.topic.event", null);
         long sleepMs = PROPS.getLong("kafka.send.sleep");
         boolean producerLog = PROPS.getBool("kafka.producer.log.enable", false);
@@ -26,7 +26,7 @@ public class FileToKafka extends AbsTools {
         LocalDate startDate = startTime.toLocalDate();
         for (int i = 0; i < Integer.MAX_VALUE; i++) {
             startDate = startDate.plusDays(i);
-            MakeDataUtils.readFileToKafka(file, startDate, sleepMs, topic, PROPS, producerLog);
+            MakeDataUtils.readFileToKafka(filePath, startDate, sleepMs, topic, PROPS, producerLog);
         }
     }
 
