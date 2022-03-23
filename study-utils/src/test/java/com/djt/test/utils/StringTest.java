@@ -357,4 +357,15 @@ public class StringTest {
         System.out.println(StringUtils.unwrap(str, "aa"));
     }
 
+    @Test
+    public void testNull() {
+        String str = null;
+        System.out.println(str + "\n");
+
+        str = "666\n";
+        System.out.println(StringUtils.endsWith(str, "\n"));
+
+        System.out.println(System.lineSeparator());
+    }
+
 }

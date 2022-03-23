@@ -4,6 +4,7 @@ import cn.hutool.core.comparator.CompareUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.UUID;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -24,10 +25,9 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.function.Function;
 
 /**
  * 文件工具类
@@ -39,42 +39,23 @@ import java.util.List;
 public class FileUtils {
 
     /**
-     * 默认批次大小
-     */
-    public static final int DEFAULT_BATCH_SIZE = 10000;
-
-    /**
      * ORC文件转换为txt文件
      *
      * @param sourceOrcPath 源文件
      * @param destTxtPath   目标文件
-     * @param isOverwrite   是否覆盖写
-     */
-    public static void parseOrcToTxt(String sourceOrcPath, String destTxtPath, boolean isOverwrite) {
-        parseOrcToTxt(sourceOrcPath, destTxtPath, isOverwrite, DEFAULT_BATCH_SIZE);
-    }
-
-    /**
-     * ORC文件转换为txt文件
-     *
-     * @param sourceOrcPath 源文件
-     * @param destTxtPath   目标文件
-     * @param isOverwrite   是否覆盖写
      * @param batchSize     批次大小
      */
-    public static void parseOrcToTxt(String sourceOrcPath, String destTxtPath, boolean isOverwrite, int batchSize) {
+    public static void parseOrcToTxt(String sourceOrcPath, String destTxtPath, int batchSize) {
         Validate.isTrue(FileUtil.isFile(sourceOrcPath), "文件不存在: {}", sourceOrcPath);
         System.out.println("文件转换开始");
         long start = System.currentTimeMillis();
         RecordReader recordReader = null;
         BufferedWriter txtWriter = null;
+        String tmpFile = destTxtPath + "_" + UUID.randomUUID();
         try {
-            if (isOverwrite) {
-                FileUtil.del(destTxtPath);
-            }
             Path sourcePath = new Path(sourceOrcPath);
             Reader orcReader = OrcFile.createReader(sourcePath, OrcFile.readerOptions(new Configuration()));
-            txtWriter = FileUtil.getWriter(destTxtPath, CharsetUtil.CHARSET_UTF_8, true);
+            txtWriter = FileUtil.getWriter(tmpFile, CharsetUtil.CHARSET_UTF_8, true);
             TypeDescription schema = orcReader.getSchema();
             List<String> fieldNames = schema.getFieldNames();
             VectorizedRowBatch batch = schema.createRowBatch(batchSize);
@@ -92,6 +73,8 @@ public class FileUtils {
                     txtWriter.write(lineJson.toString() + "\n");
                 }
             }
+            IoUtil.close(txtWriter);
+            FileUtil.move(FileUtil.file(tmpFile), FileUtil.file(destTxtPath), true);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -103,18 +86,58 @@ public class FileUtils {
                 }
             }
             IOUtils.closeQuietly(txtWriter);
+            FileUtil.del(tmpFile);
         }
         long stop = System.currentTimeMillis();
         System.out.println(StrUtil.format("文件转换完成,耗时: {} s", (stop - start) / 1000d));
     }
 
     /**
-     * 打印文件前N行
+     * 复制文件前N行
+     *
+     * @param srcPath  源文件
+     * @param destPath 目标文件
+     * @param lines    行数
+     */
+    public static void copyLines(String srcPath, String destPath, long lines) {
+        Validate.isTrue(FileUtil.isFile(srcPath), "文件不存在: {}", srcPath);
+        System.out.println("文件复制开始");
+        long start = System.currentTimeMillis();
+        BufferedReader reader = null;
+        BufferedWriter writer = null;
+        String tmpFile = destPath + "_" + UUID.randomUUID();
+        try {
+            reader = FileUtil.getUtf8Reader(srcPath);
+            writer = FileUtil.getWriter(tmpFile, StandardCharsets.UTF_8, true);
+            long count = 0;
+            Iterator<String> iter = reader.lines().iterator();
+            while (iter.hasNext()) {
+                writer.write(iter.next() + "\n");
+                if (++count >= lines) {
+                    break;
+                }
+            }
+            IoUtil.close(writer);
+            FileUtil.move(FileUtil.file(tmpFile), FileUtil.file(destPath), true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            IoUtil.close(reader);
+            IoUtil.close(writer);
+            FileUtil.del(tmpFile);
+        }
+        long stop = System.currentTimeMillis();
+        System.out.println(StrUtil.format("文件复制结束,耗时: {} s", (stop - start) / 1000d));
+    }
+
+    /**
+     * 按照自定义格式打印文件前N行
      *
      * @param filePath 文件路径
      * @param lines    打印行数
+     * @param mapFunc  数据转换函数
      */
-    public static void printFileTopLines(String filePath, long lines) {
+    public static void printFileTopLines(String filePath, long lines, Function<String, String> mapFunc) {
         Validate.isTrue(FileUtil.isFile(filePath), "文件不存在: {}", filePath);
         BufferedReader reader = null;
         Validate.isTrue(lines > 0, "行数必须大于0");
@@ -125,6 +148,9 @@ public class FileUtils {
             while ((line = reader.readLine()) != null) {
                 if (++lineCount > lines) {
                     return;
+                }
+                if (mapFunc != null) {
+                    line = mapFunc.apply(line);
                 }
                 System.out.println(StrUtil.format("第{}行=>{}", lineCount, line));
             }
@@ -152,10 +178,8 @@ public class FileUtils {
         long stop;
         Validate.isTrue(FileUtil.isFile(srcPath), "源文件不存在！");
         BufferedReader reader = null;
-        String tmpDir = null;
+        String tmpDir = FileUtil.getParent(srcPath, 1) + "\\.tmp_" + UUID.randomUUID();
         try {
-            FileUtil.del(destPath);
-            tmpDir = FileUtil.getParent(srcPath, 1) + "\\.tmp_" + UUID.randomUUID();
             FileUtil.mkdir(tmpDir);
             reader = FileUtil.getUtf8Reader(srcPath);
             List<String> sortFileList = new ArrayList<>();
@@ -168,7 +192,7 @@ public class FileUtils {
                 tmpLineList.add(lineIter.next());
                 if ((++batchCount) % batchSize == 0 || !lineIter.hasNext()) {
                     tmpLineList.sort(comparator);
-                    String tmpFile = tmpDir + "\\tmp_" + UUID.randomUUID();
+                    String tmpFile = tmpDir + "\\" + UUID.randomUUID();
                     FileUtil.writeLines(tmpLineList, tmpFile, StandardCharsets.UTF_8);
                     sortFileList.add(tmpFile);
                     tmpLineList.clear();
@@ -176,25 +200,41 @@ public class FileUtils {
             }
             stop = System.currentTimeMillis();
             System.out.println(StrUtil.format("文件拆分结束,耗时: {} s", (stop - start) / 1000d));
-            //合并排序
+
+            int threadNum = (int) Math.ceil(sortFileList.size() / 2d);
+            ExecutorService executor = ThreadUtil.newExecutor(threadNum, threadNum, sortFileList.size());
+            //并行归并排序
             while (sortFileList.size() > 1) {
-                List<String> tmpFileList = new ArrayList<>();
+                List<String> tmpFileList = Collections.synchronizedList(new ArrayList<>());
+                List<Future<?>> futureList = new ArrayList<>();
                 Iterator<String> fileIter = sortFileList.iterator();
+                //文件两两归并排序
                 while (fileIter.hasNext()) {
                     String fileA = fileIter.next();
-                    fileIter.remove();
                     if (fileIter.hasNext()) {
+                        fileIter.remove();
                         String fileB = fileIter.next();
                         fileIter.remove();
-                        String tmpFile = tmpDir + "\\" + UUID.randomUUID();
-                        mergeSort(fileA, fileB, tmpFile, comparator, isAsc);
-                        FileUtil.del(fileA);
-                        FileUtil.del(fileB);
-                        tmpFileList.add(tmpFile);
+                        Future<?> future = executor.submit(() -> {
+                            String tmpFile = tmpDir + "\\" + UUID.randomUUID();
+                            mergeSort(fileA, fileB, tmpFile, comparator, isAsc);
+                            FileUtil.del(fileA);
+                            FileUtil.del(fileB);
+                            tmpFileList.add(tmpFile);
+                        });
+                        futureList.add(future);
+                    }
+                }
+                for (Future<?> future : futureList) {
+                    try {
+                        future.get(Long.MAX_VALUE, TimeUnit.SECONDS);
+                    } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                        throw new RuntimeException("文件合并失败！", e);
                     }
                 }
                 sortFileList.addAll(tmpFileList);
             }
+            executor.shutdown();
             //最终文件改名
             FileUtil.move(FileUtil.file(sortFileList.get(0)), FileUtil.file(destPath), true);
         } catch (Exception e) {
@@ -237,44 +277,42 @@ public class FileUtils {
             while (iterA.hasNext() && iterB.hasNext()) {
                 if (lineA == null) {
                     lineA = iterA.next();
-                    continue;
                 }
                 if (lineB == null) {
                     lineB = iterB.next();
-                    continue;
                 }
                 int cp = CompareUtil.compare(lineA, lineB, comparator);
-                lineA += "\n";
-                lineB += "\n";
                 if (cp > 0) {
                     if (isAsc) {
-                        writer.write(lineB);
-                        lineB = iterB.next();
+                        writeLine(writer, lineB, true);
+                        lineB = null;
                     } else {
-                        writer.write(lineA);
-                        lineA = iterA.next();
+                        writeLine(writer, lineA, true);
+                        lineA = null;
                     }
                 } else if (cp < 0) {
                     if (isAsc) {
-                        writer.write(lineA);
-                        lineA = iterA.next();
+                        writeLine(writer, lineA, true);
+                        lineA = null;
                     } else {
-                        writer.write(lineB);
-                        lineB = iterB.next();
+                        writeLine(writer, lineB, true);
+                        lineB = null;
                     }
                 } else {
-                    writer.write(lineA);
-                    writer.write(lineB);
-                    lineA = iterA.next();
-                    lineB = iterB.next();
+                    writeLine(writer, lineA, true);
+                    writeLine(writer, lineB, true);
+                    lineA = null;
+                    lineB = null;
                 }
             }
             //剩余数据合并
+            writeLine(writer, lineA, true);
+            writeLine(writer, lineB, true);
             while (iterA.hasNext()) {
-                writer.write(iterA.next() + "\n");
+                writeLine(writer, iterA.next(), true);
             }
             while (iterB.hasNext()) {
-                writer.write(iterB.next() + "\n");
+                writeLine(writer, iterB.next(), true);
             }
             IoUtil.close(writer);
             //临时文件改名
@@ -285,9 +323,32 @@ public class FileUtils {
             IoUtil.close(readerA);
             IoUtil.close(readerB);
             IoUtil.close(writer);
+            FileUtil.del(tmpFile);
         }
         long stop = System.currentTimeMillis();
         System.out.println(StrUtil.format("文件合并完成,耗时: {} s", (stop - start) / 1000d));
+    }
+
+    /**
+     * 写一行数据
+     *
+     * @param writer      writer
+     * @param line        一行数据
+     * @param ignoreBlank 是否忽略空行
+     */
+    public static void writeLine(BufferedWriter writer, String line, boolean ignoreBlank) {
+        Validate.notNull(writer);
+        String writeLine = line;
+        if (!StringUtils.endsWith(line, System.lineSeparator())) {
+            writeLine += System.lineSeparator();
+        }
+        if (!ignoreBlank || !StringUtils.isBlank(line)) {
+            try {
+                writer.write(writeLine);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

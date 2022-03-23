@@ -1,12 +1,16 @@
-package com.djt.test.thread;
+package com.djt.test.utils;
 
+import cn.hutool.core.math.MathUtil;
 import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -51,11 +55,11 @@ public class ThreadPoolTest {
                 }
                 //System.out.println(100 / 0);
             });
-            //try {
-            //    future.get();
-            //} catch (InterruptedException | ExecutionException e) {
-            //    log.error("出错：{}", e.getMessage());
-            //}
+            try {
+                future.get();
+            } catch (InterruptedException | ExecutionException e) {
+                log.error("出错：{}", e.getMessage());
+            }
         }
         executor.shutdown();
         while (!executor.isTerminated()) {
@@ -140,6 +144,63 @@ public class ThreadPoolTest {
         ScheduledExecutorService scheduler = ThreadUtil.createScheduledExecutor(1);
         scheduler.scheduleWithFixedDelay(() ->
                 log.info("当前线程=>{}", Thread.currentThread().getName()), 10, 10, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void testThreadExecute() {
+        Random random = new Random();
+        ExecutorService pool = ThreadUtil.newExecutor(10, 10, 100);
+        for (int i = 0; i < 10; i++) {
+            int id = i;
+            pool.execute(() -> {
+                Thread.currentThread().setName("线程" + id);
+                String name = Thread.currentThread().getName();
+                System.out.println(StrUtil.format("{}开始执行", name));
+                ThreadUtil.sleep(random.nextInt(10) * 1000);
+                System.out.println(StrUtil.format("{}执行完成", name));
+            });
+        }
+        pool.shutdown();
+        try {
+            if (!pool.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS)) {
+                throw new RuntimeException("超时等待");
+            }
+        } catch (InterruptedException | RuntimeException e) {
+            e.printStackTrace();
+        }
+        System.out.println("所有线程执行完成");
+    }
+
+    @Test
+    public void testThreadSubmit() {
+        System.out.println(Math.ceil(5/2d));
+        Random random = new Random();
+        ExecutorService pool = ThreadUtil.newExecutor(10, 10, 100);
+        List<Future<?>> futureList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            int id = i;
+            Future<?> future = pool.submit(() -> {
+                Thread.currentThread().setName("线程" + id);
+                String name = Thread.currentThread().getName();
+                int randomInt = random.nextInt(10);
+                System.out.println(StrUtil.format("{}开始执, 休眠{}s", name, randomInt));
+                ThreadUtil.sleep(randomInt * 1000);
+                if (randomInt % 2 == 0) {
+                    throw new RuntimeException(name + " 发生异常");
+                }
+                System.out.println(StrUtil.format("{}执行完成", name));
+            });
+            futureList.add(future);
+        }
+        pool.shutdown();
+        for (Future<?> future : futureList) {
+            try {
+                future.get(600, TimeUnit.SECONDS);
+            } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("所有线程执行完成");
     }
 
 }

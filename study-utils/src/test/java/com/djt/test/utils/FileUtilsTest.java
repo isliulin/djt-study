@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * @author 　djt317@qq.com
@@ -154,40 +155,6 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testParseOrcToTxt() {
-        String orc = "E:\\tmp\\orc_001";
-        String text = "E:\\tmp\\txt_001";
-        com.djt.utils.FileUtils.parseOrcToTxt(orc, text, true);
-        com.djt.utils.FileUtils.printFileTopLines(text, 10);
-    }
-
-    @Test
-    public void testCopyLines() {
-        long lines = 10000;
-        String filePath = "E:\\tmp\\order_txt_20220303";
-        String destPath = "E:\\tmp\\test_txt";
-        BufferedReader reader = null;
-        BufferedWriter writer = null;
-        long count = 0;
-        try {
-            reader = FileUtil.getUtf8Reader(filePath);
-            writer = FileUtil.getWriter(destPath, StandardCharsets.UTF_8, true);
-            Iterator<String> iter = reader.lines().iterator();
-            while (iter.hasNext()) {
-                writer.write(iter.next() + "\n");
-                if (++count >= lines) {
-                    break;
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            IoUtil.close(reader);
-            IoUtil.close(writer);
-        }
-    }
-
-    @Test
     public void testReader() {
         String orc = "E:\\tmp\\txt_001";
         BufferedReader reader = FileUtil.getUtf8Reader(orc);
@@ -218,23 +185,75 @@ public class FileUtilsTest {
     }
 
     @Test
+    public void testMove() {
+        String src = "C:\\Users\\duanjiatao\\Desktop\\tmp\\testData\\666";
+        String dest = "C:\\Users\\duanjiatao\\Desktop\\tmp\\testData\\777";
+        FileUtil.move(FileUtil.file(src), FileUtil.file(dest), true);
+    }
+
+    public Function<String, String> mapFunc = s -> {
+        if (StringUtils.isBlank(s)) {
+            return null;
+        }
+        return JSON.parseObject(s).getString("trans_time");
+    };
+
+    public Comparator<String> comparator = (o1, o2) -> {
+        if (StringUtils.isBlank(o1) && StringUtils.isBlank(o2)) {
+            return 0;
+        } else if (StringUtils.isBlank(o1)) {
+            return -1;
+        } else if (StringUtils.isBlank(o2)) {
+            return 1;
+        }
+        String time1 = JSON.parseObject(o1).getString("trans_time");
+        String time2 = JSON.parseObject(o2).getString("trans_time");
+        return StringUtils.compare(time1, time2);
+    };
+
+    @Test
+    public void testParseOrcToTxt() {
+        String orc = "C:\\Users\\duanjiatao\\Desktop\\tmp\\testData\\order_orc_20220303";
+        String text = "C:\\Users\\duanjiatao\\Desktop\\tmp\\testData\\order_txt_20220303";
+        com.djt.utils.FileUtils.parseOrcToTxt(orc, text, 100000);
+        com.djt.utils.FileUtils.printFileTopLines(text, 10, null);
+    }
+
+    @Test
+    public void testCopyLines() {
+        String filePath = "C:\\Users\\duanjiatao\\Desktop\\tmp\\testData\\order_txt_20220303";
+        String destPath = "C:\\Users\\duanjiatao\\Desktop\\tmp\\testData\\test_txt";
+        com.djt.utils.FileUtils.copyLines(filePath, destPath, 10000);
+        com.djt.utils.FileUtils.printFileTopLines(destPath, 10, mapFunc);
+    }
+
+    @Test
     public void testSortFileByLine() {
-        String srcPath = "E:\\tmp\\order_txt_20220303";
-        String descPath = "E:\\tmp\\order_txt_20220303_sorted";
-        Comparator<String> comparator = (o1, o2) -> {
-            if (StringUtils.isBlank(o1) && StringUtils.isBlank(o2)) {
-                return 0;
-            } else if (StringUtils.isBlank(o1)) {
-                return -1;
-            } else if (StringUtils.isBlank(o2)) {
-                return 1;
-            }
-            String time1 = JSON.parseObject(o1).getString("trans_time");
-            String time2 = JSON.parseObject(o2).getString("trans_time");
-            return StringUtils.compare(time1, time2);
-        };
-        com.djt.utils.FileUtils.sortFileByLine(srcPath, descPath, 10000, comparator, true);
-        com.djt.utils.FileUtils.printFileTopLines(descPath, 100);
+        String srcPath = "C:\\Users\\duanjiatao\\Desktop\\tmp\\testData\\order_txt_20220303";
+        String descPath = "C:\\Users\\duanjiatao\\Desktop\\tmp\\testData\\order_txt_20220303_sorted";
+        com.djt.utils.FileUtils.sortFileByLine(srcPath, descPath, 100000, comparator, true);
+    }
+
+    @Test
+    public void testPrintFileTopLines() {
+        String path = "C:\\Users\\duanjiatao\\Desktop\\tmp\\testData\\order_txt_20220303_sorted";
+        com.djt.utils.FileUtils.printFileTopLines(path, 600 * 10000, mapFunc);
+    }
+
+    @Test
+    public void testCopySortPrint() {
+        testCopyLines();
+        testSortFileByLine();
+        testPrintFileTopLines();
+    }
+
+    @Test
+    public void testMergeSort() {
+        String file1 = "C:\\Users\\duanjiatao\\Desktop\\tmp\\testData\\test_sort_1";
+        String file2 = "C:\\Users\\duanjiatao\\Desktop\\tmp\\testData\\test_sort_2";
+        String dest = "C:\\Users\\duanjiatao\\Desktop\\tmp\\testData\\test_sort_result";
+        com.djt.utils.FileUtils.mergeSort(file1, file2, dest, comparator, true);
+        com.djt.utils.FileUtils.printFileTopLines(dest, 500 * 10000, mapFunc);
     }
 
 }
