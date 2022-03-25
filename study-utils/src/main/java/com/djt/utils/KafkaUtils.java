@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -75,7 +76,10 @@ public class KafkaUtils {
         }
     }
 
-    public static volatile boolean isRunning = true;
+    /**
+     * 消费者运行标志
+     */
+    public static volatile AtomicBoolean isRunning = new AtomicBoolean(true);
 
     /**
      * 启动消费者打印数据
@@ -110,7 +114,7 @@ public class KafkaUtils {
             pool.execute(() -> {
                 Consumer<String, String> consumer = KafkaUtils.createConsumer(getConsumerProps(properties));
                 consumer.subscribe(Collections.singletonList(topic));
-                while (isRunning) {
+                while (isRunning.get()) {
                     ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(pollMs));
                     for (ConsumerRecord<String, String> record : records) {
                         counter.increment();
@@ -138,13 +142,18 @@ public class KafkaUtils {
             pool.execute(() -> {
                 long lastTime = System.currentTimeMillis();
                 long lastNums = 0;
-                while (isRunning) {
+                int noDateCount = 0;
+                while (isRunning.get()) {
                     long now = System.currentTimeMillis();
                     long nums = counter.longValue();
                     if (now - lastTime >= 5000 && nums > lastNums) {
                         lastNums = nums;
                         lastTime = now;
+                        noDateCount = 0;
                         log.info("已消费数据量:{}", nums);
+                    } else if (nums <= lastNums && ++noDateCount >= 10) {
+                        log.info("数据已全部消费.");
+                        isRunning.set(false);
                     }
                     ThreadUtil.sleep(1000);
                 }
