@@ -237,7 +237,7 @@ public class FileUtilsTest {
     @Test
     public void testPrintFileTopLines() {
         String path = "C:\\Users\\duanjiatao\\Desktop\\tmp\\testData\\order_txt_20220303_sorted";
-        com.djt.utils.FileUtils.printFileTopLines(path, 600 * 10000, mapFunc);
+        com.djt.utils.FileUtils.printFileTopLines(path, 100, mapFunc);
     }
 
     @Test

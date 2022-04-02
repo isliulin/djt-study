@@ -1,5 +1,6 @@
 package com.djt.test.utils;
 
+import cn.hutool.Hutool;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.UUID;
@@ -25,6 +26,11 @@ import java.util.List;
  * @since 　 2021-02-02
  */
 public class HutoolTest {
+
+    @Test
+    public void test() {
+        Hutool.printAllUtils();
+    }
 
     @Test
     public void testStrUtil() {

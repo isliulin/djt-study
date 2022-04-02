@@ -3,6 +3,9 @@ package com.djt.test.hbase
 import org.apache.commons.lang3.StringUtils
 import org.junit.Test
 
+import scala.collection.mutable
+
+
 /**
  * @author 　djt317@qq.com
  * @since 　 2021-02-24
@@ -40,6 +43,29 @@ class ScalaTest {
         println(map.getOrElse("c", null))
         println(map.getOrElse("b", null))
         println(map.get("d").get)
+    }
+
+    @Test
+    def testMap2(): Unit = {
+        val map = new mutable.HashMap[String, String]()
+        map.put("A", "1")
+        map.put("B", "2")
+        map.put("C", "3")
+        println(map)
+        map.foreach(kv => {
+            map.remove(kv._1)
+        })
+        println(map)
+    }
+
+    @Test
+    def testMap3(): Unit = {
+        val map = new mutable.HashMap[String, String]()
+        map.put("A", "1")
+        map.put("B", "2")
+        map.put("C", "3")
+        println(map)
+        println(map.maxBy(kv => kv._2.toLong)._2)
     }
 
 

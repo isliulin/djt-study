@@ -44,8 +44,8 @@ public class ToolsTest {
 
     @Test
     public void testConsumeData() {
-        PROPS.setProperty("kafka.topic.event", "RISK_ANALYSIS_EVENT");
-        PROPS.setProperty("group.id", "GROUP_RISK_ANALYSIS_STAT");
+        //PROPS.setProperty("kafka.topic.event", "RISK_ANALYSIS_EVENT");
+        //PROPS.setProperty("group.id", "GROUP_RISK_ANALYSIS_STAT");
         PROPS.setProperty("kafka.consumer.log.enable", false);
         AbsTools tools = new ConsumeData();
         tools.execute(null);

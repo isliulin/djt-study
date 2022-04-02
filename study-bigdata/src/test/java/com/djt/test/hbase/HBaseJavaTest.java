@@ -32,6 +32,9 @@ public class HBaseJavaTest {
     public void before() {
         hbaseConf.set(HConstants.ZOOKEEPER_QUORUM, "cdh-dev01.jlpay.io,cdh-dev02.jlpay.io,cdh-dev03.jlpay.io");
         hbaseConf.set(HConstants.CLIENT_PORT_STR, "2181");
+        hbaseConf.setInt(HConstants.HBASE_RPC_TIMEOUT_KEY, 60000);
+        hbaseConf.setInt(HConstants.HBASE_CLIENT_RETRIES_NUMBER, 1);
+        hbaseConf.setInt(HConstants.HBASE_CLIENT_OPERATION_TIMEOUT, 10000);
         try {
             conn = ConnectionFactory.createConnection(hbaseConf);
         } catch (IOException e) {
@@ -89,12 +92,14 @@ public class HBaseJavaTest {
         try {
             table = conn.getTable(TableName.valueOf(tableName));
             byte[] cf = Bytes.toBytes("cf");
-            byte[] row = Bytes.toBytes(DigestUtils.md5Hex("123456789"));
-            byte[] field = Bytes.toBytes("f1");
+            byte[] row = Bytes.toBytes(DigestUtils.md5Hex("1234567890"));
+            byte[] field1 = Bytes.toBytes("f1");
+            byte[] field2 = Bytes.toBytes("f2");
             Put put = new Put(row);
 
-            put.addColumn(cf, field, ObjectUtil.serialize("666"));
-            put.setTTL(10000L);
+            put.addColumn(cf, field1, ObjectUtil.serialize("666"));
+            put.addColumn(cf, field2, ObjectUtil.serialize("777"));
+            put.setTTL(5000L);
             table.put(put);
             while (true) {
                 Map<String, Object> resultMap = getResultMap(table, row);
@@ -104,8 +109,24 @@ public class HBaseJavaTest {
                 }
                 ThreadUtil.sleep(1000);
             }
-
         } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            IoUtil.close(table);
+            IoUtil.close(conn);
+        }
+    }
+
+    @Test
+    public void testGet() {
+        String tableName = "TEST:T_TEST_DJT";
+        Table table = null;
+        try {
+            table = conn.getTable(TableName.valueOf(tableName));
+            byte[] row = Bytes.toBytes(DigestUtils.md5Hex("1234567890"));
+            Map<String, Object> resultMap = getResultMap(table, row);
+            System.out.println(resultMap);
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             IoUtil.close(table);

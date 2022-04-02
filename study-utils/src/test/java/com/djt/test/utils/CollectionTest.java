@@ -169,5 +169,23 @@ public class CollectionTest {
         System.out.println(list);
     }
 
+    @Test
+    public void test9() {
+        for (int i = 0; i < 10; i++) {
+            try {
+                testExp(i);
+            } catch (Exception e) {
+                System.err.println(i + ":" + e.getMessage());
+                continue;
+            }
+            System.out.println(i);
+        }
+    }
+
+    private void testExp(int i) {
+        if (i % 2 == 0) {
+            throw new IllegalArgumentException("异常");
+        }
+    }
 
 }

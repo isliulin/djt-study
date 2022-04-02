@@ -1,6 +1,5 @@
 package com.djt.test.utils;
 
-import cn.hutool.core.math.MathUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +13,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -173,7 +173,7 @@ public class ThreadPoolTest {
 
     @Test
     public void testThreadSubmit() {
-        System.out.println(Math.ceil(5/2d));
+        System.out.println(Math.ceil(5 / 2d));
         Random random = new Random();
         ExecutorService pool = ThreadUtil.newExecutor(10, 10, 100);
         List<Future<?>> futureList = new ArrayList<>();
@@ -201,6 +201,29 @@ public class ThreadPoolTest {
             }
         }
         System.out.println("所有线程执行完成");
+    }
+
+    @Test
+    public void testThreadPool2() throws InterruptedException {
+        long begin = System.currentTimeMillis();
+        int pooSize = 1000;
+        LongAdder count = new LongAdder();
+        ExecutorService executor = ThreadUtil.newExecutor(pooSize, pooSize, 100000);
+        for (int i = 0; i < 100000; i++) {
+            int id = i;
+            executor.execute(() -> {
+                long start = System.currentTimeMillis();
+                for (int j = 0; j < 10000; j++) {
+                    count.increment();
+                }
+                long stop = System.currentTimeMillis();
+                System.out.println(StrUtil.format("线程{}执行完成,耗时:{}", id, (stop - start)));
+            });
+        }
+        executor.shutdown();
+        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+        long end = System.currentTimeMillis();
+        System.out.println(StrUtil.format("所有线程执行完成,结果={},总耗时:{}", count, (end - begin)));
     }
 
 }
