@@ -20,7 +20,7 @@ public class OtherTest {
     }
 
     /**
-     * 计算斐波那契数列
+     * 递归计算斐波那契数列
      *
      * @param index 位数
      * @return long

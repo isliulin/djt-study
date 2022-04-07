@@ -366,6 +366,36 @@ public class StringTest {
         System.out.println(StringUtils.endsWith(str, "\n"));
 
         System.out.println(System.lineSeparator());
+
+    }
+
+    @Test
+    public void testJson4() {
+        Set<String> set = new HashSet<>();
+        set.add("A");
+        set.add("B");
+        set.add("C");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("key1", set);
+        System.out.println(jsonObject);
+    }
+
+    @Test
+    public void testRegionCodeByLevel() {
+        System.out.println(getRegionCodeByLevel("123456", 1));
+        System.out.println(getRegionCodeByLevel("123456", 2));
+        System.out.println(getRegionCodeByLevel("123456", 3));
+        System.out.println(getRegionCodeByLevel(null, 3));
+        System.out.println(getRegionCodeByLevel("", 3));
+    }
+
+    public String getRegionCodeByLevel(String areaCode, int level) {
+        Validate.isTrue(level >= 1 && level <= 3, "非法的地区级别: %s, 只支持1/2/3", level);
+        int codeLength = level * 2;
+        if (!StringUtils.isBlank(areaCode) && areaCode.length() >= codeLength) {
+            return StringUtils.rightPad(StringUtils.substring(areaCode, 0, codeLength), 6, "0");
+        }
+        return null;
     }
 
 }

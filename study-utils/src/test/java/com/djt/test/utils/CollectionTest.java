@@ -1,6 +1,7 @@
 package com.djt.test.utils;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.HashMultimap;
 import org.apache.commons.collections4.set.ListOrderedSet;
@@ -186,6 +187,23 @@ public class CollectionTest {
         if (i % 2 == 0) {
             throw new IllegalArgumentException("异常");
         }
+    }
+
+    @Test
+    public void testArrayUtil() {
+        Integer[] arr = {1, 2, 3};
+        System.out.println(ArrayUtil.containsAny(arr, 1));
+        System.out.println(ArrayUtil.containsAny(arr, 4));
+    }
+
+    @Test
+    public void testMapNull() {
+        Map<String, Integer> map = new HashMap<>();
+        map.put(null, 1);
+        map.put("A", 2);
+        System.out.println(map);
+        int sum = map.values().stream().mapToInt(x -> x).sum();
+        System.out.println(sum);
     }
 
 }

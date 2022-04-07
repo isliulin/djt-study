@@ -32,4 +32,13 @@ public class MathTest {
             }
         }
     }
+
+    @Test
+    public void test2() {
+        System.out.println(Math.floor(10.0 / 3));
+        System.out.println(Math.ceil(10.0 / 3));
+        System.out.println((long) Math.floor(10.0 / 3));
+        System.out.println(Math.floorDiv(10, 3));
+        System.out.println(Math.floorDiv(10, 4));
+    }
 }
