@@ -58,4 +58,10 @@ public class ToolsTest {
         AbsTools tools = new FileToKafka();
         tools.execute(null);
     }
+
+    @Test
+    public void testFlinkMetricsCollect() {
+        AbsTools tools = new FlinkMetricsCollect();
+        tools.execute(null);
+    }
 }
