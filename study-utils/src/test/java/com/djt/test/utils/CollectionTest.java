@@ -111,8 +111,10 @@ public class CollectionTest {
         multimap.put("A", 1);
         multimap.put("A", 2);
         multimap.put("A", 3);
+        multimap.put("A", 3);
         multimap.put("B", 4);
         multimap.put("B", 5);
+        multimap.put("B", 6);
         multimap.put("B", 6);
         System.out.println(multimap);
         multimap.get("A").remove(1);

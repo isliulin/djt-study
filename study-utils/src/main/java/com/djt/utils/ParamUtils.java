@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class ParamUtils {
 
+    public static final String UNDERLINE = "_";
 
     /**
      * 字段命名转换
@@ -21,7 +22,7 @@ public class ParamUtils {
      */
     public static String toLowerCamel(String attrName) {
         String newAttrName = attrName;
-        if (StringUtils.isNotBlank(newAttrName) && newAttrName.contains("_")) {
+        if (StringUtils.isNotBlank(newAttrName) && newAttrName.contains(UNDERLINE)) {
             newAttrName = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, newAttrName);
         }
         return newAttrName;
@@ -36,7 +37,7 @@ public class ParamUtils {
      */
     public static String toUpperUnderline(String attrName) {
         String newAttrName = attrName;
-        if (StringUtils.isNotBlank(newAttrName) && !newAttrName.contains("_")) {
+        if (StringUtils.isNotBlank(newAttrName) && !newAttrName.contains(UNDERLINE)) {
             newAttrName = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, newAttrName);
         }
         return newAttrName;

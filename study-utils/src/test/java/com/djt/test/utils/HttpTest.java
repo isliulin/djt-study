@@ -4,6 +4,7 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.http.HttpHost;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -112,8 +113,13 @@ public class HttpTest {
         String url = "http://172.20.6.6:26354/monitorException";
         String body = "{\"service_model\": \"XD\", \"exe_service\": \"azkaban\", \"err_msg\": \"测试-DJT-777\", \"alarm_level\": \"3\"}";
         String rep = HttpUtil.post(url, body);
-        cn.hutool.json.JSONObject json = new cn.hutool.json.JSONObject(rep,false);
+        cn.hutool.json.JSONObject json = new cn.hutool.json.JSONObject(rep, false);
         System.out.println(json);
+    }
+
+    @Test
+    public void testHttpHost() {
+        System.out.println(HttpHost.create("10.10.10.10:6666"));
     }
 
 }
