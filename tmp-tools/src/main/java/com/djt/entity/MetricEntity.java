@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class MetricEntity {
 
     @JSONField(name = "id")
-    private String key;
+    private String id;
 
     @JSONField(name = "value")
     private double value;

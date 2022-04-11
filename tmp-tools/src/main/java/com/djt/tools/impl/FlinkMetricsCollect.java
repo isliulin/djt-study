@@ -105,11 +105,11 @@ public class FlinkMetricsCollect extends AbsTools {
      */
     @Override
     public void doExecute(String[] args) {
+        long delay = PROPS.getLong("flink.delay.seconds", 10L);
         HashMultimap<String, String> opMetrics = getOpMetrics();
         HashMultimap<String, String> tmMetrics = getTmMetrics();
-        ScheduledThreadPoolExecutor executor = ThreadUtil.createScheduledExecutor(1);
-
         RestHighLevelClient esClient = EsUtils.getRestHighLevelClient(PROPS);
+        ScheduledThreadPoolExecutor executor = ThreadUtil.createScheduledExecutor(1);
         ScheduledFuture<?> future = executor.scheduleWithFixedDelay(() -> {
             try {
                 String indexSuffix = LocalDate.now().format(DatePattern.PURE_DATE_FORMATTER);
@@ -121,7 +121,7 @@ public class FlinkMetricsCollect extends AbsTools {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-        }, 0, 10, TimeUnit.SECONDS);
+        }, 0, delay, TimeUnit.SECONDS);
 
         try {
             future.get();
