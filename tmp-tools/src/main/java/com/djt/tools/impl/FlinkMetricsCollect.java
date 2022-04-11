@@ -75,7 +75,7 @@ public class FlinkMetricsCollect extends AbsTools {
     /**
      * 单次请求最大批次
      */
-    private static final int REQUEST_BATCH_SIZE = 10;
+    private static final int REQUEST_BATCH_SIZE = 100;
 
     /**
      * Flink任务信息
