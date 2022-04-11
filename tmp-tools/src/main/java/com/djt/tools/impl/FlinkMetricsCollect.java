@@ -163,7 +163,6 @@ public class FlinkMetricsCollect extends AbsTools {
         return metrics;
     }
 
-
     /**
      * 获取Flink任务整体信息
      *
