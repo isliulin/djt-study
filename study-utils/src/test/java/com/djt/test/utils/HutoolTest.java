@@ -17,6 +17,7 @@ import org.junit.Test;
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -142,6 +143,12 @@ public class HutoolTest {
         LocalDate end = LocalDate.parse("20220102", DatePattern.PURE_DATE_FORMATTER);
         Period period = LocalDateTimeUtil.betweenPeriod(start, end);
         System.out.println(period.getDays());
+    }
+
+    @Test
+    public void testDate2() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssZ");
+        System.out.println(ZonedDateTime.now().format(formatter));
     }
 
 

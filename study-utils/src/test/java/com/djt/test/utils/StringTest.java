@@ -7,6 +7,7 @@ import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONValidator;
+import com.djt.test.bean.Student;
 import com.djt.utils.ParamUtils;
 import com.google.common.base.Joiner;
 import org.apache.commons.lang3.StringUtils;
@@ -396,6 +397,19 @@ public class StringTest {
             return StringUtils.rightPad(StringUtils.substring(areaCode, 0, codeLength), 6, "0");
         }
         return null;
+    }
+
+
+    @Test
+    public void testJson5() {
+        String str = "{\n" +
+                "  \"key\": \"123\",\n" +
+                "  \"name\": \"张三\",\n" +
+                "  \"birth_place\": \"陕西\"\n" +
+                "}";
+        Student student = JSON.parseObject(str, Student.class);
+        System.out.println(student);
+        System.out.println(JSON.toJSONString(student));
     }
 
 }

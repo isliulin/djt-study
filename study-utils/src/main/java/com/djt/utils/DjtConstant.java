@@ -17,9 +17,8 @@ public interface DjtConstant {
 
     DateTimeFormatter YMDHMS_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     DateTimeFormatter YMDHMSS_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
-    DateTimeFormatter Y_M_D = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    DateTimeFormatter YMDHMSZ_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssZ");
     DateTimeFormatter YMD = DateTimeFormatter.ofPattern("yyyyMMdd");
-    DateTimeFormatter Y_M = DateTimeFormatter.ofPattern("yyyy-MM");
     DateTimeFormatter YM = DateTimeFormatter.ofPattern("yyyyMM");
     ZoneId ZONE_ID = ZoneId.systemDefault();
     ZoneOffset ZONE_OFFSET = OffsetDateTime.now().getOffset();
