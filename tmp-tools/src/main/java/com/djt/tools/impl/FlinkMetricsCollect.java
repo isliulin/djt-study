@@ -121,7 +121,7 @@ public class FlinkMetricsCollect extends AbsTools {
                 String esIndex = ES_INDEX_NAME + indexSuffix;
                 EsUtils.upsert(esClient, esIndex, ES_INDEX_TYPE, RequestOptions.DEFAULT, resultList);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                log.error("本次请求失败:", e);
             }
         }, 0, delay, TimeUnit.SECONDS);
 

@@ -1,10 +1,10 @@
 package com.djt.entity;
 
-import cn.hutool.core.date.DatePattern;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.djt.utils.DjtConstant;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * 监控信息
@@ -25,7 +25,7 @@ public class MetricEntity {
     private double value;
 
     @JSONField(name = "c_time")
-    private String cTime = LocalDateTime.now().format(DatePattern.NORM_DATETIME_FORMATTER);
+    private String cTime = ZonedDateTime.now().format(DjtConstant.YMDHMSZ_FORMAT);
 
     @JSONField(name = "batch_no")
     private long batchNo;
