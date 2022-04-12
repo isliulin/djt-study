@@ -112,10 +112,12 @@ public class FlinkMetricsCollect extends AbsTools {
         ScheduledThreadPoolExecutor executor = ThreadUtil.createScheduledExecutor(1);
         ScheduledFuture<?> future = executor.scheduleWithFixedDelay(() -> {
             try {
+                long batchNo = System.currentTimeMillis();
                 String indexSuffix = LocalDate.now().format(DatePattern.PURE_DATE_FORMATTER);
                 List<MetricEntity> resultList = new ArrayList<>();
                 resultList.addAll(queryMetrics(opMetrics, MetricType.OPERATOR));
                 resultList.addAll(queryMetrics(tmMetrics, MetricType.TASKMANAGER));
+                resultList.forEach(metricEntity -> metricEntity.setBatchNo(batchNo));
                 String esIndex = ES_INDEX_NAME + indexSuffix;
                 EsUtils.upsert(esClient, esIndex, ES_INDEX_TYPE, RequestOptions.DEFAULT, resultList);
             } catch (Exception e) {

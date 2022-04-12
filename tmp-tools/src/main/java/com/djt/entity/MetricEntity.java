@@ -15,12 +15,23 @@ import java.time.LocalDateTime;
 @Data
 public class MetricEntity {
 
-    @JSONField(name = "id")
-    private String id;
+    @JSONField(name = "group")
+    private String group;
+
+    @JSONField(name = "key")
+    private String key;
 
     @JSONField(name = "value")
     private double value;
 
     @JSONField(name = "c_time")
     private String cTime = LocalDateTime.now().format(DatePattern.NORM_DATETIME_FORMATTER);
+
+    @JSONField(name = "batch_no")
+    private long batchNo;
+
+    @JSONField(name = "id")
+    public void setKey(String key) {
+        this.key = key;
+    }
 }
