@@ -7,8 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
-import static com.djt.tools.impl.FlinkMetricsCollect.JOB_URL;
-import static com.djt.tools.impl.FlinkMetricsCollect.TM_URL;
+import static com.djt.tools.impl.FlinkMetricsCollect.*;
 
 /**
  * 监控类型
@@ -19,14 +18,19 @@ import static com.djt.tools.impl.FlinkMetricsCollect.TM_URL;
 public enum MetricType {
 
     /**
-     * 算子
+     * JM
      */
-    OPERATOR(JOB_URL + "/vertices/{0}/metrics?get={1}"),
+    JOBMANAGER(JM_URL + "/metrics?get={1}"),
 
     /**
      * TM
      */
-    TASKMANAGER(TM_URL + "/{0}/metrics?get={1}");
+    TASKMANAGER(TM_URL + "/{0}/metrics?get={1}"),
+
+    /**
+     * 算子
+     */
+    OPERATOR(JOB_URL + "/vertices/{0}/metrics?get={1}");
 
     /**
      * 请求URL
@@ -47,13 +51,17 @@ public enum MetricType {
         List<MetricEntity> resultList = JSON.parseArray(HttpUtil.get(StrUtil.indexedFormat(url, args)), MetricEntity.class);
         resultList.forEach(metricEntity -> {
             switch (this) {
-                case OPERATOR:
-                    metricEntity.setGroup(StringUtils.substringAfter(metricEntity.getKey(), "."));
-                    metricEntity.setKey(StringUtils.substringBefore(metricEntity.getKey(), "."));
+                case JOBMANAGER:
+                    metricEntity.setGroup("jobmanager#" + metricEntity.getKey());
+                    metricEntity.setKey(String.valueOf(args[0]));
                     break;
                 case TASKMANAGER:
-                    metricEntity.setGroup(metricEntity.getKey());
+                    metricEntity.setGroup("taskmanager#" + metricEntity.getKey());
                     metricEntity.setKey(String.valueOf(args[0]));
+                    break;
+                case OPERATOR:
+                    metricEntity.setGroup("operator#" + StringUtils.substringAfter(metricEntity.getKey(), "."));
+                    metricEntity.setKey(StringUtils.substringBefore(metricEntity.getKey(), "."));
                     break;
                 default:
                     break;

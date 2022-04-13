@@ -53,6 +53,11 @@ public class FlinkMetricsCollect extends AbsTools {
     public static final String JOB_URL = BASE_URL + "/jobs/00000000000000000000000000000000";
 
     /**
+     * JM信息URL
+     */
+    public static final String JM_URL = BASE_URL + "/jobmanager";
+
+    /**
      * TM信息URL
      */
     public static final String TM_URL = BASE_URL + "/taskmanagers";
@@ -63,14 +68,19 @@ public class FlinkMetricsCollect extends AbsTools {
     private static final Map<String, String> PREFIX_MAP = new HashMap<>();
 
     /**
-     * 算子监控指标
+     * jm监控指标
      */
-    private static final List<String> OP_METRIC_KEYS = new ArrayList<>();
+    private static final List<String> JM_METRIC_KEYS = new ArrayList<>();
 
     /**
      * tm监控指标
      */
     private static final List<String> TM_METRIC_KEYS = new ArrayList<>();
+
+    /**
+     * 算子监控指标
+     */
+    private static final List<String> OP_METRIC_KEYS = new ArrayList<>();
 
     /**
      * 单次请求最大批次
@@ -86,12 +96,13 @@ public class FlinkMetricsCollect extends AbsTools {
         PREFIX_MAP.put("Source__KafkaSource", "Source: KafkaSource");
         PREFIX_MAP.put("Sink__addSink_Kafka", "Sink: addSink_Kafka");
 
+        JM_METRIC_KEYS.add("Status.JVM.Memory.Heap.Used");
+        TM_METRIC_KEYS.add("Status.JVM.Memory.Heap.Used");
+
         OP_METRIC_KEYS.add("*.Source__KafkaSource.numRecordsOutPerSecond");
         OP_METRIC_KEYS.add("*.Source__KafkaSource.user.kafkaRecordsInToday");
         OP_METRIC_KEYS.add("*.Source__KafkaSource.user.kafkaRecordsInYesterday");
         OP_METRIC_KEYS.add("*.Sink__addSink_Kafka.user.statDelayMillis");
-
-        TM_METRIC_KEYS.add("Status.JVM.Memory.Heap.Used");
     }
 
     public FlinkMetricsCollect() {
@@ -106,8 +117,9 @@ public class FlinkMetricsCollect extends AbsTools {
     @Override
     public void doExecute(String[] args) {
         long delay = PROPS.getLong("flink.delay.seconds", 10L);
-        HashMultimap<String, String> opMetrics = getOpMetrics();
+        HashMultimap<String, String> jmMetrics = getJmMetrics();
         HashMultimap<String, String> tmMetrics = getTmMetrics();
+        HashMultimap<String, String> opMetrics = getOpMetrics();
         RestHighLevelClient esClient = EsUtils.getRestHighLevelClient(PROPS);
         ScheduledThreadPoolExecutor executor = ThreadUtil.createScheduledExecutor(1);
         ScheduledFuture<?> future = executor.scheduleWithFixedDelay(() -> {
@@ -115,8 +127,9 @@ public class FlinkMetricsCollect extends AbsTools {
                 long batchNo = System.currentTimeMillis();
                 String indexSuffix = LocalDate.now().format(DatePattern.PURE_DATE_FORMATTER);
                 List<MetricEntity> resultList = new ArrayList<>();
-                resultList.addAll(queryMetrics(opMetrics, MetricType.OPERATOR));
+                resultList.addAll(queryMetrics(jmMetrics, MetricType.JOBMANAGER));
                 resultList.addAll(queryMetrics(tmMetrics, MetricType.TASKMANAGER));
+                resultList.addAll(queryMetrics(opMetrics, MetricType.OPERATOR));
                 resultList.forEach(metricEntity -> metricEntity.setBatchNo(batchNo));
                 String esIndex = ES_INDEX_NAME + indexSuffix;
                 EsUtils.upsert(esClient, esIndex, ES_INDEX_TYPE, RequestOptions.DEFAULT, resultList);
@@ -130,6 +143,29 @@ public class FlinkMetricsCollect extends AbsTools {
         } catch (Exception e) {
             throw new RuntimeException("监控数据采集异常: ", e);
         }
+    }
+
+    /**
+     * 获取所有JM监控指标
+     *
+     * @return HashMultimap<String, String>
+     */
+    private HashMultimap<String, String> getJmMetrics() {
+        HashMultimap<String, String> metrics = HashMultimap.create();
+        JM_METRIC_KEYS.forEach(key -> metrics.put("", key));
+        return metrics;
+    }
+
+    /**
+     * 获取所有TM监控指标
+     *
+     * @return HashMultimap<String, String>
+     */
+    private HashMultimap<String, String> getTmMetrics() {
+        HashMultimap<String, String> metrics = HashMultimap.create();
+        Set<String> tmIds = flinkJob.getTaskmanagers().keySet();
+        TM_METRIC_KEYS.forEach(key -> tmIds.forEach(tm -> metrics.put(tm, key)));
+        return metrics;
     }
 
     /**
@@ -150,18 +186,6 @@ public class FlinkMetricsCollect extends AbsTools {
                 metrics.put(vertex.getId(), StringUtils.join(strArr, '.'));
             }
         });
-        return metrics;
-    }
-
-    /**
-     * 获取所有TM监控指标
-     *
-     * @return HashMultimap<String, String>
-     */
-    private HashMultimap<String, String> getTmMetrics() {
-        HashMultimap<String, String> metrics = HashMultimap.create();
-        Set<String> tmIds = flinkJob.getTaskmanagers().keySet();
-        TM_METRIC_KEYS.forEach(key -> tmIds.forEach(tm -> metrics.put(tm, key)));
         return metrics;
     }
 
@@ -202,8 +226,8 @@ public class FlinkMetricsCollect extends AbsTools {
             while (iter.hasNext()) {
                 tmpList.add(iter.next());
                 if (tmpList.size() >= REQUEST_BATCH_SIZE || !iter.hasNext()) {
-                    String metrics = StringUtils.join(tmpList, ',');
-                    metricEntityList.addAll(metricType.queryMetrics(id, metrics));
+                    String metric = StringUtils.join(tmpList, ',');
+                    metricEntityList.addAll(metricType.queryMetrics(id, metric));
                     tmpList.clear();
                 }
             }
