@@ -24,7 +24,7 @@ public class UtilsTest {
     @Test
     public void testProp() {
         System.out.println(PROPS.get("test.line"));
-        
+
     }
 
 }
