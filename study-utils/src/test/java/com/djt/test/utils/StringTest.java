@@ -412,4 +412,12 @@ public class StringTest {
         System.out.println(JSON.toJSONString(student));
     }
 
+    @Test
+    public void testReplace2() {
+        String str = "aaa\u0001bbb\u0002ccc";
+        System.out.println(str);
+        System.out.println(str.replaceAll("[\u0001,\u0002]", ""));
+    }
+
+
 }

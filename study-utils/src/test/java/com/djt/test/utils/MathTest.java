@@ -1,6 +1,11 @@
 package com.djt.test.utils;
 
+import cn.hutool.core.math.Calculator;
 import org.junit.Test;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 /**
  * @author 　djt317@qq.com
@@ -41,4 +46,42 @@ public class MathTest {
         System.out.println(Math.floorDiv(10, 3));
         System.out.println(Math.floorDiv(10, 4));
     }
+
+    @Test
+    public void test3() throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("js");
+
+        String str;
+        str = "100";
+        System.out.println(engine.eval(str));
+
+        str = "3*(2+3)";
+        System.out.println(engine.eval(str));
+
+        str = "3*2/(5-1)";
+        System.out.println(engine.eval(str));
+
+        str = "(3*2/(5-2)+1)%2";
+        System.out.println(engine.eval(str));
+    }
+
+    @Test
+    public void test4() {
+        String str;
+
+        str = "100";
+        System.out.println(Calculator.conversion(str));
+
+        str = "3*(2+3)";
+        System.out.println(Calculator.conversion(str));
+
+        str = "3*2/(5-2)";
+        System.out.println(Calculator.conversion(str));
+
+        str = "(3*2/(5-2)+1)%2";
+        System.out.println(Calculator.conversion(str));
+    }
+
+
 }
