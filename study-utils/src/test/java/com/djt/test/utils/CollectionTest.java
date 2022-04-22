@@ -2,8 +2,11 @@ package com.djt.test.utils;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.TreeMultiset;
+import org.apache.commons.collections4.list.TreeList;
 import org.apache.commons.collections4.set.ListOrderedSet;
 import org.junit.Test;
 
@@ -206,6 +209,32 @@ public class CollectionTest {
         System.out.println(map);
         int sum = map.values().stream().mapToInt(x -> x).sum();
         System.out.println(sum);
+    }
+
+    @Test
+    public void testTreeList() {
+        TreeList<String> treeList = new TreeList<>();
+        treeList.add("2");
+        treeList.add("3");
+        treeList.add("1");
+        System.out.println(treeList);
+        byte[] bytes = ObjectUtil.serialize(treeList);
+        treeList = ObjectUtil.deserialize(bytes);
+        System.out.println(treeList);
+    }
+
+    @Test
+    public void testTreeMultiset() {
+        Random random = new Random();
+        TreeMultiset<Integer> treeMultiset = TreeMultiset.create();
+        for (int i = 0; i < 30; i++) {
+            treeMultiset.add(random.nextInt(30));
+        }
+        System.out.println(treeMultiset);
+        //System.out.println(Arrays.toString(treeMultiset.toArray(new Integer[0])));
+        treeMultiset.setCount(3, 1);
+        System.out.println(treeMultiset);
+
     }
 
 }
