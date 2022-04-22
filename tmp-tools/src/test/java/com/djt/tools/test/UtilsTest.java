@@ -17,14 +17,13 @@ public class UtilsTest {
 
     @Test
     public void testReadFileToKafka() {
-        String file = "C:\\Users\\duanjiatao\\Desktop\\tmp\\testData\\order_txt_20220303";
+        String file = "C:\\Users\\duanjiatao\\Desktop\\tmp\\testData\\order_txt_20220303_sorted";
         MakeDataUtils.readFileToKafka(file, LocalDate.now(), 1000, "RISK_ANALYSIS_EVENT_TMP", PROPS, true);
     }
 
     @Test
     public void testProp() {
         System.out.println(PROPS.get("test.line"));
-
     }
 
 }
