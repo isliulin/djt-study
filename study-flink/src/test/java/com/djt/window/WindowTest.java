@@ -1,0 +1,100 @@
+package com.djt.window;
+
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.ObjectUtil;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Scanner;
+
+/**
+ * @author 　djt317@qq.com
+ * @since 　 2022-04-25
+ */
+public class WindowTest {
+
+    @Test
+    public void testDynamicTimeWindow() {
+        QueueTimeWindow<Integer> window = new QueueTimeWindow<>(5000, 2000);
+        long tms = System.currentTimeMillis();
+        for (int i = 0; i < 10; i++) {
+            System.out.println("==============================");
+            tms += 1000;
+            addAndPrint(window, tms, i);
+            ThreadUtil.sleep(1000);
+        }
+
+        System.out.println("==============================");
+        window.clear();
+        System.out.println(window);
+    }
+
+    @Test
+    public void testDynamicTimeWindow2() {
+        QueueTimeWindow<Integer> window = new QueueTimeWindow<>(5000, 2000);
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("==============================");
+            String inputStr = scanner.nextLine();
+            if (StringUtils.isBlank(inputStr)) {
+                System.err.println("无效输入!");
+                continue;
+            }
+            if ("exit".equalsIgnoreCase(inputStr)) {
+                System.out.println("程序结束.");
+                return;
+            }
+            String[] strArr = StringUtils.split(inputStr, ',');
+            if (ArrayUtils.isEmpty(strArr) || strArr.length != 2) {
+                System.err.println("无效输入!");
+                continue;
+            }
+            LocalDateTime dt;
+            long tms;
+            int v;
+            try {
+                dt = LocalDateTime.parse(strArr[0].trim(), DatePattern.NORM_DATETIME_FORMATTER);
+                tms = LocalDateTimeUtil.toEpochMilli(dt);
+                v = Integer.parseInt(strArr[1].trim());
+            } catch (Exception e) {
+                System.err.println("无效输入!");
+                continue;
+            }
+            addAndPrint(window, tms, v);
+            ThreadUtil.sleep(1000);
+        }
+    }
+
+    /**
+     * 添加并打印数据
+     *
+     * @param window    window
+     * @param timestamp timestamp
+     * @param v         v
+     * @param <V>       V
+     */
+    private <V extends Serializable> void addAndPrint(QueueTimeWindow<V> window, long timestamp, V v) {
+        String dt = LocalDateTimeUtil.of(timestamp).format(DatePattern.NORM_DATETIME_FORMATTER);
+        if (window.add(timestamp, v)) {
+            System.out.println("数据迟到:" + dt + ":" + v);
+        }
+        System.out.println("当前队列:" + window);
+        System.out.println("当前数据:" + window.getResult());
+    }
+
+    @Test
+    public void testSerialize() {
+        QueueTimeWindow<Integer> window = new QueueTimeWindow<>(5000, 2000);
+        window.add(System.currentTimeMillis(), 1);
+        System.out.println(window);
+        byte[] windowBytes = ObjectUtil.serialize(window);
+        window = ObjectUtil.deserialize(windowBytes);
+        System.out.println(window);
+    }
+
+}
