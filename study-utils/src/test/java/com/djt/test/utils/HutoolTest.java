@@ -1,6 +1,7 @@
 package com.djt.test.utils;
 
 import cn.hutool.Hutool;
+import cn.hutool.core.comparator.CompareUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.UUID;
@@ -149,6 +150,13 @@ public class HutoolTest {
     public void testDate2() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssZ");
         System.out.println(ZonedDateTime.now().format(formatter));
+    }
+
+    @Test
+    public void testCompareUtil() {
+        Long a = null;
+        Long b = null;
+        System.out.println(CompareUtil.compare(a, b));
     }
 
 

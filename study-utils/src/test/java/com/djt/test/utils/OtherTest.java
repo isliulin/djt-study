@@ -1,10 +1,12 @@
 package com.djt.test.utils;
 
 import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.StrUtil;
 import com.djt.utils.DjtConstant;
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -104,5 +106,26 @@ public class OtherTest {
     @Test
     public void test8() {
         System.out.println(Long.MAX_VALUE);
+    }
+
+    @Test
+    public void test9() {
+        LocalDateTime time1 = LocalDateTime.now();
+        LocalDateTime time2 = time1.plusSeconds(1);
+        System.out.println(time1.isBefore(time2));
+        System.out.println(time1.isAfter(time2));
+        System.out.println(LocalDateTimeUtil.between(time1, time2, ChronoUnit.SECONDS));
+        System.out.println(LocalDateTimeUtil.between(time2, time1, ChronoUnit.SECONDS));
+    }
+
+    @Test
+    public void test10() {
+        //System.out.println((double) 0.1+(double)0.1+(double)0.1);
+
+        BigDecimal a = new BigDecimal("0.1");
+        BigDecimal b = new BigDecimal("0.1");
+        BigDecimal c = new BigDecimal("0.1");
+        System.out.println(a.add(b).add(c).doubleValue());
+
     }
 }
