@@ -1,15 +1,22 @@
 package com.djt.window;
 
+import cn.hutool.core.comparator.CompareUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.flink.api.java.tuple.Tuple1;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.junit.Test;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.Scanner;
 
 /**
@@ -95,6 +102,35 @@ public class WindowTest {
         byte[] windowBytes = ObjectUtil.serialize(window);
         window = ObjectUtil.deserialize(windowBytes);
         System.out.println(window);
+    }
+
+    @Test
+    public void testTupleComparator() {
+        TupleComparator<Tuple1<Integer>> tuple1TupleComparator = new TupleComparator<>(0);
+        System.out.println(tuple1TupleComparator.compare(Tuple1.of(1), Tuple1.of(2)));
+
+        TupleComparator<Tuple2<Integer, Integer>> tuple2TupleComparator = new TupleComparator<>(0);
+        System.out.println(tuple2TupleComparator.compare(Tuple2.of(1, 2), Tuple2.of(2, 3)));
+
+        tuple2TupleComparator = new TupleComparator<>(2);
+        try {
+            System.out.println(tuple2TupleComparator.compare(Tuple2.of(1, 2), Tuple2.of(2, 3)));
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+
+        TupleComparator<Tuple3<JSONObject, Integer, Integer>> tuple3TupleComparator = new TupleComparator<>(0);
+        try {
+            System.out.println(tuple3TupleComparator.compare(Tuple3.of(new JSONObject(), 1, 2), Tuple3.of(new JSONObject(), 2, 3)));
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+
+        Comparator<JSONObject> comparator = (o1, o2) -> CompareUtil.compare(o1.getInteger("a"), o2.getInteger("a"));
+        tuple3TupleComparator = new TupleComparator<>(0, comparator);
+        System.out.println(tuple3TupleComparator.compare(Tuple3.of(JSON.parseObject("{\"a\":1}"), 1, 2),
+                Tuple3.of(JSON.parseObject("{\"a\":2}"), 2, 3)));
+
     }
 
 }

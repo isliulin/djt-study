@@ -1,6 +1,5 @@
 package com.djt.window;
 
-import cn.hutool.core.comparator.CompareUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import org.apache.commons.lang3.Validate;
@@ -8,7 +7,6 @@ import org.apache.flink.api.java.tuple.Tuple2;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -50,7 +48,7 @@ public class QueueTimeWindow<V extends Serializable> implements Serializable {
         Validate.isTrue(maxOutOfOrderMillis >= 0, "maxOutOfOrderMillis 不能为负数！");
         this.keepLatestMillis = keepLatestMillis;
         this.maxOutOfOrderMillis = maxOutOfOrderMillis;
-        queue = new PriorityQueue<>(1, new Tuple2Comparator<>());
+        queue = new PriorityQueue<>(1, new TupleComparator<>(0));
     }
 
     /**
@@ -80,7 +78,7 @@ public class QueueTimeWindow<V extends Serializable> implements Serializable {
 
     /**
      * 获取最新数据结果
-     * 取数范围为: currentTimestamp - keepLatestMillis ~ currentTimestamp
+     * 取数范围为: [currentTimestamp - keepLatestMillis , currentTimestamp]
      *
      * @return List<V>
      */
@@ -151,16 +149,4 @@ public class QueueTimeWindow<V extends Serializable> implements Serializable {
         return sb.toString();
     }
 
-    /**
-     * 序列化的比较器
-     *
-     * @param <T0> f0类型
-     * @param <T1> f1类型
-     */
-    private static class Tuple2Comparator<T0 extends Comparable<T0>, T1> implements Comparator<Tuple2<T0, T1>>, Serializable {
-        @Override
-        public int compare(Tuple2<T0, T1> o1, Tuple2<T0, T1> o2) {
-            return CompareUtil.compare(o1.f0, o2.f0);
-        }
-    }
 }
