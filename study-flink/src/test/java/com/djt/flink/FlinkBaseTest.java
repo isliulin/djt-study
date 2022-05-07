@@ -7,11 +7,12 @@ import com.djt.utils.ConfigConstants;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.RestOptions;
-import org.apache.flink.contrib.streaming.state.EmbeddedRocksDBStateBackend;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.source.SocketTextStreamFunction;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.connectors.kafka.internals.KafkaTopicPartition;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -42,7 +43,7 @@ public class FlinkBaseTest {
         streamEnv.getConfig().setAutoWatermarkInterval(ConfigConstants.flinkWatermarkInterval());
 
         //streamEnv.setStateBackend(new FsStateBackend(ConfigConstants.flinkCheckpointPath()));
-        streamEnv.setStateBackend(new EmbeddedRocksDBStateBackend(true));
+        //streamEnv.setStateBackend(new EmbeddedRocksDBStateBackend(true));
 
         CheckpointConfig checkpointConfig = streamEnv.getCheckpointConfig();
         checkpointConfig.enableUnalignedCheckpoints();
@@ -120,6 +121,14 @@ public class FlinkBaseTest {
         }
 
         streamEnv.execute("testKafkaSource2");
+    }
+
+    @Test
+    public void testSocketSource() throws Exception {
+        DataStreamSource<String> streamSource = streamEnv.addSource(
+                new SocketTextStreamFunction("172.20.20.183", 10385, "\n", 10));
+        streamSource.print().setParallelism(1);
+        streamEnv.execute("testSocketSource");
     }
 
 }
